@@ -1,0 +1,2 @@
+C:/Projetos/gpsmobileapp/gpsmobileapp/android/app/.cxx/Debug/33701c4g/x86/CMakeFiles/edit_cache.dir
+C:/Projetos/gpsmobileapp/gpsmobileapp/android/app/.cxx/Debug/33701c4g/x86/CMakeFiles/rebuild_cache.dir

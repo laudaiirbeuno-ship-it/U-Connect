@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "627469085868",
+    "project_id": "u-connect-app",
+    "storage_bucket": "u-connect-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:627469085868:android:7952698dfe560aba490309",
+        "android_client_info": {
+          "package_name": "com.uconnect.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBEIXovu5vxgZKCSzkmdzcqB14XVm1cxrs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

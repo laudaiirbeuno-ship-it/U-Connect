@@ -1,0 +1,20 @@
+{
+  "buildFiles": [
+    "C:\\Users\\Micro\\AppData\\Local\\flutter\\packages\\flutter_tools\\gradle\\src\\main\\groovy\\CMakeLists.txt"
+  ],
+  "cleanCommandsComponents": [
+    [
+      "C:\\Users\\Micro\\AppData\\Local\\Android\\Sdk\\cmake\\3.22.1\\bin\\ninja.exe",
+      "-C",
+      "C:\\Projects\\GPS Wox\\Mobile\\gpsmobileapp\\gpsmobileapp\\android\\app\\.cxx\\RelWithDebInfo\\3h51415o\\armeabi-v7a",
+      "clean"
+    ]
+  ],
+  "buildTargetsCommandComponents": [
+    "C:\\Users\\Micro\\AppData\\Local\\Android\\Sdk\\cmake\\3.22.1\\bin\\ninja.exe",
+    "-C",
+    "C:\\Projects\\GPS Wox\\Mobile\\gpsmobileapp\\gpsmobileapp\\android\\app\\.cxx\\RelWithDebInfo\\3h51415o\\armeabi-v7a",
+    "{LIST_OF_TARGETS_TO_BUILD}"
+  ],
+  "libraries": {}
+}
