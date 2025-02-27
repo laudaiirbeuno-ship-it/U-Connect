@@ -85,19 +85,6 @@ class _MyHomePageState extends State<MyHomePage> {
     checkPreference();
     LocalNotificationService.initialize(context);
 
-    // Solicitar permissão para notificações
-    // if (Platform.isIOS) {
-    //   FirebaseMessaging.instance.requestPermission().then((settings) {
-    //     if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-    //       print('User  granted permission');
-    //     } else if (settings.authorizationStatus == AuthorizationStatus.provisional) {
-    //       print('User  granted provisional permission');
-    //     } else {
-    //       print('User  declined or has not accepted permission');
-    //     }
-    //   });
-    // }
-
     FirebaseMessaging.instance.requestPermission().then((settings) {
       if (settings.authorizationStatus == AuthorizationStatus.authorized) {
         print('User  granted permission');
@@ -117,11 +104,7 @@ class _MyHomePageState extends State<MyHomePage> {
     });
 
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      if (message.notification != null) {
-        print(message.notification!.body);
-        print(message.notification!.title);
-        LocalNotificationService.display(message); // Adicione esta linha
-      }
+      LocalNotificationService.display(message);      
     });
 
     FirebaseMessaging.onMessageOpenedApp.listen((message) {
@@ -139,7 +122,7 @@ class _MyHomePageState extends State<MyHomePage> {
     if (prefs!.get('baseurlall') != null) {
       StaticVarMethod.baseurlall = prefs!.get('baseurlall').toString();
     } else {
-      StaticVarMethod.baseurlall = "http://173.249.6.87";
+      StaticVarMethod.baseurlall = "https://web.unnicatelemetria.com.br";
     }
 
     if (prefs!.get('email') != null) {
@@ -152,9 +135,7 @@ class _MyHomePageState extends State<MyHomePage> {
       Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (context) => (StaticVarMethod.signinpage == 1)
-                ? signinwithbackground1()
-                : signinwithbackground2()),
+            builder: (context) => signinwithbackground2()),
       );
     }
   }
@@ -180,18 +161,14 @@ class _MyHomePageState extends State<MyHomePage> {
           Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => (StaticVarMethod.signinpage == 1)
-                    ? signinwithbackground1()
-                    : signinwithbackground2()),
+                builder: (context) => signinwithbackground2()),
           );
         }
       } else {
         Navigator.push(
           context,
           MaterialPageRoute(
-              builder: (context) => (StaticVarMethod.signinpage == 1)
-                  ? signinwithbackground1()
-                  : signinwithbackground2()),
+              builder: (context) => signinwithbackground2()),
         );
       }
     });
