@@ -25,9 +25,6 @@ import 'storage/user_repository.dart';
 import '../../bottom_navigation/bottom_navigation_01.dart';
 
 Future<void> backgroundHandler(RemoteMessage message) async {
-  print(message.data.toString());
-  print(message.notification!.title);
-  print("AQUI 2");
   LocalNotificationService.display(message);
 }
 
