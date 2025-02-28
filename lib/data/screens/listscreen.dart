@@ -9,31 +9,17 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:jiffy/jiffy.dart';
-import 'package:maktrogps/bloc/kmandfuelhistory/bloc/kmandfuelhistory_bloc.dart';
 import 'package:maktrogps/config/constant.dart';
 import 'package:maktrogps/config/static.dart';
 import 'package:maktrogps/data/datasources.dart';
 import 'package:maktrogps/data/model/devices.dart';
 import 'package:maktrogps/data/model/history.dart';
-import 'package:maktrogps/data/model/loginModel.dart';
-import 'package:maktrogps/data/model/product_model.dart';
-import 'package:maktrogps/data/screens/historyscreen.dart';
-import 'package:maktrogps/data/screens/livetrackoriginal.dart';
-import 'package:maktrogps/data/screens/mainmapscreenoriginal.dart';
-import 'package:maktrogps/data/screens/notificationscreen.dart';
-import 'package:maktrogps/data/screens/optionsscreen/alloptions.dart';
-import 'package:maktrogps/data/screens/playback.dart';
-import 'package:maktrogps/data/screens/playbackscreen.dart';
+
 import 'package:maktrogps/data/screens/playbackselection.dart';
 import 'package:maktrogps/data/screens/reports/reportselection.dart';
-import 'package:maktrogps/data/screens/reports/vehicle_info.dart';
-import 'package:maktrogps/data/screens/task/tasks.dart';
-import 'package:maktrogps/data/screens/testscreens/livelocation.dart';
-import 'package:maktrogps/data/screens/trip/tripinfoselectionscreen.dart';
+
 import 'package:maktrogps/data/screens/vehicle_dasboard.dart';
-import 'package:maktrogps/mapconfig/CustomColor.dart';
-import 'package:maktrogps/ui/reusable/cache_image_network.dart';
+
 import 'package:maktrogps/ui/reusable/global_function.dart';
 import 'package:maktrogps/ui/reusable/global_widget.dart';
 import 'package:maktrogps/ui/reusable/shimmer_loading.dart';
@@ -46,11 +32,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../config/Session.dart';
 import '../../mvvm/view_model/objects.dart';
-import '../../utils/MapUtils.dart';
 import 'LiveMapScreen/LiveMapScreen.dart';
-import 'commands/CommandWindow.dart';
-import 'livetrack.dart';
-import 'lockscreen.dart';
 
 import 'lockscreenNew.dart';
 import 'reports/kmdetail.dart';
@@ -65,10 +47,11 @@ class _listscreen extends State<listscreen>
   // initialize global function and global widget
   final _globalFunction = GlobalFunction();
   final _globalWidget = GlobalWidget();
+
   final _shimmerLoading = ShimmerLoading();
   final ItemScrollController itemScrollController = ItemScrollController();
   final ItemPositionsListener itemPositionsListener =
-      ItemPositionsListener.create();
+  ItemPositionsListener.create();
 
   final _scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -80,9 +63,13 @@ class _listscreen extends State<listscreen>
   final Completer<GoogleMapController> _mapController = Completer();
   Set<Marker> markers = new Set();
 
+  Color primaryColor = Color(0xff0540ac);
+  Color secondaryColor = Color(0xFF050A30);
+
   Color _color1 = Color(0xff777777);
   Color _color2 = Color(0xFF515151);
   Color _topSearchColor = Colors.white;
+
   List<deviceItems> _vehiclesData = [];
   List<deviceItems> _vehiclesData_sorted = [];
   List<deviceItems> _vehiclesData_duplicate = [];
@@ -207,9 +194,9 @@ class _listscreen extends State<listscreen>
             }
           } else {
             if (model.name.toString().toLowerCase().contains(filtertext
-                    .toLowerCase()) /*||
+                .toLowerCase()) /*||
                   model.devicedata!.first.imei!.contains(query.toLowerCase())*/
-                ) {
+            ) {
               _vehiclesData_duplicate.add(_vehiclesData_sorted.elementAt(i));
               print('item exists');
             }
@@ -276,94 +263,97 @@ class _listscreen extends State<listscreen>
 
     return Scaffold(
       key: _scaffoldKey,
-      backgroundColor: Colors.white,
+      backgroundColor: secondaryColor,
       appBar: AppBar(
         automaticallyImplyLeading: false,
         elevation: 0,
         title: (_searchEnabled)
             ? Container(
-                child: TextFormField(
-                  controller: _etSearch,
-                  style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.grey.shade800 /*Colors.white*/),
-                  onChanged: (value) {
-                    setState(() {
-                      print('text changed');
-                      if (value.isNotEmpty) {
-                        filterSearchResults(value);
-                      } else {
-                        _vehiclesData.clear();
-                        filtertext = "All";
-                        // setState(() {
-                        //_getData();
-                        print("full list");
-                        //  });
-                      }
-                    });
-                  },
-                  decoration: InputDecoration(
-                    fillColor: Colors.transparent,
-                    filled: true,
-                    hintText: 'Enter device name or IMEI',
-                    hintStyle: TextStyle(
-                        fontSize: 16,
-                        color: Colors.grey.shade800 /*Colors.white*/),
-                    prefixIcon: Icon(Icons.search,
-                        color: Colors.black /*Colors.white*/, size: 18),
-                    suffixIcon: (_etSearch.text == '')
-                        ? null
-                        : GestureDetector(
-                            onTap: () {
-                              filtertext = "All";
-                              //setState(() {
-                              //_getData();
-                              _etSearch = TextEditingController(text: '');
-                              _searchEnabled =
-                                  _searchEnabled == false ? true : false;
-                              //  });
-                            },
-                            child: Icon(Icons.close,
-                                color: Colors.grey[500], size: 16)),
-                    focusedBorder: UnderlineInputBorder(
+                  child: TextFormField(
+                    controller: _etSearch,
+                    style: TextStyle(fontSize: 16, color: Colors.white),
+                    onChanged: (value) {
+                      setState(() {
+                        print('text changed');
+                        if (value.isNotEmpty) {
+                          filterSearchResults(value);
+                        } else {
+                          _vehiclesData.clear();
+                          filtertext = "All";
+                          print("full list");
+                        }
+                      });
+                    },
+                    decoration: InputDecoration(
+                      fillColor: Colors.transparent,
+                      filled: true,
+                      hintText: 'Nome do rastreador, imei...',
+                      hintStyle: TextStyle(
+                          fontSize: 16,
+                          color: Colors.white
+                      ),
+                      prefixIcon: Icon(
+                          Icons.search,
+                          color: Colors.white, size: 18
+                      ),
+                      suffixIcon: (_etSearch.text == '')
+                          ? null
+                          : GestureDetector(
+                          onTap: () {
+                            filtertext = "All";
+                            //setState(() {
+                            //_getData();
+                            _etSearch = TextEditingController(text: '');
+                            _searchEnabled =
+                            _searchEnabled == false ? true : false;
+                            //  });
+                          },
+                          child: Icon(Icons.close,
+                              color: Colors.grey[500], size: 16)),
+                      focusedBorder: UnderlineInputBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(5.0)),
+                          borderSide: BorderSide(color: Colors.grey[200]!)),
+                      enabledBorder: UnderlineInputBorder(
                         borderRadius: BorderRadius.all(Radius.circular(5.0)),
-                        borderSide: BorderSide(color: Colors.grey[200]!)),
-                    enabledBorder: UnderlineInputBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(5.0)),
-                      borderSide: BorderSide(color: Colors.grey[200]!),
+                        borderSide: BorderSide(color: Colors.grey[200]!),
+                      ),
                     ),
                   ),
-                ),
-              )
+                )
             : Text(
-                'Veículos',
-                style: TextStyle(
-                  color: Colors.black,
-                ),
-              ),
-        // backgroundColor: themeDark,
-        backgroundColor: Colors.grey.shade300,
+          'Veículos',
+          style: TextStyle(
+            color: Colors.white,
+          ),
+        ),
+        backgroundColor: primaryColor,
         bottom: PreferredSize(
           child: Container(
               decoration: BoxDecoration(
                   border: Border(
                       bottom: BorderSide(
-                    color: Colors.white,
-                    width: 1.0,
-                  )),
-                  color: Colors.white),
+                        color: secondaryColor,
+                        width: 1.0,
+                      )),
+                  color: secondaryColor
+              ),
               padding: EdgeInsets.fromLTRB(5, 10, 10, 0),
               height: 120,
               child: ListView(
                 padding: EdgeInsets.all(10),
                 children: [
-                  Text("Filtrar"),
+                  Text(
+                      "Filtrar",
+                    style: TextStyle(
+                      color: Colors.white
+                    ),
+                  ),
                   DropdownButton<String>(
                     isExpanded: true,
                     value: filterSelected,
                     elevation: 16,
-                    style: const TextStyle(color: Colors.black),
-                    underline: Container(height: 1, color: Colors.grey),
+                    style: const TextStyle(color: Colors.white),
+                    underline: Container(height: 1, color: Colors.white),
                     onChanged: (String? value) {
                       setState(() {
                         filterSelected = value; // Atualiza o valor selecionado
@@ -382,27 +372,47 @@ class _listscreen extends State<listscreen>
                         }
                       });
                     },
-                    items: carstatusList.map<DropdownMenuItem<String>>((String value) {
+                    items: carstatusList
+                        .map<DropdownMenuItem<String>>((String value) {
                       String txtVal = "";
 
                       // Define o texto a ser exibido no dropdown
                       if (value == "All Vehicle") {
-                        txtVal = getTranslated(context, 'all')! + " (" + _vehiclesData.length.toString() + ")";
+                        txtVal = getTranslated(context, 'all')! +
+                            " (" +
+                            _vehiclesData.length.toString() +
+                            ")";
                       } else if (value == "Running") {
-                        txtVal = getTranslated(context, 'running')! + " (" + _runningVehicles.length.toString() + ")";
+                        txtVal = getTranslated(context, 'running')! +
+                            " (" +
+                            _runningVehicles.length.toString() +
+                            ")";
                       } else if (value == "Stopped") {
-                        txtVal = getTranslated(context, 'stopped')! + " (" + _stoppedVehicles.length.toString() + ")";
+                        txtVal = getTranslated(context, 'stopped')! +
+                            " (" +
+                            _stoppedVehicles.length.toString() +
+                            ")";
                       } else if (value == "Idle") {
-                        txtVal = getTranslated(context, 'idle')! + " (" + _idleVehicles.length.toString() + ")";
+                        txtVal = getTranslated(context, 'idle')! +
+                            " (" +
+                            _idleVehicles.length.toString() +
+                            ")";
                       } else if (value == "In Active") {
-                        txtVal = getTranslated(context, 'offline')! + " (" + _inactiveVehicles.length.toString() + ")";
+                        txtVal = getTranslated(context, 'offline')! +
+                            " (" +
+                            _inactiveVehicles.length.toString() +
+                            ")";
                       } else if (value == "Expired") {
-                        txtVal = getTranslated(context, 'noData')! + " (" + _noDataVehicles.length.toString() + ")";
+                        txtVal = getTranslated(context, 'noData')! +
+                            " (" +
+                            _noDataVehicles.length.toString() +
+                            ")";
                       }
 
                       // Retorna o DropdownMenuItem com o valor correto
                       return DropdownMenuItem<String>(
-                        value: value, // O valor que será atribuído a filterSelected
+                        value: value,
+                        // O valor que será atribuído a filterSelected
                         child: Text(txtVal), // O texto a ser exibido
                       );
                     }).toList(),
@@ -415,7 +425,7 @@ class _listscreen extends State<listscreen>
           IconButton(
               icon: Icon(
                 (_searchEnabled) ? Icons.clear_rounded : Icons.search,
-                color: Colors.grey.shade800 /*Colors.white*/,
+                color: Colors.white /*Colors.white*/,
                 size: 26,
               ),
               onPressed: () {
@@ -491,7 +501,6 @@ class _listscreen extends State<listscreen>
           }
         }
       }
-
     } else {
       if (query == "All") {
         _vehiclesData_duplicate.addAll(_vehiclesData_sorted);
@@ -534,7 +543,7 @@ class _listscreen extends State<listscreen>
       final startIndex = other.indexOf(start);
       final endIndex = other.indexOf(end, startIndex + start.length);
       int hours =
-          int.parse(other.substring(startIndex + start.length, endIndex));
+      int.parse(other.substring(startIndex + start.length, endIndex));
       enginehours = (hours / 3600).toStringAsFixed(2);
     }
     if (other.contains("<sat>")) {
@@ -550,7 +559,7 @@ class _listscreen extends State<listscreen>
       final startIndex = other.indexOf(start);
       final endIndex = other.indexOf(end, startIndex + start.length);
       double dis =
-          double.parse(other.substring(startIndex + start.length, endIndex));
+      double.parse(other.substring(startIndex + start.length, endIndex));
       totaldistance = (dis / 1000).toStringAsFixed(2);
       // totaldistance = other.substring(startIndex + start.length, endIndex);
     }
@@ -568,56 +577,56 @@ class _listscreen extends State<listscreen>
       devicestatus = "Not connected";
       statuscolor = Colors.blue;
       if (StaticVarMethod.pref_static!
-              .get(productData.deviceData!.imei.toString()) !=
+          .get(productData.deviceData!.imei.toString()) !=
           null)
         iconpath =
-            "assets/tbtrack/${StaticVarMethod.pref_static!.get(productData.deviceData!.imei.toString())}sideinactive.png";
+        "assets/tbtrack/${StaticVarMethod.pref_static!.get(productData.deviceData!.imei.toString())}sideinactive.png";
     } else if (productData.speed!.toInt() > 0) {
       iconpath = 'assets/tbtrack/car_siderunning.png';
       devicestatus = "Moving";
       statuscolor = Colors.green;
       if (StaticVarMethod.pref_static!
-              .get(productData.deviceData!.imei.toString()) !=
+          .get(productData.deviceData!.imei.toString()) !=
           null)
         iconpath =
-            "assets/tbtrack/${StaticVarMethod.pref_static!.get(productData.deviceData!.imei.toString())}siderunning.png";
+        "assets/tbtrack/${StaticVarMethod.pref_static!.get(productData.deviceData!.imei.toString())}siderunning.png";
     } else if (productData.online!.contains('engine')) {
       iconpath = 'assets/tbtrack/car_sideidle.png';
       devicestatus = "Idle";
       statuscolor = Colors.yellow;
       if (StaticVarMethod.pref_static!
-              .get(productData.deviceData!.imei.toString()) !=
+          .get(productData.deviceData!.imei.toString()) !=
           null)
         iconpath =
-            "assets/tbtrack/${StaticVarMethod.pref_static!.get(productData.deviceData!.imei.toString())}sideidle.png";
+        "assets/tbtrack/${StaticVarMethod.pref_static!.get(productData.deviceData!.imei.toString())}sideidle.png";
     } else if (productData.online!.contains('online')) {
       iconpath = 'assets/tbtrack/car_siderunning.png';
       devicestatus = "Online";
       statuscolor = Colors.green;
       if (StaticVarMethod.pref_static!
-              .get(productData.deviceData!.imei.toString()) !=
+          .get(productData.deviceData!.imei.toString()) !=
           null)
         iconpath =
-            "assets/tbtrack/${StaticVarMethod.pref_static!.get(productData.deviceData!.imei.toString())}siderunning.png";
+        "assets/tbtrack/${StaticVarMethod.pref_static!.get(productData.deviceData!.imei.toString())}siderunning.png";
     } else if (productData.online!.contains('ack')) {
       iconpath = 'assets/tbtrack/car_sidestop.png';
       statuscolor = Colors.red;
 
       devicestatus = "Stopped";
       if (StaticVarMethod.pref_static!
-              .get(productData.deviceData!.imei.toString()) !=
+          .get(productData.deviceData!.imei.toString()) !=
           null)
         iconpath =
-            "assets/tbtrack/${StaticVarMethod.pref_static!.get(productData.deviceData!.imei.toString())}sidestop.png";
+        "assets/tbtrack/${StaticVarMethod.pref_static!.get(productData.deviceData!.imei.toString())}sidestop.png";
     } else {
       iconpath = 'assets/tbtrack/car_sideinactive.png';
       devicestatus = "Not connected";
       statuscolor = Colors.blue;
       if (StaticVarMethod.pref_static!
-              .get(productData.deviceData!.imei.toString()) !=
+          .get(productData.deviceData!.imei.toString()) !=
           null)
         iconpath =
-            "assets/tbtrack/${StaticVarMethod.pref_static!.get(productData.deviceData!.imei.toString())}sideinactive.png";
+        "assets/tbtrack/${StaticVarMethod.pref_static!.get(productData.deviceData!.imei.toString())}sideinactive.png";
     }
 
     return GestureDetector(
@@ -637,7 +646,7 @@ class _listscreen extends State<listscreen>
             backgroundColor: Colors.transparent,
             builder: (BuildContext context) {
               return Container(
-                  //color: Colors.transparent,
+                //color: Colors.transparent,
                   height: MediaQuery.of(context).size.height / 1.6,
                   child: _showDeliveryPopup());
             },
@@ -723,7 +732,7 @@ class _listscreen extends State<listscreen>
                                       //color:Colors.yellowAccent,
                                       child: Column(
                                           crossAxisAlignment:
-                                              CrossAxisAlignment.start,
+                                          CrossAxisAlignment.start,
                                           children: [
                                             Container(
                                               margin: const EdgeInsets.fromLTRB(
@@ -797,12 +806,12 @@ class _listscreen extends State<listscreen>
                                       // color:Colors.white,
                                       child: Column(
                                           crossAxisAlignment:
-                                              CrossAxisAlignment.start,
+                                          CrossAxisAlignment.start,
                                           children: [
                                             Container(
                                               padding:
-                                                  const EdgeInsets.fromLTRB(
-                                                      0, 15, 0, 0),
+                                              const EdgeInsets.fromLTRB(
+                                                  0, 15, 0, 0),
                                               child: Image.asset(
                                                   "assets/tbtrack/fillcircle.png",
                                                   height: 6,
@@ -811,8 +820,8 @@ class _listscreen extends State<listscreen>
                                             ),
                                             Container(
                                               padding:
-                                                  const EdgeInsets.fromLTRB(
-                                                      2, 2, 0, 0),
+                                              const EdgeInsets.fromLTRB(
+                                                  2, 2, 0, 0),
                                               child: Image.asset(
                                                   "assets/tbtrack/ellipse.png",
                                                   height: 2.5,
@@ -821,8 +830,8 @@ class _listscreen extends State<listscreen>
                                             ),
                                             Container(
                                               padding:
-                                                  const EdgeInsets.fromLTRB(
-                                                      2, 2, 0, 0),
+                                              const EdgeInsets.fromLTRB(
+                                                  2, 2, 0, 0),
                                               child: Image.asset(
                                                   "assets/tbtrack/ellipse.png",
                                                   height: 2.5,
@@ -831,8 +840,8 @@ class _listscreen extends State<listscreen>
                                             ),
                                             Container(
                                               padding:
-                                                  const EdgeInsets.fromLTRB(
-                                                      2, 2, 0, 0),
+                                              const EdgeInsets.fromLTRB(
+                                                  2, 2, 0, 0),
                                               child: Image.asset(
                                                   "assets/tbtrack/ellipse.png",
                                                   height: 2.5,
@@ -841,8 +850,8 @@ class _listscreen extends State<listscreen>
                                             ),
                                             Container(
                                               padding:
-                                                  const EdgeInsets.fromLTRB(
-                                                      2, 2, 0, 0),
+                                              const EdgeInsets.fromLTRB(
+                                                  2, 2, 0, 0),
                                               child: Image.asset(
                                                   "assets/tbtrack/ellipse.png",
                                                   height: 2.5,
@@ -851,8 +860,8 @@ class _listscreen extends State<listscreen>
                                             ),
                                             Container(
                                               padding:
-                                                  const EdgeInsets.fromLTRB(
-                                                      2, 2, 0, 3),
+                                              const EdgeInsets.fromLTRB(
+                                                  2, 2, 0, 3),
                                               child: Image.asset(
                                                   "assets/tbtrack/ellipse.png",
                                                   height: 2.5,
@@ -866,8 +875,8 @@ class _listscreen extends State<listscreen>
                                                 color: Color(0xffE83F82)),
                                             Container(
                                               padding:
-                                                  const EdgeInsets.fromLTRB(
-                                                      2, 1, 0, 0),
+                                              const EdgeInsets.fromLTRB(
+                                                  2, 1, 0, 0),
                                               child: Image.asset(
                                                   "assets/tbtrack/ellipse.png",
                                                   height: 2.5,
@@ -876,8 +885,8 @@ class _listscreen extends State<listscreen>
                                             ),
                                             Container(
                                               padding:
-                                                  const EdgeInsets.fromLTRB(
-                                                      2, 1, 0, 0),
+                                              const EdgeInsets.fromLTRB(
+                                                  2, 1, 0, 0),
                                               child: Image.asset(
                                                   "assets/tbtrack/ellipse.png",
                                                   height: 2.5,
@@ -886,8 +895,8 @@ class _listscreen extends State<listscreen>
                                             ),
                                             Container(
                                               padding:
-                                                  const EdgeInsets.fromLTRB(
-                                                      2, 1, 0, 0),
+                                              const EdgeInsets.fromLTRB(
+                                                  2, 1, 0, 0),
                                               child: Image.asset(
                                                   "assets/tbtrack/ellipse.png",
                                                   height: 2.5,
@@ -896,8 +905,8 @@ class _listscreen extends State<listscreen>
                                             ),
                                             Container(
                                               padding:
-                                                  const EdgeInsets.fromLTRB(
-                                                      2, 1, 0, 3),
+                                              const EdgeInsets.fromLTRB(
+                                                  2, 1, 0, 3),
                                               child: Image.asset(
                                                   "assets/tbtrack/ellipse.png",
                                                   height: 2.5,
@@ -911,8 +920,8 @@ class _listscreen extends State<listscreen>
                                                 color: Color(0xff26C090)),
                                             Container(
                                               padding:
-                                                  const EdgeInsets.fromLTRB(
-                                                      2, 1, 0, 0),
+                                              const EdgeInsets.fromLTRB(
+                                                  2, 1, 0, 0),
                                               child: Image.asset(
                                                   "assets/tbtrack/ellipse.png",
                                                   height: 2.5,
@@ -921,8 +930,8 @@ class _listscreen extends State<listscreen>
                                             ),
                                             Container(
                                               padding:
-                                                  const EdgeInsets.fromLTRB(
-                                                      2, 1, 0, 0),
+                                              const EdgeInsets.fromLTRB(
+                                                  2, 1, 0, 0),
                                               child: Image.asset(
                                                   "assets/tbtrack/ellipse.png",
                                                   height: 2.5,
@@ -931,8 +940,8 @@ class _listscreen extends State<listscreen>
                                             ),
                                             Container(
                                               padding:
-                                                  const EdgeInsets.fromLTRB(
-                                                      2, 1, 0, 0),
+                                              const EdgeInsets.fromLTRB(
+                                                  2, 1, 0, 0),
                                               child: Image.asset(
                                                   "assets/tbtrack/ellipse.png",
                                                   height: 2.5,
@@ -941,8 +950,8 @@ class _listscreen extends State<listscreen>
                                             ),
                                             Container(
                                               padding:
-                                                  const EdgeInsets.fromLTRB(
-                                                      2, 1, 0, 3),
+                                              const EdgeInsets.fromLTRB(
+                                                  2, 1, 0, 3),
                                               child: Image.asset(
                                                   "assets/tbtrack/ellipse.png",
                                                   height: 2.5,
@@ -956,8 +965,8 @@ class _listscreen extends State<listscreen>
                                                 color: Color(0xffBD712E)),
                                             Container(
                                               padding:
-                                                  const EdgeInsets.fromLTRB(
-                                                      2, 1, 0, 0),
+                                              const EdgeInsets.fromLTRB(
+                                                  2, 1, 0, 0),
                                               child: Image.asset(
                                                   "assets/tbtrack/ellipse.png",
                                                   height: 2.5,
@@ -966,8 +975,8 @@ class _listscreen extends State<listscreen>
                                             ),
                                             Container(
                                               padding:
-                                                  const EdgeInsets.fromLTRB(
-                                                      2, 1, 0, 0),
+                                              const EdgeInsets.fromLTRB(
+                                                  2, 1, 0, 0),
                                               child: Image.asset(
                                                   "assets/tbtrack/ellipse.png",
                                                   height: 2.5,
@@ -976,8 +985,8 @@ class _listscreen extends State<listscreen>
                                             ),
                                             Container(
                                               padding:
-                                                  const EdgeInsets.fromLTRB(
-                                                      2, 1, 0, 0),
+                                              const EdgeInsets.fromLTRB(
+                                                  2, 1, 0, 0),
                                               child: Image.asset(
                                                   "assets/tbtrack/ellipse.png",
                                                   height: 2.5,
@@ -986,8 +995,8 @@ class _listscreen extends State<listscreen>
                                             ),
                                             Container(
                                               padding:
-                                                  const EdgeInsets.fromLTRB(
-                                                      2, 1, 0, 3),
+                                              const EdgeInsets.fromLTRB(
+                                                  2, 1, 0, 3),
                                               child: Image.asset(
                                                   "assets/tbtrack/ellipse.png",
                                                   height: 2.5,
@@ -1006,7 +1015,7 @@ class _listscreen extends State<listscreen>
                                       width: 75,
                                       child: Column(
                                           crossAxisAlignment:
-                                              CrossAxisAlignment.start,
+                                          CrossAxisAlignment.start,
                                           children: [
                                             Container(
                                               margin: EdgeInsets.fromLTRB(
@@ -1070,287 +1079,287 @@ class _listscreen extends State<listscreen>
                                     ),
                                     (productData.sensors == null)
                                         ? Container(
-                                            height: 140,
-                                            width: 20,
-                                            //color:Colors.blue,
-                                            child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.end,
-                                                children: [
-                                                  Container(
-                                                    decoration: BoxDecoration(
-                                                        color: Colors.white,
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(20)),
-                                                    margin: const EdgeInsets
-                                                        .fromLTRB(0, 10, 0, 0),
-                                                    child: Image.asset(
-                                                        "assets/tbtrack/frozen.png",
-                                                        height: 15,
-                                                        width: 15,
-                                                        color: Colors.black38),
-                                                  ),
-                                                  Container(
-                                                    decoration: BoxDecoration(
-                                                        //color: Colors.white,
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(20)),
-                                                    margin: const EdgeInsets
-                                                        .fromLTRB(0, 15, 0, 0),
-                                                    child: Image.asset(
-                                                      "assets/tbtrack/battery.png",
-                                                      height: 18,
-                                                      width:
-                                                          18, //color:Colors.black38
-                                                    ),
-                                                  ),
-                                                  Container(
-                                                    decoration: BoxDecoration(
-                                                        //color: Colors.white,
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(20)),
-                                                    margin: const EdgeInsets
-                                                        .fromLTRB(0, 15, 0, 0),
-                                                    child: Image.asset(
-                                                      "assets/tbtrack/signal.png",
-                                                      height: 15,
-                                                      width:
-                                                          15, //color:Colors.black38
-                                                    ),
-                                                  ),
-                                                  Container(
-                                                    decoration: BoxDecoration(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(20)),
-                                                    margin: const EdgeInsets
-                                                        .fromLTRB(0, 15, 0, 0),
-                                                    child: Image.asset(
-                                                        "assets/tbtrack/circle.png",
-                                                        height: 20,
-                                                        width: 20,
-                                                        color: Colors.black38),
-                                                  ),
-                                                ]),
-                                          )
-                                        : (productData.sensors!.isNotEmpty)
-                                            ? Container(
-                                                height: 140,
-                                                width: 60,
-                                                child: ListView.builder(
-                                                    scrollDirection:
-                                                        Axis.vertical,
-                                                    itemCount: productData
-                                                        .sensors!.length,
-                                                    itemBuilder:
-                                                        (context, index) {
-                                                      return Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .only(
-                                                                left: 15.0,
-                                                                right: 8,
-                                                                top: 10),
-                                                        child: Container(
-                                                            child: Column(
-                                                                children: <Widget>[
-                                                              productData
-                                                                          .sensors![
-                                                                              index]
-                                                                          .type
-                                                                          .toString()
-                                                                          .toLowerCase() ==
-                                                                      'ignition'
-                                                                  ? Image.asset(
-                                                                      "assets/saftyappicon/ignintion.png",
-                                                                      height:
-                                                                          imageSize,
-                                                                      width:
-                                                                          imageSize)
-                                                                  : productData
-                                                                              .sensors![
-                                                                                  index]
-                                                                              .type
-                                                                              .toString()
-                                                                              .toLowerCase() ==
-                                                                          'engine'
-                                                                      ? Image.asset(
-                                                                          "assets/saftyappicon/ignintion.png",
-                                                                          height:
-                                                                              imageSize,
-                                                                          width:
-                                                                              imageSize)
-                                                                      : productData.sensors![index].type.toString().toLowerCase() ==
-                                                                              'sat'
-                                                                          ? Image.asset(
-                                                                              "assets/saftyappicon/sattelite.png",
-                                                                              height: imageSize,
-                                                                              width: imageSize)
-                                                                          : productData.sensors![index].type.toString().toLowerCase() == 'odometer'
-                                                                              ? Image.asset("assets/saftyappicon/odomenetr.png", height: imageSize, width: imageSize)
-                                                                              : productData.sensors![index].type.toString().toLowerCase() == 'battery'
-                                                                                  ? Image.asset(
-                                                                                      "assets/saftyappicon/battery.png",
-                                                                                      height: imageSize,
-                                                                                      width: imageSize,
-                                                                                    )
-                                                                                  : productData.sensors![index].type.toString().toLowerCase() == 'charge'
-                                                                                      ? Image.asset(
-                                                                                          "assets/saftyappicon/charge_icon.png",
-                                                                                          height: imageSize,
-                                                                                          width: imageSize,
-                                                                                        )
-                                                                                      : productData.sensors![index].type.toString().toLowerCase() == 'engine lock'
-                                                                                          ? Icon(
-                                                                                              Icons.hourglass_bottom_rounded,
-                                                                                              size: 16,
-                                                                                              color: themeDark,
-                                                                                            )
-                                                                                          : productData.sensors![index].type.toString().toLowerCase() == 'gps'
-                                                                                              ? Icon(
-                                                                                                  Icons.gps_fixed_outlined,
-                                                                                                  size: 16,
-                                                                                                  color: themeDark,
-                                                                                                )
-                                                                                              : productData.sensors![index].type.toString().toLowerCase() == 'gsm'
-                                                                                                  ? Image.asset(
-                                                                                                      "assets/saftyappicon/gsmicon.png",
-                                                                                                      height: imageSize,
-                                                                                                      width: imageSize,
-                                                                                                      color: themeDark,
-                                                                                                    )
-                                                                                                  : productData.sensors![index].type.toString().toLowerCase() == 'moving'
-                                                                                                      ? Icon(
-                                                                                                          Icons.moving_outlined,
-                                                                                                          size: 16,
-                                                                                                          color: themeDark,
-                                                                                                        )
-                                                                                                      : productData.sensors![index].type.toString().toLowerCase() == 'gps starting km'
-                                                                                                          ? Icon(
-                                                                                                              Icons.gps_fixed_outlined,
-                                                                                                              size: 16,
-                                                                                                              color: themeDark,
-                                                                                                            )
-                                                                                                          : productData.sensors![index].type.toString().toLowerCase() == 'temp'
-                                                                                                              ? Icon(
-                                                                                                                  FontAwesomeIcons.temperatureLow,
-                                                                                                                  size: 16,
-                                                                                                                  color: themeDark,
-                                                                                                                )
-                                                                                                              : productData.sensors![index].type.toString().toLowerCase() == 'engine_hours'
-                                                                                                                  ? Icon(
-                                                                                                                      Icons.alarm,
-                                                                                                                      size: 16,
-                                                                                                                      color: themeDark,
-                                                                                                                    )
-                                                                                                                  : Image.asset("assets/saftyappicon/mileage.png", height: imageSize, width: imageSize, color: themeDark),
-                                                              Text(
-                                                                  productData
-                                                                      .sensors![
-                                                                          index]
-                                                                      .name
-                                                                      .toString(),
-                                                                  style: TextStyle(
-                                                                      fontSize:
-                                                                          7,
-                                                                      height:
-                                                                          1.5,
-                                                                      color:
-                                                                          themeDark)),
-                                                              Text(
-                                                                  "${productData.sensors![index].value.toString()}",
-                                                                  style: TextStyle(
-                                                                      fontSize:
-                                                                          7,
-                                                                      height: 1,
-                                                                      color:
-                                                                          themeDark))
-                                                            ])),
-                                                      );
-                                                    }),
-                                              )
-                                            : Container(
-                                                height: 140,
-                                                child: Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment.end,
-                                                    children: [
-                                                      Container(
-                                                        decoration: BoxDecoration(
-                                                            color: Colors.white,
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        20)),
-                                                        margin: const EdgeInsets
-                                                            .fromLTRB(
-                                                            0, 10, 0, 0),
-                                                        child: Image.asset(
-                                                            "assets/tbtrack/frozen.png",
-                                                            height: 15,
-                                                            width: 15,
-                                                            color:
-                                                                Colors.black38),
-                                                      ),
-                                                      Container(
-                                                        decoration:
-                                                            BoxDecoration(
-                                                                //color: Colors.white,
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(
-                                                                            20)),
-                                                        margin: const EdgeInsets
-                                                            .fromLTRB(
-                                                            0, 15, 0, 0),
-                                                        child: Image.asset(
-                                                          "assets/tbtrack/battery.png",
-                                                          height: 18,
-                                                          width:
-                                                              18, //color:Colors.black38
-                                                        ),
-                                                      ),
-                                                      Container(
-                                                        decoration:
-                                                            BoxDecoration(
-                                                                //color: Colors.white,
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(
-                                                                            20)),
-                                                        margin: const EdgeInsets
-                                                            .fromLTRB(
-                                                            0, 15, 0, 0),
-                                                        child: Image.asset(
-                                                          "assets/tbtrack/signal.png",
-                                                          height: 15,
-                                                          width:
-                                                              15, //color:Colors.black38
-                                                        ),
-                                                      ),
-                                                      Container(
-                                                        decoration:
-                                                            BoxDecoration(
-                                                                //color: Colors.white,
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(
-                                                                            20)),
-                                                        margin: const EdgeInsets
-                                                            .fromLTRB(
-                                                            0, 15, 0, 0),
-                                                        child: Image.asset(
-                                                            "assets/tbtrack/circle.png",
-                                                            height: 20,
-                                                            width: 20,
-                                                            color:
-                                                                Colors.black38),
-                                                      ),
-                                                    ]),
+                                      height: 140,
+                                      width: 20,
+                                      //color:Colors.blue,
+                                      child: Column(
+                                          crossAxisAlignment:
+                                          CrossAxisAlignment.end,
+                                          children: [
+                                            Container(
+                                              decoration: BoxDecoration(
+                                                  color: Colors.white,
+                                                  borderRadius:
+                                                  BorderRadius
+                                                      .circular(20)),
+                                              margin: const EdgeInsets
+                                                  .fromLTRB(0, 10, 0, 0),
+                                              child: Image.asset(
+                                                  "assets/tbtrack/frozen.png",
+                                                  height: 15,
+                                                  width: 15,
+                                                  color: Colors.black38),
+                                            ),
+                                            Container(
+                                              decoration: BoxDecoration(
+                                                //color: Colors.white,
+                                                  borderRadius:
+                                                  BorderRadius
+                                                      .circular(20)),
+                                              margin: const EdgeInsets
+                                                  .fromLTRB(0, 15, 0, 0),
+                                              child: Image.asset(
+                                                "assets/tbtrack/battery.png",
+                                                height: 18,
+                                                width:
+                                                18, //color:Colors.black38
                                               ),
+                                            ),
+                                            Container(
+                                              decoration: BoxDecoration(
+                                                //color: Colors.white,
+                                                  borderRadius:
+                                                  BorderRadius
+                                                      .circular(20)),
+                                              margin: const EdgeInsets
+                                                  .fromLTRB(0, 15, 0, 0),
+                                              child: Image.asset(
+                                                "assets/tbtrack/signal.png",
+                                                height: 15,
+                                                width:
+                                                15, //color:Colors.black38
+                                              ),
+                                            ),
+                                            Container(
+                                              decoration: BoxDecoration(
+                                                  borderRadius:
+                                                  BorderRadius
+                                                      .circular(20)),
+                                              margin: const EdgeInsets
+                                                  .fromLTRB(0, 15, 0, 0),
+                                              child: Image.asset(
+                                                  "assets/tbtrack/circle.png",
+                                                  height: 20,
+                                                  width: 20,
+                                                  color: Colors.black38),
+                                            ),
+                                          ]),
+                                    )
+                                        : (productData.sensors!.isNotEmpty)
+                                        ? Container(
+                                      height: 140,
+                                      width: 60,
+                                      child: ListView.builder(
+                                          scrollDirection:
+                                          Axis.vertical,
+                                          itemCount: productData
+                                              .sensors!.length,
+                                          itemBuilder:
+                                              (context, index) {
+                                            return Padding(
+                                              padding:
+                                              const EdgeInsets
+                                                  .only(
+                                                  left: 15.0,
+                                                  right: 8,
+                                                  top: 10),
+                                              child: Container(
+                                                  child: Column(
+                                                      children: <Widget>[
+                                                        productData
+                                                            .sensors![
+                                                        index]
+                                                            .type
+                                                            .toString()
+                                                            .toLowerCase() ==
+                                                            'ignition'
+                                                            ? Image.asset(
+                                                            "assets/saftyappicon/ignintion.png",
+                                                            height:
+                                                            imageSize,
+                                                            width:
+                                                            imageSize)
+                                                            : productData
+                                                            .sensors![
+                                                        index]
+                                                            .type
+                                                            .toString()
+                                                            .toLowerCase() ==
+                                                            'engine'
+                                                            ? Image.asset(
+                                                            "assets/saftyappicon/ignintion.png",
+                                                            height:
+                                                            imageSize,
+                                                            width:
+                                                            imageSize)
+                                                            : productData.sensors![index].type.toString().toLowerCase() ==
+                                                            'sat'
+                                                            ? Image.asset(
+                                                            "assets/saftyappicon/sattelite.png",
+                                                            height: imageSize,
+                                                            width: imageSize)
+                                                            : productData.sensors![index].type.toString().toLowerCase() == 'odometer'
+                                                            ? Image.asset("assets/saftyappicon/odomenetr.png", height: imageSize, width: imageSize)
+                                                            : productData.sensors![index].type.toString().toLowerCase() == 'battery'
+                                                            ? Image.asset(
+                                                          "assets/saftyappicon/battery.png",
+                                                          height: imageSize,
+                                                          width: imageSize,
+                                                        )
+                                                            : productData.sensors![index].type.toString().toLowerCase() == 'charge'
+                                                            ? Image.asset(
+                                                          "assets/saftyappicon/charge_icon.png",
+                                                          height: imageSize,
+                                                          width: imageSize,
+                                                        )
+                                                            : productData.sensors![index].type.toString().toLowerCase() == 'engine lock'
+                                                            ? Icon(
+                                                          Icons.hourglass_bottom_rounded,
+                                                          size: 16,
+                                                          color: themeDark,
+                                                        )
+                                                            : productData.sensors![index].type.toString().toLowerCase() == 'gps'
+                                                            ? Icon(
+                                                          Icons.gps_fixed_outlined,
+                                                          size: 16,
+                                                          color: themeDark,
+                                                        )
+                                                            : productData.sensors![index].type.toString().toLowerCase() == 'gsm'
+                                                            ? Image.asset(
+                                                          "assets/saftyappicon/gsmicon.png",
+                                                          height: imageSize,
+                                                          width: imageSize,
+                                                          color: themeDark,
+                                                        )
+                                                            : productData.sensors![index].type.toString().toLowerCase() == 'moving'
+                                                            ? Icon(
+                                                          Icons.moving_outlined,
+                                                          size: 16,
+                                                          color: themeDark,
+                                                        )
+                                                            : productData.sensors![index].type.toString().toLowerCase() == 'gps starting km'
+                                                            ? Icon(
+                                                          Icons.gps_fixed_outlined,
+                                                          size: 16,
+                                                          color: themeDark,
+                                                        )
+                                                            : productData.sensors![index].type.toString().toLowerCase() == 'temp'
+                                                            ? Icon(
+                                                          FontAwesomeIcons.temperatureLow,
+                                                          size: 16,
+                                                          color: themeDark,
+                                                        )
+                                                            : productData.sensors![index].type.toString().toLowerCase() == 'engine_hours'
+                                                            ? Icon(
+                                                          Icons.alarm,
+                                                          size: 16,
+                                                          color: themeDark,
+                                                        )
+                                                            : Image.asset("assets/saftyappicon/mileage.png", height: imageSize, width: imageSize, color: themeDark),
+                                                        Text(
+                                                            productData
+                                                                .sensors![
+                                                            index]
+                                                                .name
+                                                                .toString(),
+                                                            style: TextStyle(
+                                                                fontSize:
+                                                                7,
+                                                                height:
+                                                                1.5,
+                                                                color:
+                                                                themeDark)),
+                                                        Text(
+                                                            "${productData.sensors![index].value.toString()}",
+                                                            style: TextStyle(
+                                                                fontSize:
+                                                                7,
+                                                                height: 1,
+                                                                color:
+                                                                themeDark))
+                                                      ])),
+                                            );
+                                          }),
+                                    )
+                                        : Container(
+                                      height: 140,
+                                      child: Column(
+                                          crossAxisAlignment:
+                                          CrossAxisAlignment.end,
+                                          children: [
+                                            Container(
+                                              decoration: BoxDecoration(
+                                                  color: Colors.white,
+                                                  borderRadius:
+                                                  BorderRadius
+                                                      .circular(
+                                                      20)),
+                                              margin: const EdgeInsets
+                                                  .fromLTRB(
+                                                  0, 10, 0, 0),
+                                              child: Image.asset(
+                                                  "assets/tbtrack/frozen.png",
+                                                  height: 15,
+                                                  width: 15,
+                                                  color:
+                                                  Colors.black38),
+                                            ),
+                                            Container(
+                                              decoration:
+                                              BoxDecoration(
+                                                //color: Colors.white,
+                                                  borderRadius:
+                                                  BorderRadius
+                                                      .circular(
+                                                      20)),
+                                              margin: const EdgeInsets
+                                                  .fromLTRB(
+                                                  0, 15, 0, 0),
+                                              child: Image.asset(
+                                                "assets/tbtrack/battery.png",
+                                                height: 18,
+                                                width:
+                                                18, //color:Colors.black38
+                                              ),
+                                            ),
+                                            Container(
+                                              decoration:
+                                              BoxDecoration(
+                                                //color: Colors.white,
+                                                  borderRadius:
+                                                  BorderRadius
+                                                      .circular(
+                                                      20)),
+                                              margin: const EdgeInsets
+                                                  .fromLTRB(
+                                                  0, 15, 0, 0),
+                                              child: Image.asset(
+                                                "assets/tbtrack/signal.png",
+                                                height: 15,
+                                                width:
+                                                15, //color:Colors.black38
+                                              ),
+                                            ),
+                                            Container(
+                                              decoration:
+                                              BoxDecoration(
+                                                //color: Colors.white,
+                                                  borderRadius:
+                                                  BorderRadius
+                                                      .circular(
+                                                      20)),
+                                              margin: const EdgeInsets
+                                                  .fromLTRB(
+                                                  0, 15, 0, 0),
+                                              child: Image.asset(
+                                                  "assets/tbtrack/circle.png",
+                                                  height: 20,
+                                                  width: 20,
+                                                  color:
+                                                  Colors.black38),
+                                            ),
+                                          ]),
+                                    ),
                                   ],
                                 ),
                               ],
@@ -1385,361 +1394,361 @@ class _listscreen extends State<listscreen>
     double imageSize = MediaQuery.of(context).size.width / 17;
     return StatefulBuilder(
         builder: (BuildContext context, StateSetter mystate) {
-      return Container(
-          margin: EdgeInsets.only(left: 10, right: 10, bottom: 140),
-          decoration: BoxDecoration(
-              color: Colors.white, borderRadius: BorderRadius.circular(10)),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Center(
-                child: Container(
-                  margin: EdgeInsets.only(
-                    top: 12,
+          return Container(
+              margin: EdgeInsets.only(left: 10, right: 10, bottom: 140),
+              decoration: BoxDecoration(
+                  color: Colors.white, borderRadius: BorderRadius.circular(10)),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Center(
+                    child: Container(
+                      margin: EdgeInsets.only(
+                        top: 12,
+                      ),
+                      child: Text('${StaticVarMethod.deviceName}',
+                          style: TextStyle(
+                              fontSize: 13,
+                              color: Colors.black,
+                              fontWeight: FontWeight.bold)),
+                    ),
                   ),
-                  child: Text('${StaticVarMethod.deviceName}',
-                      style: TextStyle(
-                          fontSize: 13,
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold)),
-                ),
-              ),
-              Container(
-                  margin: EdgeInsets.only(top: 12, bottom: 20),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      Expanded(
-                        child: Column(
-                          children: <Widget>[
-                            GestureDetector(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      //  builder: (context) => livetrack()),
-                                      builder: (context) => LiveMapScreen()),
-                                );
-                              },
-                              child: Container(
-                                  padding: EdgeInsets.all(8),
-                                  decoration: new BoxDecoration(
-                                    color: Colors.white,
-                                    shape: BoxShape.rectangle,
-                                    borderRadius:
+                  Container(
+                      margin: EdgeInsets.only(top: 12, bottom: 20),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          Expanded(
+                            child: Column(
+                              children: <Widget>[
+                                GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        //  builder: (context) => livetrack()),
+                                          builder: (context) => LiveMapScreen()),
+                                    );
+                                  },
+                                  child: Container(
+                                      padding: EdgeInsets.all(8),
+                                      decoration: new BoxDecoration(
+                                        color: Colors.white,
+                                        shape: BoxShape.rectangle,
+                                        borderRadius:
                                         BorderRadius.all(Radius.circular(15)),
-                                    // borderRadius: BorderRadius.circular(8),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black26,
-                                        blurRadius: 1.0,
-                                        //offset: const Offset(0.0, 10.0),
+                                        // borderRadius: BorderRadius.circular(8),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.black26,
+                                            blurRadius: 1.0,
+                                            //offset: const Offset(0.0, 10.0),
+                                          ),
+                                        ],
                                       ),
-                                    ],
-                                  ),
-                                  // color: Colors.white,
-                                  //color: Color(0x99FFFFFF),
-                                  child: Column(children: <Widget>[
-                                    Image.asset(
-                                        "assets/images/movingdurationicon.png",
-                                        height: imageSize,
-                                        width: imageSize),
-                                    Text(
-                                        getTranslated(context, 'liveTracking')!,
-                                        style:
+                                      // color: Colors.white,
+                                      //color: Color(0x99FFFFFF),
+                                      child: Column(children: <Widget>[
+                                        Image.asset(
+                                            "assets/images/movingdurationicon.png",
+                                            height: imageSize,
+                                            width: imageSize),
+                                        Text(
+                                            getTranslated(context, 'liveTracking')!,
+                                            style:
                                             TextStyle(fontSize: 12, height: 2))
-                                  ])),
+                                      ])),
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
-                      ),
-                      Expanded(
-                        child: Column(
-                          children: <Widget>[
-                            GestureDetector(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => kmdetail()),
-                                );
-                              },
-                              child: Container(
-                                  padding: EdgeInsets.all(8),
-                                  decoration: new BoxDecoration(
-                                    color: Colors.white,
-                                    shape: BoxShape.rectangle,
-                                    borderRadius:
+                          ),
+                          Expanded(
+                            child: Column(
+                              children: <Widget>[
+                                GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => kmdetail()),
+                                    );
+                                  },
+                                  child: Container(
+                                      padding: EdgeInsets.all(8),
+                                      decoration: new BoxDecoration(
+                                        color: Colors.white,
+                                        shape: BoxShape.rectangle,
+                                        borderRadius:
                                         BorderRadius.all(Radius.circular(15)),
-                                    // borderRadius: BorderRadius.circular(8),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black26,
-                                        blurRadius: 1.0,
-                                        //offset: const Offset(0.0, 10.0),
+                                        // borderRadius: BorderRadius.circular(8),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.black26,
+                                            blurRadius: 1.0,
+                                            //offset: const Offset(0.0, 10.0),
+                                          ),
+                                        ],
                                       ),
-                                    ],
-                                  ),
-                                  // color: Colors.white,
-                                  //color: Color(0x99FFFFFF),
-                                  child: Column(children: <Widget>[
-                                    Image.asset(
-                                        "assets/images/icons8-bar-chart-100.png",
-                                        height: imageSize,
-                                        width: imageSize),
-                                    Text(getTranslated(context, 'mileage')!,
-                                        style: TextStyle(
-                                            fontSize: 12, height: 2.0))
-                                  ])),
+                                      // color: Colors.white,
+                                      //color: Color(0x99FFFFFF),
+                                      child: Column(children: <Widget>[
+                                        Image.asset(
+                                            "assets/images/icons8-bar-chart-100.png",
+                                            height: imageSize,
+                                            width: imageSize),
+                                        Text(getTranslated(context, 'mileage')!,
+                                            style: TextStyle(
+                                                fontSize: 12, height: 2.0))
+                                      ])),
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
-                      ),
-                      Expanded(
-                        child: Column(
-                          children: <Widget>[
-                            GestureDetector(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          playbackselection()),
-                                );
-                              },
-                              child: Container(
-                                  padding: EdgeInsets.all(8),
-                                  decoration: new BoxDecoration(
-                                    color: Colors.white,
-                                    shape: BoxShape.rectangle,
-                                    borderRadius:
+                          ),
+                          Expanded(
+                            child: Column(
+                              children: <Widget>[
+                                GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              playbackselection()),
+                                    );
+                                  },
+                                  child: Container(
+                                      padding: EdgeInsets.all(8),
+                                      decoration: new BoxDecoration(
+                                        color: Colors.white,
+                                        shape: BoxShape.rectangle,
+                                        borderRadius:
                                         BorderRadius.all(Radius.circular(15)),
-                                    // borderRadius: BorderRadius.circular(8),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black26,
-                                        blurRadius: 1.0,
-                                        //offset: const Offset(0.0, 10.0),
+                                        // borderRadius: BorderRadius.circular(8),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.black26,
+                                            blurRadius: 1.0,
+                                            //offset: const Offset(0.0, 10.0),
+                                          ),
+                                        ],
                                       ),
-                                    ],
-                                  ),
-                                  // color: Colors.white,
-                                  //color: Color(0x99FFFFFF),
-                                  child: Column(children: <Widget>[
-                                    Image.asset(
-                                        "assets/images/icons8-play-100.png",
-                                        height: imageSize,
-                                        width: imageSize),
-                                    Text(getTranslated(context, 'playback')!,
-                                        style: TextStyle(
-                                            fontSize: 12, height: 2.0))
-                                  ])),
+                                      // color: Colors.white,
+                                      //color: Color(0x99FFFFFF),
+                                      child: Column(children: <Widget>[
+                                        Image.asset(
+                                            "assets/images/icons8-play-100.png",
+                                            height: imageSize,
+                                            width: imageSize),
+                                        Text(getTranslated(context, 'playback')!,
+                                            style: TextStyle(
+                                                fontSize: 12, height: 2.0))
+                                      ])),
+                                ),
+                              ],
                             ),
-                          ],
+                          ),
+                        ],
+                      )),
+                  Container(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        Expanded(
+                          child: Column(
+                            children: <Widget>[
+                              GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => reportselection()),
+                                  );
+                                },
+                                child: Container(
+                                    padding: EdgeInsets.all(8),
+                                    decoration: new BoxDecoration(
+                                      color: Colors.white,
+                                      shape: BoxShape.rectangle,
+                                      borderRadius:
+                                      BorderRadius.all(Radius.circular(15)),
+                                      // borderRadius: BorderRadius.circular(8),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black26,
+                                          blurRadius: 1.0,
+                                          //offset: const Offset(0.0, 10.0),
+                                        ),
+                                      ],
+                                    ),
+                                    // color: Colors.white,
+                                    //color: Color(0x99FFFFFF),
+                                    child: Column(children: <Widget>[
+                                      Image.asset(
+                                          "assets/images/icons8-bar-chart-100.png",
+                                          height: imageSize,
+                                          width: imageSize),
+                                      Text(getTranslated(context, 'reports')!,
+                                          style:
+                                          TextStyle(fontSize: 12, height: 2.0))
+                                    ])),
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
-                  )),
-              Container(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    Expanded(
-                      child: Column(
-                        children: <Widget>[
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => reportselection()),
-                              );
-                            },
-                            child: Container(
-                                padding: EdgeInsets.all(8),
-                                decoration: new BoxDecoration(
-                                  color: Colors.white,
-                                  shape: BoxShape.rectangle,
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(15)),
-                                  // borderRadius: BorderRadius.circular(8),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black26,
-                                      blurRadius: 1.0,
-                                      //offset: const Offset(0.0, 10.0),
-                                    ),
-                                  ],
-                                ),
-                                // color: Colors.white,
-                                //color: Color(0x99FFFFFF),
-                                child: Column(children: <Widget>[
-                                  Image.asset(
-                                      "assets/images/icons8-bar-chart-100.png",
-                                      height: imageSize,
-                                      width: imageSize),
-                                  Text(getTranslated(context, 'reports')!,
-                                      style:
-                                          TextStyle(fontSize: 12, height: 2.0))
-                                ])),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Expanded(
-                      child: Column(
-                        children: <Widget>[
-                          GestureDetector(
-                            onTap: () {
-                              // Navigator.push(
-                              //   context,
-                              //   MaterialPageRoute(
-                              //       builder: (context) => CommandWindowPage()),
-                              // );
+                        Expanded(
+                          child: Column(
+                            children: <Widget>[
+                              GestureDetector(
+                                onTap: () {
+                                  // Navigator.push(
+                                  //   context,
+                                  //   MaterialPageRoute(
+                                  //       builder: (context) => CommandWindowPage()),
+                                  // );
 
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => lockscreenNew()),
-                              );
-                            },
-                            child: Container(
-                                padding: EdgeInsets.all(8),
-                                decoration: new BoxDecoration(
-                                  color: Colors.white,
-                                  shape: BoxShape.rectangle,
-                                  borderRadius:
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => lockscreenNew()),
+                                  );
+                                },
+                                child: Container(
+                                    padding: EdgeInsets.all(8),
+                                    decoration: new BoxDecoration(
+                                      color: Colors.white,
+                                      shape: BoxShape.rectangle,
+                                      borderRadius:
                                       BorderRadius.all(Radius.circular(15)),
-                                  // borderRadius: BorderRadius.circular(8),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black26,
-                                      blurRadius: 1.0,
-                                      //offset: const Offset(0.0, 10.0),
+                                      // borderRadius: BorderRadius.circular(8),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black26,
+                                          blurRadius: 1.0,
+                                          //offset: const Offset(0.0, 10.0),
+                                        ),
+                                      ],
                                     ),
-                                  ],
-                                ),
-                                // color: Colors.white,
-                                //color: Color(0x99FFFFFF),
-                                child: Column(children: <Widget>[
-                                  Image.asset(
-                                      "assets/images/icons8-play-100.png",
-                                      height: imageSize,
-                                      width: imageSize),
-                                  Text(getTranslated(context, 'command')!,
-                                      style:
+                                    // color: Colors.white,
+                                    //color: Color(0x99FFFFFF),
+                                    child: Column(children: <Widget>[
+                                      Image.asset(
+                                          "assets/images/icons8-play-100.png",
+                                          height: imageSize,
+                                          width: imageSize),
+                                      Text(getTranslated(context, 'command')!,
+                                          style:
                                           TextStyle(fontSize: 12, height: 2.0))
-                                ])),
+                                    ])),
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
-                    ),
-                    Expanded(
-                      child: Column(
-                        children: <Widget>[
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
+                        ),
+                        Expanded(
+                          child: Column(
+                            children: <Widget>[
+                              GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
 
-                                    // builder: (context) => tripinfoselectionscreen()),
-                                    // builder: (context) => vehicle_info()),
-                                    builder: (context) => vehicle_dasboard()),
-                              );
+                                      // builder: (context) => tripinfoselectionscreen()),
+                                      // builder: (context) => vehicle_info()),
+                                        builder: (context) => vehicle_dasboard()),
+                                  );
 
-                              //_onMapTypeButtonPressed();
-                            },
-                            child: Container(
-                                padding: EdgeInsets.all(8),
-                                decoration: new BoxDecoration(
-                                  color: Colors.white,
-                                  shape: BoxShape.rectangle,
-                                  borderRadius:
+                                  //_onMapTypeButtonPressed();
+                                },
+                                child: Container(
+                                    padding: EdgeInsets.all(8),
+                                    decoration: new BoxDecoration(
+                                      color: Colors.white,
+                                      shape: BoxShape.rectangle,
+                                      borderRadius:
                                       BorderRadius.all(Radius.circular(15)),
-                                  // borderRadius: BorderRadius.circular(8),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black26,
-                                      blurRadius: 1.0,
-                                      //offset: const Offset(0.0, 10.0),
+                                      // borderRadius: BorderRadius.circular(8),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black26,
+                                          blurRadius: 1.0,
+                                          //offset: const Offset(0.0, 10.0),
+                                        ),
+                                      ],
                                     ),
-                                  ],
-                                ),
-                                // color: Colors.white,
-                                //color: Color(0x99FFFFFF),
-                                child: Column(children: <Widget>[
-                                  Image.asset(
-                                      "assets/images/icons8-info-popup-100.png",
-                                      height: imageSize,
-                                      width: imageSize),
-                                  Text(getTranslated(context, 'device_info')!,
-                                      style:
+                                    // color: Colors.white,
+                                    //color: Color(0x99FFFFFF),
+                                    child: Column(children: <Widget>[
+                                      Image.asset(
+                                          "assets/images/icons8-info-popup-100.png",
+                                          height: imageSize,
+                                          width: imageSize),
+                                      Text(getTranslated(context, 'device_info')!,
+                                          style:
                                           TextStyle(fontSize: 12, height: 2.0))
-                                ])),
+                                    ])),
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-              ),
-              Container(
-                margin: EdgeInsets.only(top: 12),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    Expanded(
-                      child: Column(
-                        children: <Widget>[
-                          GestureDetector(
-                            onTap: () async {
-                              String url =
-                                  "https://www.google.com/maps/search/?api=1&query=${StaticVarMethod.lat},${StaticVarMethod.lng}";
+                  ),
+                  Container(
+                    margin: EdgeInsets.only(top: 12),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        Expanded(
+                          child: Column(
+                            children: <Widget>[
+                              GestureDetector(
+                                onTap: () async {
+                                  String url =
+                                      "https://www.google.com/maps/search/?api=1&query=${StaticVarMethod.lat},${StaticVarMethod.lng}";
 
-                              if (await canLaunchUrl(Uri.parse(url))) {
-                                await launchUrl(Uri.parse(url));
-                              } else {
-                                throw 'Could not open the map.';
-                              }
-                            },
-                            child: Container(
-                                padding: EdgeInsets.all(8),
-                                decoration: new BoxDecoration(
-                                  color: Colors.white,
-                                  shape: BoxShape.rectangle,
-                                  borderRadius:
+                                  if (await canLaunchUrl(Uri.parse(url))) {
+                                    await launchUrl(Uri.parse(url));
+                                  } else {
+                                    throw 'Could not open the map.';
+                                  }
+                                },
+                                child: Container(
+                                    padding: EdgeInsets.all(8),
+                                    decoration: new BoxDecoration(
+                                      color: Colors.white,
+                                      shape: BoxShape.rectangle,
+                                      borderRadius:
                                       BorderRadius.all(Radius.circular(15)),
-                                  // borderRadius: BorderRadius.circular(8),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black26,
-                                      blurRadius: 1.0,
-                                      //offset: const Offset(0.0, 10.0),
+                                      // borderRadius: BorderRadius.circular(8),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black26,
+                                          blurRadius: 1.0,
+                                          //offset: const Offset(0.0, 10.0),
+                                        ),
+                                      ],
                                     ),
-                                  ],
-                                ),
-                                // color: Colors.white,
-                                //color: Color(0x99FFFFFF),
-                                child: Column(children: <Widget>[
-                                  Image.asset(
-                                      "assets/speedoicon/assets_images_shareicon.png",
-                                      height: imageSize,
-                                      width: imageSize),
-                                  Text(getTranslated(context, 'share')!,
-                                      style:
+                                    // color: Colors.white,
+                                    //color: Color(0x99FFFFFF),
+                                    child: Column(children: <Widget>[
+                                      Image.asset(
+                                          "assets/speedoicon/assets_images_shareicon.png",
+                                          height: imageSize,
+                                          width: imageSize),
+                                      Text(getTranslated(context, 'share')!,
+                                          style:
                                           TextStyle(fontSize: 12, height: 2.0))
-                                ])),
+                                    ])),
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-              )
-            ],
-          ));
-    });
+                  )
+                ],
+              ));
+        });
   }
 
   // add marker
@@ -1867,7 +1876,7 @@ class _listscreen extends State<listscreen>
           // Use the AnimatedList's removeItem method to trigger the animation.
           _listKey.currentState!.removeItem(
             removeIndex,
-            (BuildContext context, Animation<double> animation) {
+                (BuildContext context, Animation<double> animation) {
               // Build the widget for the removed item during the animation.
               return SizeTransition(
                 sizeFactor: animation,

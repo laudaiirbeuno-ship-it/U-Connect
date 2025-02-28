@@ -3,7 +3,6 @@ import 'dart:convert';
 
 import 'package:bloc/bloc.dart';
 import 'package:maktrogps/config/static.dart';
-import 'package:maktrogps/data/model/PositionHistory.dart';
 import 'package:maktrogps/data/model/history.dart';
 import 'package:meta/meta.dart';
 import 'package:http/http.dart' as http;

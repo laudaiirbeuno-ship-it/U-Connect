@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'dart:async';
 import 'dart:convert';
 import 'package:firebase_core/firebase_core.dart';
@@ -78,7 +77,9 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   void initState() {
+
     super.initState();
+
     checkPreference();
     LocalNotificationService.initialize(context);
 
@@ -101,7 +102,7 @@ class _MyHomePageState extends State<MyHomePage> {
     });
 
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      LocalNotificationService.display(message);      
+      LocalNotificationService.display(message);
     });
 
     FirebaseMessaging.onMessageOpenedApp.listen((message) {
@@ -109,76 +110,18 @@ class _MyHomePageState extends State<MyHomePage> {
       Navigator.of(context).pushNamed(routeFromMessage);
     });
 
-    getToken();
+
   }
 
   void checkPreference() async {
     StaticVarMethod.pref_static = await SharedPreferences.getInstance();
-    prefs = await SharedPreferences.getInstance();
-
-    if (prefs!.get('baseurlall') != null) {
-      StaticVarMethod.baseurlall = prefs!.get('baseurlall').toString();
-    } else {
-      StaticVarMethod.baseurlall = "https://web.unnicatelemetria.com.br";
-    }
-
-    if (prefs!.get('email') != null) {
-      if (prefs!.get("popup_notify") == null) {
-        prefs!.setBool("popup_notify", true);
-      }
-      checkLogin();
-    } else {
-      prefs!.setBool("popup_notify", true);
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => signinwithbackground2()),
-      );
-    }
-  }
-
-  void checkLogin() {
-    gpsapis api = new gpsapis();
-    api
-        .getlogin(
-            prefs!.get('email').toString(), prefs!.get('password').toString())
-        .then((response) {
-      if (response != null) {
-        if (response.statusCode == 200) {
-          prefs!.setBool("popup_notify", true);
-          prefs!.setString("user", response.body);
-          final res = LoginModel.fromJson(json.decode(response.body));
-          StaticVarMethod.user_api_hash = res.userApiHash;
-          prefs!.setString('user_api_hash', res.userApiHash!);
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => BottomNavigation_01()),
-          );
-        } else {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => signinwithbackground2()),
-          );
-        }
-      } else {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) => signinwithbackground2()),
-        );
-      }
-    });
+    StaticVarMethod.baseurlall = "https://web.unnicatelemetria.com.br";
   }
 
   Future<void> getDeviceTokenToSendNotification() async {
     String? fcmToken = await FirebaseMessaging.instance.getToken();
     StaticVarMethod.notificationToken = fcmToken.toString();
-    print("Token Value: " + StaticVarMethod.notificationToken);
-  }
-
-  Future<void> getToken() async {
-    String? fcmToken = await FirebaseMessaging.instance.getToken();
+    print("FCM TOKEN: " + StaticVarMethod.notificationToken);
   }
 
   @override

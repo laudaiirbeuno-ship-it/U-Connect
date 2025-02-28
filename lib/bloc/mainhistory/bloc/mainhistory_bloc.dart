@@ -4,7 +4,6 @@ import 'dart:convert';
 import 'package:bloc/bloc.dart';
 import 'package:maktrogps/config/static.dart';
 import 'package:maktrogps/data/model/PositionHistory.dart';
-import 'package:maktrogps/data/model/history.dart';
 import 'package:meta/meta.dart';
 import 'package:http/http.dart' as http;
 part 'mainhistory_event.dart';
@@ -22,8 +21,6 @@ class MainHistoryBloc extends Bloc<MainHistoryEvent, MainHistoryState> {
   FutureOr<void> historyInitialFetchEvent(MainHistoryInitialFetchEvent event, Emitter<MainHistoryState> emit) async {
     emit(MainHistoryFetchingLoadingState());
 
-
-    List<TripsItems> list = [];
     final response = await http.get(Uri.parse(StaticVarMethod.baseurlall +
         "/api/get_history?lang=en&user_api_hash=${StaticVarMethod
             .user_api_hash}&from_date=" + StaticVarMethod.fromdate +

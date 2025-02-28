@@ -26,101 +26,11 @@ class StaticVarMethod {
 
   static int reportType = 1;
 
-  //static String baseurlall= "https://maktrogps.com";
-
-  // static String baseurlall= "http://38.242.199.100";
-  // static String baseurlall= "http://38.242.158.64";
-
-  // static String baseurlall= "http://207.244.225.51";
-
-  //static String baseurlall= "http://136.244.82.204";
-  //demo@demo.com   demo
-  // static String baseurlall="https://bittrackerz.com";
-  //static String baseurlall= "http://gps.mototrackerbd.com";
-  //static String baseurlall= "http://brtcvts.com";
   static String baseurlall = UserRepository.getServerURL();
-  // static String imageurl= 'assets/appsicon/trackon.png';
-
-  // static String listimageurl= 'assets/appsicon/rqtrackerlist.png';
-  // static String loginimageurl= 'assets/appsicon/rqtrackerlogin.png';
-  // static String splashimageurl= 'assets/appsicon/rqtrackerlogin.png';
-
-  // static String listimageurl= 'assets/appsicon/trackmasterlistscreen.jpeg';
-  // static String loginimageurl= 'assets/appsicon/trackmasterlogin.jpeg';
-  // static String splashimageurl= 'assets/appsicon/trackmasterlogin.jpeg';
-
-  // static String listimageurl= 'assets/appsicon/sigo500by200.png';
-  // static String loginimageurl= 'assets/appsicon/sigo500by200.png';
-  // static String splashimageurl= 'assets/appsicon/sigo500by200.png';
-  //static String listimageurl= 'assets/appsicon/vehitrack.jpeg';
-  //static String loginimageurl= 'assets/appsicon/vehitrack.jpeg';
-  //static String splashimageurl= 'assets/appsicon/vehitrack.jpeg';
-  //
-  // static String listimageurl= 'assets/appsicon/gblrentalexpressappicon.jpg';
-  // static String loginimageurl= 'assets/appsicon/gblrentalexpressappicon.jpg';
-  // static String splashimageurl= 'assets/appsicon/gblrentalexpressappicon.jpg';
-
-  // static String listimageurl= 'assets/appsicon/vtracklogo.jpeg';
-  // static String loginimageurl= 'assets/appsicon/vtracklogo.jpeg';
-  // static String splashimageurl= 'assets/appsicon/vtracklogo.jpeg';
-
-  // //
-  // static String listimageurl= 'assets/appsicon/navaiotfull512by512.png';
-  // static String loginimageurl= 'assets/appsicon/navaiotfull512by512.png';
-  // static String splashimageurl= 'assets/appsicon/navaiotfull512by512.png';
-  //
-  // static String listimageurl= 'assets/appsicon/orbitgps.jpeg';
-  // static String loginimageurl= 'assets/appsicon/orbitgps.jpeg';
-  // static String splashimageurl= 'assets/appsicon/orbitgps.jpeg';
-
-  // static String listimageurl= 'assets/appsicon/expresstrqarfinal.png';
-  // static String loginimageurl= 'assets/appsicon/expresstrqarfinal.png';
-  // static String splashimageurl= 'assets/appsicon/expresstrqarfinal.png';
-
-  // static String listimageurl= 'assets/appsicon/telematix.png';
-  // static String loginimageurl= 'assets/appsicon/telematix.png';
-  // static String splashimageurl= 'assets/appsicon/telematix.png';
-
+  
   static String listimageurl = 'assets/appsicon/logo-fill.png';
   static String loginimageurl = 'assets/appsicon/logo.png';
   static String splashimageurl = 'assets/appsicon/logo-fill.png';
-
-  // static String listimageurl= 'assets/appsicon/sigo500by200.png';
-  // static String loginimageurl= 'assets/appsicon/sigo500by200.png';
-  // static String splashimageurl= 'assets/appsicon/sigo500by200.png';
-
-  // static String listimageurl= 'assets/appsicon/roadpoint.jpeg';
-  // static String loginimageurl= 'assets/appsicon/roadpoint.jpeg';
-  // static String splashimageurl= 'assets/appsicon/roadpoint.jpeg';
-
-  // static String listimageurl= 'assets/appsicon/wonderlevel.jpg';
-  // static String loginimageurl= 'assets/appsicon/wonderlevel.jpg';
-  // static String splashimageurl= 'assets/appsicon/wonderlevel.jpg';
-
-  // static String listimageurl= 'assets/appsicon/gmtsfiverbangladeshlogo.png';
-  // static String loginimageurl= 'assets/appsicon/gmtsfiverbangladeshlogo.png';
-  // static String splashimageurl= 'assets/appsicon/gmtsfiverbangladeshlogo.png';
-
-  // static String listimageurl= 'assets/appsicon/smartgpstrackerlist.png';
-  // static String loginimageurl= 'assets/appsicon/smartgpstrackerlist.png';
-  // static String splashimageurl= 'assets/appsicon/smartgpstrackerlist.png';
-
-  // static String listimageurl= 'assets/appsicon/colombiaservirastreo.jpeg';
-  // static String loginimageurl= 'assets/appsicon/colombiaservirastreo.jpeg';
-  // static String splashimageurl= 'assets/appsicon/colombiaservirastreo.jpeg';
-
-  //
-  // static String listimageurl= 'assets/appsicon/sftech.png';
-  // static String loginimageurl= 'assets/appsicon/sftech.png';
-  // static String splashimageurl= 'assets/appsicon/sftech.png';
-  //
-  // static String listimageurl= 'assets/appsicon/btplloginlogo.png';
-  // static String loginimageurl= 'assets/appsicon/btplloginlogo.png';
-  // static String splashimageurl= 'assets/appsicon/btplloginlogo.png';
-
-  // static String listimageurl= 'assets/appsicon/proativarastreamentoicon.png';
-  // static String loginimageurl= 'assets/appsicon/proativarastreamentoicon.png';
-  // static String splashimageurl= 'assets/appsicon/proativarastreamentoicon.png';
 
   static String backgroundimageurl = 'assets/appsicon/smartgpstrackerlogin.png';
 

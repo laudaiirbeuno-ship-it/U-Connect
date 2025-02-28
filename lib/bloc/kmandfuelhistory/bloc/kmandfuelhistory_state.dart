@@ -1,6 +1,5 @@
 part of 'kmandfuelhistory_bloc.dart';
 
-@immutable
 abstract class KmandfuelHistoryState {}
 
 class KmandfuelHistoryActionState extends KmandfuelHistoryState {}
