@@ -58,7 +58,7 @@ class _changedevicesettingsState extends State<changedevicesettings> {
     return Scaffold(
       backgroundColor:  Colors.grey[300],
       appBar: AppBar(
-        //automaticallyImplyLeading: false,
+        automaticallyImplyLeading: false,
         //elevation: 0,
         iconTheme: IconThemeData(
           color: Colors.black, //change your color here
@@ -68,7 +68,19 @@ class _changedevicesettingsState extends State<changedevicesettings> {
 
         ],
         backgroundColor: Colors.white,
-        title: Text(getTranslated(context, 'changeVehicleSettings')!, style: GlobalStyle.appBarTitle),
+        title: Row(
+          spacing: 16,
+          children: [
+            Icon(
+              Icons.car_crash,
+              color: Colors.black,
+            ),
+            Text(
+              getTranslated(context, 'changeVehicleSettings')!,
+              style: TextStyle(color: Colors.black),
+            ),
+          ],
+        ),
         //bottom: _reusableWidget.bottomAppBar(),
       ),
       body: ListView(

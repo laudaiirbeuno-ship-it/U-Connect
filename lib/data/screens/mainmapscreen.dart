@@ -46,7 +46,7 @@ class _mainmapscreen extends State<mainmapscreen> {
 
   bool _showMarker = true;
   bool _showTitle = true;
-  double _currentZoom = 14;
+  double _currentZoom = 100;
 
   LatLng _initialPosition = LatLng(35.168033, 74.900467);
   Location currentLocation = Location();
@@ -198,18 +198,6 @@ class _mainmapscreen extends State<mainmapscreen> {
     print("Map Builder");
     return Scaffold(
       backgroundColor: Colors.white,
-      /*  appBar: AppBar(
-         automaticallyImplyLeading: false,
-         elevation: 0,
-      */ /* iconTheme: IconThemeData(
-          color: GlobalStyle.appBarIconThemeColor,
-        ),*/ /*
-      //systemOverlayStyle: GlobalStyle.appBarSystemOverlayStyle,
-      centerTitle: false,
-      title: Center( child:Text("Map Screen")*/ /*Image.asset('assets/appsicon/btplloginlogo.png', height: 40)*/ /*) ,
-      backgroundColor: Colors.blue.shade900,
-      //bottom: _reusableWidget.bottomAppBar(),
-    ),*/ //_globalWidget.globalAppBar(),
       body: Stack(
         children: [
           _buildGoogleMap(),
@@ -358,12 +346,16 @@ class _mainmapscreen extends State<mainmapscreen> {
                 // color: Colors.white,
                 //color: Color(0x99FFFFFF),
                 child: (_showMarker)
-                    ? Image.asset("assets/nepalicon/poi_default.png",
-                        height: 20, width: 20)
-                    : Image.asset("assets/nepalicon/poi_outline.png",
-                        height: 20,
-                        width:
-                            20), /*Icon(
+                    ? Icon(
+                  Icons.place,
+                  color: Colors.black,
+                  size: 20,
+                )
+                    : Icon(
+                  Icons.place_outlined,
+                  color: Colors.black,
+                  size: 20,
+                ), /*Icon(
                   (_showMarker)
                       ? Icons.location_on
                       : Icons.location_off,
@@ -402,10 +394,16 @@ class _mainmapscreen extends State<mainmapscreen> {
                 // color: Colors.white,
                 //color: Color(0x99FFFFFF),
                 child: (_showTitle)
-                    ? Image.asset("assets/nepalicon/car_with_name.png",
-                        height: 25, width: 25)
-                    : Image.asset("assets/nepalicon/car_without_name.png",
-                        height: 25, width: 25),
+                    ? Icon(
+                  Icons.label,
+                  color: Colors.black,
+                  size: 20,
+                )
+                    : Icon(
+                  Icons.label_outline,
+                  color: Colors.black,
+                  size: 20,
+                ),
               ),
             ),
           ),
@@ -414,7 +412,7 @@ class _mainmapscreen extends State<mainmapscreen> {
             left: 16,
             child: GestureDetector(
               onTap: () async {
-                //  _recenterall();
+                 _recenterall();
               },
               child: Container(
                   padding: EdgeInsets.all(5),
@@ -798,10 +796,16 @@ class _mainmapscreen extends State<mainmapscreen> {
                   ],
                 ),
                 child: (_trafficEnabled)
-                    ? Image.asset("assets/nepalicon/traffic-lights-active.png",
-                        height: 25, width: 25)
-                    : Image.asset("assets/nepalicon/traffic-lights.png",
-                        height: 25, width: 25),
+                    ? Icon(
+                  Icons.traffic,
+                  color: Colors.black,
+                  size: 20,
+                )
+                    : Icon(
+                  Icons.traffic_outlined,
+                  color: Colors.black,
+                  size: 20,
+                ),
               ),
             ),
           ),
@@ -827,8 +831,11 @@ class _mainmapscreen extends State<mainmapscreen> {
                       ),
                     ],
                   ),
-                  child: Image.asset("assets/nepalicon/roadmap.png",
-                      height: 25, width: 25)),
+                  child: Icon(
+                    Icons.layers,
+                    color: Colors.black,
+                    size: 20,
+                  )),
             ),
           ),
           Positioned(
@@ -857,8 +864,11 @@ class _mainmapscreen extends State<mainmapscreen> {
                   ),
                   // color: Colors.white,
                   //color: Color(0x99FFFFFF),
-                  child: Image.asset("assets/nepalicon/my_location.png",
-                      height: 25, width: 25)),
+                  child: Icon(
+                    Icons.my_location,
+                    color: Colors.black,
+                    size: 20,
+                  )),
             ),
           ),
           Positioned(
@@ -873,7 +883,7 @@ class _mainmapscreen extends State<mainmapscreen> {
                   CameraUpdate.newCameraPosition(
                     CameraPosition(
                       target: _initialPosition,
-                      zoom: currentZoomLevel,
+                      zoom: 15.0,
                     ),
                   ),
                 );
@@ -941,8 +951,11 @@ class _mainmapscreen extends State<mainmapscreen> {
                   ),
                   // color: Colors.white,
                   //color: Color(0x99FFFFFF),
-                  child: Image.asset("assets/nepalicon/zoom_out.png",
-                      height: 25, width: 25)),
+                  child: Icon(
+                    Icons.zoom_out,
+                    color: Colors.grey[700],
+                    size: 30,
+                  )),
             ),
           ),
 
@@ -1451,9 +1464,16 @@ class _mainmapscreen extends State<mainmapscreen> {
 
   void _recenterall() {
     CameraUpdate u2 =
-        CameraUpdate.newLatLngBounds(_boundsFromLatLngList(_latlng), 50);
+    CameraUpdate.newLatLngBounds(_boundsFromLatLngList(_latlng), 200);
     this._controller.moveCamera(u2).then((void v) {
       _check(u2, this._controller);
+      // Ajuste o zoom após recarregar
+      _controller.animateCamera(CameraUpdate.newCameraPosition(
+        CameraPosition(
+          target: _initialPosition,
+          zoom: 15.0, // Ajuste o valor do zoom aqui para um valor menor
+        ),
+      ));
     });
   }
 
@@ -1465,7 +1485,7 @@ class _mainmapscreen extends State<mainmapscreen> {
     _controller
         ?.animateCamera(CameraUpdate.newCameraPosition(new CameraPosition(
       target: LatLng(location.latitude ?? 0.0, location.longitude ?? 0.0),
-      zoom: 12.0,
+      zoom: 15.0,
     )));
     setState(() {
       _markers.add(Marker(
@@ -1507,7 +1527,7 @@ class _mainmapscreen extends State<mainmapscreen> {
       markers: Set<Marker>.of(_allMarker.values),
       initialCameraPosition: CameraPosition(
         target: _initialPosition,
-        zoom: _currentZoom,
+        zoom: 15.0,
       ),
       onCameraMove: _onGeoChanged,
       onCameraIdle: () {
@@ -1526,19 +1546,20 @@ class _mainmapscreen extends State<mainmapscreen> {
         // we use timer for this demo
         // in the real application, get all marker from database
         // Get the marker from API and add the marker here
-        _timerDummy = Timer(Duration(seconds: 0), () {
+        _timerDummy = Timer(Duration(seconds: 2), () {
           setState(() {
             _mapLoading = false;
             updateMarker();
             // zoom to all marker
-            if (_isBound == false /*&& _doneListing==true*/) {
-              _isBound = true;
-              CameraUpdate u2 = CameraUpdate.newLatLngBounds(
-                  _boundsFromLatLngList(_latlng), 100);
-              this._controller.moveCamera(u2).then((void v) {
-                _check(u2, this._controller);
-              });
-            }
+            // if (_isBound == false /*&& _doneListing==true*/) {
+            //   _isBound = true;
+            //   CameraUpdate u2 = CameraUpdate.newLatLngBounds(
+            //       _boundsFromLatLngList(_latlng), 15.0);
+            //   this._controller.moveCamera(u2).then((void v) {
+            //     _check(u2, this._controller);
+            //   });
+            // }
+            _recenterall();
             _mapLoading = false;
           });
         });
@@ -1563,7 +1584,13 @@ class _mainmapscreen extends State<mainmapscreen> {
 
     //_allMarker.clear();
     for (int i = 0; i < devicesList.length; i++) {
+
       String other = devicesList[i].deviceData!.traccar!.other.toString();
+
+      String baseUrl = "https://web.unnicatelemetria.com.br/";
+      String? deviceIconPath = devicesList[i].icon?.path;
+      String deviceIconFullPath = baseUrl + (deviceIconPath ?? '');
+
       String ignition = "false";
 
       if (other.contains("<ignition>")) {
@@ -1577,70 +1604,31 @@ class _mainmapscreen extends State<mainmapscreen> {
         var color;
         var label;
 
-        String iconpath = 'assets/tbtrack/car_toprunning.png';
         if (devicesList[i].speed!.toInt() > 0) {
-          iconpath = 'assets/tbtrack/car_toprunning.png';
+
           color = Colors.green;
           label = devicesList[i].name.toString() +
               '(' +
               devicesList[i].speed!.toString() +
               ' km)';
-          if (StaticVarMethod.pref_static!
-                  .get(devicesList[i].deviceData!.imei.toString()) !=
-              null)
-            iconpath = "assets/tbtrack/" +
-                StaticVarMethod.pref_static!
-                    .get(devicesList[i].deviceData!.imei.toString())
-                    .toString() +
-                "toprunning.png";
+
         } else if (devicesList[i].online!.contains('engine')) {
-          iconpath = 'assets/tbtrack/car_topidle.png';
           color = Colors.yellow;
           label = devicesList[i].name.toString();
-          if (StaticVarMethod.pref_static!
-                  .get(devicesList[i].deviceData!.imei.toString()) !=
-              null)
-            iconpath = "assets/tbtrack/" +
-                StaticVarMethod.pref_static!
-                    .get(devicesList[i].deviceData!.imei.toString())
-                    .toString() +
-                "topidle.png";
+
         } else if (devicesList[i].online!.contains('online')) {
-          iconpath = 'assets/tbtrack/car_toprunning.png';
           color = Colors.green;
           label = devicesList[i].name.toString();
-          if (StaticVarMethod.pref_static!
-                  .get(devicesList[i].deviceData!.imei.toString()) !=
-              null)
-            iconpath = "assets/tbtrack/" +
-                StaticVarMethod.pref_static!
-                    .get(devicesList[i].deviceData!.imei.toString())
-                    .toString() +
-                "toprunning.png";
+
         } else if (devicesList[i].online!.contains('ack')) {
-          iconpath = 'assets/tbtrack/car_topstop.png';
           color = Colors.red;
           label = devicesList[i].name.toString();
-          if (StaticVarMethod.pref_static!
-                  .get(devicesList[i].deviceData!.imei.toString()) !=
-              null)
-            iconpath = "assets/tbtrack/" +
-                StaticVarMethod.pref_static!
-                    .get(devicesList[i].deviceData!.imei.toString())
-                    .toString() +
-                "topstop.png";
+
         } else if (devicesList[i].online!.contains('offline')) {
-          iconpath = 'assets/tbtrack/car_topinactive.png';
+
           color = Colors.blue;
           label = devicesList[i].name.toString();
-          if (StaticVarMethod.pref_static!
-                  .get(devicesList[i].deviceData!.imei.toString()) !=
-              null)
-            iconpath = "assets/tbtrack/" +
-                StaticVarMethod.pref_static!
-                    .get(devicesList[i].deviceData!.imei.toString())
-                    .toString() +
-                "topinactive.png";
+
         }
 
         double lat = devicesList[i].lat as double;
@@ -1650,7 +1638,7 @@ class _mainmapscreen extends State<mainmapscreen> {
         LatLng position = LatLng(lat, lng);
         _latlng.add(position);
         _createImageLabel(
-                iconpath: iconpath,
+                iconpath: deviceIconFullPath,
                 label: label,
                 course: devicesList[i].course.toDouble(),
                 color: color,
@@ -1660,9 +1648,6 @@ class _mainmapscreen extends State<mainmapscreen> {
           _allMarker[MarkerId(i.toString())] = Marker(
               markerId: MarkerId(i.toString()),
               position: position,
-              //rotation: 0.0,
-              // infoWindow: InfoWindow(
-              //    title: 'This is marker ' + (i + 1).toString()),
               onTap: () {
                 _initialPosition =
                     LatLng(position.latitude, position.longitude);
@@ -1671,17 +1656,12 @@ class _mainmapscreen extends State<mainmapscreen> {
                 setState(() {
                   isshowvehicledetail = true;
                 });
-                /*      Fluttertoast.showToast(
-                        msg: 'Click marker ' + (i + 1).toString(),
-                        toastLength: Toast.LENGTH_SHORT);*/
+
               },
               anchor: Offset(0.5, 0.5),
               icon: customIcon);
         });
 
-        // setState(() {
-        //
-        // });
         if (i == devicesList.length - 1) {
           _doneListing = true;
         }
@@ -1748,20 +1728,6 @@ Future<BitmapDescriptor> getMarkerIcon(String imagePath, String infoText,
   canvas.translate(
       canvasSize.width / 2, canvasSize.height / 2 + infoHeight / 2);
 
-  // Add shadow circle
-  // canvas.drawOval(
-  //     Rect.fromLTWH(-markerSize.width / 2, -markerSize.height / 2,
-  //         markerSize.width, markerSize.height),
-  //     markerPaint);
-  // // Add border circle
-  // canvas.drawOval(
-  //     Rect.fromLTWH(
-  //         -markerSize.width / 2 + shadowWidth,
-  //         -markerSize.height / 2 + shadowWidth,
-  //         markerSize.width - 2 * shadowWidth,
-  //         markerSize.height - 2 * shadowWidth),
-  //     borderPaint);
-
   // Oval for the image
   Rect oval = Rect.fromLTWH(
       -markerSize.width / 2 + .5 * shadowWidth,
@@ -1783,7 +1749,7 @@ Future<BitmapDescriptor> getMarkerIcon(String imagePath, String infoText,
   ui.Image image;
   // Add image
   // if(imagePath.contains("arrow-ack.png")){
-  image = await getImageFromPath(imagePath);
+  image = await getImageFromPathUrl(imagePath);
   // image = await getImageFromPath("assets/images/direction.png");
   /* }else{
     image = await getImageFromPathUrl(imagePath);
@@ -1836,12 +1802,10 @@ Future<BitmapDescriptor> getMarkerIcon(String imagePath, String infoText,
     canvas.restore();
   }
 
-  // Convert canvas to image
   final ui.Image markerAsImage = await pictureRecorder
       .endRecording()
       .toImage(canvasSize.width.toInt(), canvasSize.height.toInt());
 
-  // Convert image to bytes
   final ByteData? byteData =
       await markerAsImage.toByteData(format: ui.ImageByteFormat.png);
   final Uint8List? uint8List = byteData?.buffer.asUint8List();
@@ -1849,102 +1813,7 @@ Future<BitmapDescriptor> getMarkerIcon(String imagePath, String infoText,
   return BitmapDescriptor.fromBytes(uint8List!);
 }
 
-/*
-Future<BitmapDescriptor> getMarkerIconwithTitle(String imagePath,String infoText,Color color,double rotateDegree) async {
-  final ui.PictureRecorder pictureRecorder = ui.PictureRecorder();
-  final Canvas canvas = Canvas(pictureRecorder);
-
-  //size
-  Size canvasSize = Size(700.0,220.0);
-  Size markerSize = Size(80.0,80.0);
-
-  // Add info text
-  TextPainter textPainter = TextPainter(textDirection: TextDirection.ltr);
-  textPainter.text = TextSpan(
-    text: infoText,
-    style: TextStyle(fontSize: 30.0,fontWeight: FontWeight.w600, color: color),
-  );
-  textPainter.layout();
-
-  final Paint infoPaint = Paint()..color = Colors.white;
-  final Paint infoStrokePaint = Paint()..color = color;
-  final double infoHeight = 70.0;
-  final double strokeWidth = 2.0;
-
-  final Paint markerPaint = Paint()..color = color.withOpacity(.5);
-  final double shadowWidth = 30.0;
-
-  final Paint borderPaint = Paint()..color = color..strokeWidth=2.0..style = PaintingStyle.stroke;
-
-  final double imageOffset = shadowWidth*.5;
-
-  canvas.translate(canvasSize.width/2, canvasSize.height/2+infoHeight/2);
-
-  // Add shadow circle
-  canvas.drawOval(Rect.fromLTWH(-markerSize.width/2, -markerSize.height/2, markerSize.width, markerSize.height), markerPaint);
-  // Add border circle
-  canvas.drawOval(Rect.fromLTWH(-markerSize.width/2+shadowWidth, -markerSize.height/2+shadowWidth, markerSize.width-2*shadowWidth, markerSize.height-2*shadowWidth), borderPaint);
-
-  // Oval for the image
-  Rect oval = Rect.fromLTWH(-markerSize.width/2+.5* shadowWidth, -markerSize.height/2+.5*shadowWidth, markerSize.width-shadowWidth, markerSize.height-shadowWidth);
-
-  //save canvas before rotate
-  canvas.save();
-
-  double rotateRadian = (pi/180.0)*rotateDegree;
-
-  //Rotate Image
-  canvas.rotate(rotateRadian);
-
-  // Add path for oval image
-  canvas.clipPath(Path()
-    ..addOval(oval));
-
-  // Add image
-  ui.Image image = await getImageFromPath(imagePath);
-  paintImage(canvas: canvas,image: image, rect: oval, fit: BoxFit.fitHeight);
-
-  canvas.restore();
-
-  // Add info box stroke
-  canvas.drawPath(Path()..addRRect(RRect.fromLTRBR(-textPainter.width/2-infoHeight/2, -canvasSize.height/2-infoHeight/2+1, textPainter.width/2+infoHeight/2, -canvasSize.height/2+infoHeight/2+1,Radius.circular(35.0)))
-    ..moveTo(-15, -canvasSize.height/2+infoHeight/2+1)
-    ..lineTo(0, -canvasSize.height/2+infoHeight/2+25)
-    ..lineTo(15, -canvasSize.height/2+infoHeight/2+1)
-      , infoStrokePaint);
-
-  //info info box
-  canvas.drawPath(Path()..addRRect(RRect.fromLTRBR(-textPainter.width/2-infoHeight/2+strokeWidth, -canvasSize.height/2-infoHeight/2+1+strokeWidth, textPainter.width/2+infoHeight/2-strokeWidth, -canvasSize.height/2+infoHeight/2+1-strokeWidth,Radius.circular(32.0)))
-    ..moveTo(-15+strokeWidth/2, -canvasSize.height/2+infoHeight/2+1-strokeWidth)
-    ..lineTo(0, -canvasSize.height/2+infoHeight/2+25-strokeWidth*2)
-    ..lineTo(15-strokeWidth/2, -canvasSize.height/2+infoHeight/2+1-strokeWidth)
-      , infoPaint);
-  textPainter.paint(
-      canvas,
-      Offset(
-          - textPainter.width / 2,
-          -canvasSize.height/2-infoHeight/2+infoHeight / 2 - textPainter.height / 2
-      )
-  );
-
-  canvas.restore();
-
-  // Convert canvas to image
-  final ui.Image markerAsImage = await pictureRecorder.endRecording().toImage(
-      canvasSize.width.toInt(),
-      canvasSize.height.toInt()
-  );
-
-  // Convert image to bytes
-  final ByteData? byteData = await markerAsImage.toByteData(format: ui.ImageByteFormat.png);
-  final Uint8List? uint8List = byteData?.buffer.asUint8List();
-
-  return BitmapDescriptor.fromBytes(uint8List!);
-}
-*/
-
 Future<ui.Image> getImageFromPath(String imagePath) async {
-  //File imageFile = File(imagePath);
   var bd = await rootBundle.load(imagePath);
   Uint8List imageBytes = Uint8List.view(bd.buffer);
 
@@ -1953,16 +1822,12 @@ Future<ui.Image> getImageFromPath(String imagePath) async {
   ui.decodeImageFromList(imageBytes, (ui.Image img) {
     return completer.complete(img);
   });
-
   return completer.future;
 }
 
 Future<ui.Image> getImageFromPathUrl(String imagePath) async {
-  //File imageFile = File(imagePath);
   final response = await http.Client().get(Uri.parse(imagePath));
   final bytes = response.bodyBytes;
-//  var bd = await rootBundle.load(imagePath);
-  //Uint8List imageBytes = Uint8List.view(bd.buffer);
 
   final Completer<ui.Image> completer = new Completer();
 

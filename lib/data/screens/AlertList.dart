@@ -166,8 +166,20 @@ class _AlertListPageState extends State<AlertListPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(getTranslated(context, 'alerts')!,
-            style: TextStyle(color: Colors.black)),
+        automaticallyImplyLeading: false,
+        title: Row(
+          spacing: 16,
+          children: [
+            Icon(
+              Icons.notifications,
+              color: Colors.black,
+            ),
+            Text(
+              getTranslated(context, 'alerts')!,
+              style: TextStyle(color: Colors.black),
+            ),
+          ],
+        ),
         iconTheme: IconThemeData(
           color: Colors.black, //change your color here
         ),

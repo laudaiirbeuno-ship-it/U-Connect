@@ -112,6 +112,7 @@ dependencies:
   flutter_speed_dial: ^7.0.0
   #sliding_up_panel2: ^3.3.0+1
   change_app_package_name: ^1.4.0
+  marquee: ^2.3.0
 
 dependency_overrides:
   http: ^1.0.0

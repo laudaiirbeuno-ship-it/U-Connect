@@ -1047,11 +1047,11 @@ class _LiveMapScreenState extends State<LiveMapScreen>
                         ),
                         // color: Colors.white,
                         //color: Color(0x99FFFFFF),
-                        child: Image.asset(
-                            "assets/speedoicon/assets_images_kmicon.png",
-                            height: 20,
-                            width:
-                                20), /*Icon(Icons.refresh,
+                        child: Icon(
+                          Icons.query_stats_outlined,
+                          color: Colors.black,
+                          size: 20,
+                        ), /*Icon(Icons.refresh,
                   color: Colors.white,
                   size: 25,*/
                       ),
@@ -1087,11 +1087,11 @@ class _LiveMapScreenState extends State<LiveMapScreen>
                         ),
                         // color: Colors.white,
                         //color: Color(0x99FFFFFF),
-                        child: Image.asset(
-                            "assets/images/icons8-info-popup-100.png",
-                            height: 20,
-                            width:
-                                20), /*Icon(Icons.refresh,
+                        child: Icon(
+                          Icons.info_outline,
+                          color: Colors.black,
+                          size: 20,
+                        ), /*Icon(Icons.refresh,
                   color: Colors.white,
                   size: 25,*/
                       ),

@@ -39,7 +39,10 @@ class _NotificationsPageState extends State<NotificationsPage> {
         title: Row(
           spacing: 16,
           children: [
-            // Image.asset(StaticVarMethod.splashimageurl, height: 30),
+            Icon(
+              Icons.notifications_sharp,
+              color: Colors.black,
+            ),
             Text(
               'Notificações',
               style: TextStyle(

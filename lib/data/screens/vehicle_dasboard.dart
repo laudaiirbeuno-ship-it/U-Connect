@@ -88,11 +88,21 @@ class _vehicle_dasboard extends State<vehicle_dasboard> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text(
-          StaticVarMethod.deviceName.toString(),
-          style: TextStyle(
-            color: Colors.black,
-          ),
+        automaticallyImplyLeading: false,
+        title: Row(
+          spacing: 16,
+          children: [
+            Icon(
+              Icons.info_outline,
+              color: Colors.black,
+            ),
+            Text(
+              StaticVarMethod.deviceName.toString(),
+              style: TextStyle(
+                color: Colors.black,
+              ),
+            )
+          ],
         ),
         iconTheme: IconThemeData(
           color: Colors.black, //change your color here

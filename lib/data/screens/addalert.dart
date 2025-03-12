@@ -57,11 +57,21 @@ class _vehicle_infoState extends State<addalert> {
     return Scaffold(
       //backgroundColor: Colors.red,
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         elevation: 0,
-        title: Text(getTranslated(context, 'alertAdd')!,
-            style: TextStyle(
+        title: Row(
+          spacing: 16,
+          children: [
+            Icon(
+              Icons.speed,
               color: Colors.black,
-            )),
+            ),
+            Text(
+              getTranslated(context, 'alertAdd')!,
+              style: TextStyle(color: Colors.black),
+            ),
+          ],
+        ),
         iconTheme: IconThemeData(
           color: Colors.black, //change your color here
         ),

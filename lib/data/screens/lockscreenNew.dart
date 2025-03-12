@@ -86,14 +86,28 @@ class _lockscreenNewState extends State<lockscreenNew> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         //automaticallyImplyLeading: false,
         elevation: 0,
         iconTheme: IconThemeData(
           color: GlobalStyle.appBarIconThemeColor,
         ),
         systemOverlayStyle: GlobalStyle.appBarSystemOverlayStyle,
-        title: Text(getTranslated(context, 'command')!,
-            style: TextStyle(color: Colors.black)),
+        title: Row(
+          spacing: 6,
+          children: [
+            Icon(
+              Icons.terminal_outlined,
+              color: Colors.black,
+            ),
+            Text(
+              getTranslated(context, 'command')!,
+              style: TextStyle(
+                color: Colors.black,
+              ),
+            )
+          ],
+        ),
         backgroundColor: Colors.grey[300],
         //bottom: _reusableWidget.bottomAppBar(),
       ),

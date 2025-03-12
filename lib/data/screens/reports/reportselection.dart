@@ -97,11 +97,21 @@ class _reportselection extends State<reportselection> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text(
-          '' + StaticVarMethod.deviceName,
-          style: TextStyle(
-            color: Colors.black,
-          ),
+        automaticallyImplyLeading: false,
+        title: Row(
+          spacing: 16,
+          children: [
+            Icon(
+              Icons.summarize_outlined,
+              color: Colors.black,
+            ),
+            Text(
+              '' + StaticVarMethod.deviceName,
+              style: TextStyle(
+                color: Colors.black,
+              ),
+            )
+          ],
         ),
         iconTheme: IconThemeData(
           color: Colors.black, //change your color here

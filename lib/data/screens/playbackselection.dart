@@ -177,9 +177,21 @@ class _playbackselection extends State<playbackselection> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Text(
-          '' + StaticVarMethod.deviceName,
-          style: TextStyle(color: Colors.black),
+        automaticallyImplyLeading: false,
+        title: Row(
+          spacing: 16,
+          children: [
+            Icon(
+              Icons.play_circle_outline,
+              color: Colors.black,
+            ),
+            Text(
+              '' + StaticVarMethod.deviceName,
+              style: TextStyle(
+                color: Colors.black,
+              ),
+            )
+          ],
         ),
         iconTheme: IconThemeData(
           color: Colors.black, //change your color here

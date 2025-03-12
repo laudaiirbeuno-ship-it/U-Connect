@@ -75,16 +75,26 @@ class _kmdetailState extends State<kmdetail> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         elevation: 0,
         iconTheme: IconThemeData(
           color: GlobalStyle.appBarIconThemeColor,
         ),
         systemOverlayStyle: GlobalStyle.appBarSystemOverlayStyle,
-        title: Text(
-          getTranslated(context, 'mileage')!,
-          style: TextStyle(
-            color: Colors.black,
-          ),
+        title: Row(
+          spacing: 16,
+          children: [
+            Icon(
+              Icons.query_stats_outlined,
+              color: Colors.black,
+            ),
+            Text(
+              'Quilometragem',
+              style: TextStyle(
+                color: Colors.black,
+              ),
+            )
+          ],
         ),
         backgroundColor: Colors.grey[300],
         //bottom: _reusableWidget.bottomAppBar(),

@@ -186,8 +186,20 @@ class _GeofenceListPageState extends State<GeofenceListPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(getTranslated(context, 'geofences')!,
-            style: TextStyle(color: Colors.black)),
+        automaticallyImplyLeading: false,
+        title: Row(
+          spacing: 16,
+          children: [
+            Icon(
+              Icons.circle_outlined,
+              color: Colors.black,
+            ),
+            Text(
+              getTranslated(context, 'geofences')!,
+              style: TextStyle(color: Colors.black),
+            ),
+          ],
+        ),
         iconTheme: IconThemeData(
           color: Colors.black,
           //change your color here

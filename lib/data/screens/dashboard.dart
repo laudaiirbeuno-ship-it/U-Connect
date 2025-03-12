@@ -32,6 +32,7 @@ class DashboardScreen extends StatefulWidget {
 
 class _DashboardScreenState extends State<DashboardScreen> {
   int touchedIndex = -1;
+
   // late ObjectStore objectStore;
   // late EventsStore eventsStore;
   // late DashboardStore dashboardStore;
@@ -129,31 +130,30 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         elevation: 0.0,
         iconTheme: IconThemeData(color: Colors.black),
         title: Padding(
-            padding: const EdgeInsets.only(top: 0.0, left: 2.0),
+            padding: const EdgeInsets.only(top: 0.0, left: 0.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                Center(
-                  child: Text(
-                    getTranslated(context, 'dashboard')!,
-                    style: TextStyle(color: Colors.black),
-                  ),
+                Row(
+                  spacing: 16,
+                  children: [
+                    Icon(
+                      Icons.dashboard,
+                      color: Colors.black,
+                    ),
+                    Text(
+                      getTranslated(context, 'dashboard')!,
+                      style: TextStyle(color: Colors.black),
+                    ),
+                  ],
                 ),
-                InkWell(
-                  onTap: () {
-                    launch("tel://" + prefs!.getString("PREF_SUPPORT_NO")!);
-                  },
-                  child: prefs != null
-                      ? prefs!.getString("PREF_SUPPORT_NO") != null
-                          ? Icon(Icons.support_agent_outlined)
-                          : Container()
-                      : Container(),
-                )
               ],
-            )),
+            )
+        ),
         backgroundColor: Colors.grey[300],
       ),
       body: dashboardView(),
@@ -811,6 +811,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
   List<EventsData> _stopalets = [];
   List<EventsData> _ignitiononalets = [];
   List<EventsData> _ignitionoffalets = [];
+
   Future<void> getnotiList() async {
     gpsapis api = new gpsapis();
     try {
@@ -973,6 +974,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
 class _PieData {
   _PieData(this.xData, this.yData, this.text, this.color);
+
   final String xData;
   final num yData;
   final String text;

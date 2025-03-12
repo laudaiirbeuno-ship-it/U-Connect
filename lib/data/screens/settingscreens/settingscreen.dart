@@ -87,14 +87,20 @@ class _settingscreenState extends State<settingscreen> {
       appBar: AppBar(
         automaticallyImplyLeading: false,
         elevation: 0,
-        /* iconTheme: IconThemeData(
-          color: GlobalStyle.appBarIconThemeColor,
-        ),*/
-        //systemOverlayStyle: GlobalStyle.appBarSystemOverlayStyle,
-        // centerTitle: true,
-        title: Text(
-          getTranslated(context, 'settings')!,
-          style: TextStyle(color: Colors.black),
+        title: Row(
+          spacing: 16,
+          children: [
+            Icon(
+              Icons.settings,
+              color: Colors.black,
+            ),
+            Text(
+              "Configurações",
+              style: TextStyle(
+                color: Colors.black,
+              ),
+            )
+          ],
         ),
         backgroundColor: Colors.grey[300],
         //bottom: _reusableWidget.bottomAppBar(),
@@ -831,14 +837,6 @@ class _settingscreenState extends State<settingscreen> {
                                     fontWeight: FontWeight.bold)),
                           ],
                         ),
-                        // Switch(
-                        //   value: _val,
-                        //   onChanged: (value) {
-                        //     setState(() {
-                        //       _val = value;
-                        //     });
-                        //   },
-                        // ),
                       ],
                     )),
               ),
@@ -1174,14 +1172,6 @@ class _settingscreenState extends State<settingscreen> {
                           ),
                         ],
                       )
-                      // Switch(
-                      //   value: _val,
-                      //   onChanged: (value) {
-                      //     setState(() {
-                      //       _val = value;
-                      //     });
-                      //   },
-                      // ),
                     ],
                   ),
                 ),
