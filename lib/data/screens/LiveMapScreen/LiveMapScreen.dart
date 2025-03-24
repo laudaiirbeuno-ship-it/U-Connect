@@ -30,6 +30,9 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:maps_toolkit/maps_toolkit.dart' as mtk;
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:http/http.dart' as http;
+import 'package:image/image.dart' as IMG;
+
 import '../../../config/constant.dart';
 import '../../../config/static.dart';
 import '../../../mapconfig/CustomColor.dart';
@@ -160,22 +163,21 @@ class _LiveMapScreenState extends State<LiveMapScreen>
     setState(() {});
   }
 
-  String address = "View Address";
+  String address = "Clique para ver o endereço!";
   String getAddress(lat, lng) {
     if (lat != null) {
       gpsapis.getGeocoder(lat, lng).then((value) => {
             if (value != null)
               {
                 address = value.body,
-                //  setState(() {}),
+                setState(() {}),
               }
             else
-              {address = "Address not found"}
+              {address = "Endereço não encontrado"}
           });
     } else {
-      address = "Address not found";
+      address = "Endereço não encontrado";
     }
-    print(address);
     return address;
   }
 
@@ -245,6 +247,30 @@ class _LiveMapScreenState extends State<LiveMapScreen>
         .asUint8List();
   }
 
+  Future<BitmapDescriptor> getImageFromPathUrl(String imagePath, int height) async {
+    final response = await http.Client().get(Uri.parse(imagePath));
+    final bytes = response.bodyBytes;
+
+    final Completer<ui.Image> completer = Completer();
+    ui.decodeImageFromList(bytes, (ui.Image img) {
+      completer.complete(img);
+    });
+
+    final ui.Image image = await completer.future;
+    final ByteData? byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+    final Uint8List uint8List = byteData!.buffer.asUint8List();
+
+    // Calculate the width proportionally to the height
+    final double aspectRatio = image.width / image.height;
+    final int width = (height * aspectRatio).toInt();
+
+    final ui.Codec codec = await ui.instantiateImageCodec(uint8List, targetWidth: width, targetHeight: height);
+    final ui.FrameInfo fi = await codec.getNextFrame();
+    final Uint8List resizedUint8List = (await fi.image.toByteData(format: ui.ImageByteFormat.png))!.buffer.asUint8List();
+
+    return BitmapDescriptor.fromBytes(resizedUint8List);
+  }
+
   late double lati;
   late double lngi;
   String fUpdateTime = 'Not Found';
@@ -255,6 +281,11 @@ class _LiveMapScreenState extends State<LiveMapScreen>
 
   void updateMarker(deviceItems devicelist) async {
     var iconPath;
+
+    String baseUrl = "https://web.unnicatelemetria.com.br/";
+    String? deviceIconPath = devicelist.icon?.path;
+    String deviceIconFullPath = baseUrl + (deviceIconPath ?? '');
+
     var color;
     var label;
     int? speed = int.tryParse(devicelist.speed.toString());
@@ -263,118 +294,22 @@ class _LiveMapScreenState extends State<LiveMapScreen>
     lngi = devicelist.lng!.toDouble();
     fUpdateTime = devicelist.time.toString();
     fspeed = devicelist.speed.toString();
-    // fspeed= (int.parse(devicelist.speed.toString())/1.6093).toStringAsFixed(0);
     speedo = int.tryParse(devicelist.speed.toString());
     ftotalDistance = devicelist.totalDistance.toString();
     fstopDuration = devicelist.stopDuration.toString();
-    // String replacePath = category.replaceAll("img/markers/objects/land-", "");
-    // String replacePath2 = replacePath.replaceAll(".svg", "");
-    // String finalImg = replacePath2.replaceAll(RegExp('[^A-Za-z]'),'');
 
-    Uint8List markerIcon;
+    BitmapDescriptor markerIcon;
     try {
-      if (MediaQuery.of(context).size.aspectRatio > 0.55) {
-        markerIcon = await getBytesFromAsset(iconPath, 40);
-      } else {
-        markerIcon = await getBytesFromAsset(iconPath, 60);
-      }
+      markerIcon = await getImageFromPathUrl(deviceIconFullPath, 100); // Ajuste a altura conforme necessário
     } catch (e) {
-      String other = devicelist.deviceData!.traccar!.other.toString();
-      String ignition = "false";
-      if (other.contains("<ignition>")) {
-        const start = "<ignition>";
-        const end = "</ignition>";
-        final startIndex = other.indexOf(start);
-        final endIndex = other.indexOf(end, startIndex + start.length);
-        ignition = other.substring(startIndex + start.length, endIndex);
-      }
-      if (int.tryParse(devicelist.speed.toString())! > 0) {
-        colormain = Colors.green.withOpacity(0.5);
-        iconPath = "assets/tbtrack/car_toprunning.png";
-        color = Colors.green;
-        label = devicelist.name.toString() +
-            '(' +
-            devicelist.speed!.toString() +
-            ' km)';
-        if (StaticVarMethod.pref_static!
-                .get(devicelist.deviceData!.imei.toString()) !=
-            null)
-          iconPath = "assets/tbtrack/" +
-              StaticVarMethod.pref_static!
-                  .get(devicelist.deviceData!.imei.toString())
-                  .toString() +
-              "toprunning.png";
-      } else if (ignition.contains("true") &&
-          double.parse(devicelist.speed.toString()) < 1.0) {
-        colormain = Colors.yellow.withOpacity(0.5);
-        iconPath = 'assets/tbtrack/car_topidle.png';
-        label = devicelist.name.toString();
-        if (StaticVarMethod.pref_static!
-                .get(devicelist.deviceData!.imei.toString()) !=
-            null)
-          iconPath = "assets/tbtrack/" +
-              StaticVarMethod.pref_static!
-                  .get(devicelist.deviceData!.imei.toString())
-                  .toString() +
-              "topidle.png";
-      } else if (devicelist.online
-          .toString()
-          .toLowerCase()
-          .contains("offline")) {
-        colormain = Colors.blue.withOpacity(0.5);
-        iconPath = 'assets/tbtrack/car_topinactive.png';
-        label = devicelist.name.toString();
-        if (StaticVarMethod.pref_static!
-                .get(devicelist.deviceData!.imei.toString()) !=
-            null)
-          iconPath = "assets/tbtrack/" +
-              StaticVarMethod.pref_static!
-                  .get(devicelist.deviceData!.imei.toString())
-                  .toString() +
-              "topinactive.png";
-      } else if (devicelist.online
-          .toString()
-          .toLowerCase()
-          .contains("engine")) {
-        colormain = Colors.yellow.withOpacity(0.5);
-        iconPath = 'assets/tbtrack/car_topidle.png';
-        label = devicelist.name.toString();
-        if (StaticVarMethod.pref_static!
-                .get(devicelist.deviceData!.imei.toString()) !=
-            null)
-          iconPath = "assets/tbtrack/" +
-              StaticVarMethod.pref_static!
-                  .get(devicelist.deviceData!.imei.toString())
-                  .toString() +
-              "topidle.png";
-      } else {
-        color = Colors.red;
-        colormain = Colors.red.withOpacity(0.5);
-        iconPath = "assets/tbtrack/car_topstop.png";
-        label = devicelist.name.toString();
-        if (StaticVarMethod.pref_static!
-                .get(devicelist.deviceData!.imei.toString()) !=
-            null)
-          iconPath = "assets/tbtrack/" +
-              StaticVarMethod.pref_static!
-                  .get(devicelist.deviceData!.imei.toString())
-                  .toString() +
-              "topstop.png";
-      }
-      if (MediaQuery.of(context).size.aspectRatio > 0.55) {
-        markerIcon = await getBytesFromAsset(iconPath, 40);
-      } else {
-        markerIcon = await getBytesFromAsset(iconPath, 60);
-      }
+      markerIcon = BitmapDescriptor.defaultMarker;
     }
 
-    var pinPosition = LatLng(double.parse(devicelist.lat.toString()),
-        double.parse(devicelist.lng.toString()));
+    var pinPosition = LatLng(double.parse(devicelist.lat.toString()), double.parse(devicelist.lng.toString()));
 
     if (first) {
       CameraPosition cPosition = CameraPosition(
-        target: LatLng(double.parse(devicelist.lat.toString()),
-            double.parse(devicelist.lng.toString())),
+        target: LatLng(double.parse(devicelist.lat.toString()), double.parse(devicelist.lng.toString())),
         zoom: currentZoom,
       );
 
@@ -382,7 +317,7 @@ class _LiveMapScreenState extends State<LiveMapScreen>
         markerId: MarkerId(StaticVarMethod.imei.toString()),
         position: pinPosition,
         rotation: double.parse(devicelist.course.toString()),
-        icon: BitmapDescriptor.fromBytes(markerIcon),
+        icon: markerIcon,
       );
 
       //Adding a delay and then showing the marker on screen
@@ -391,31 +326,26 @@ class _LiveMapScreenState extends State<LiveMapScreen>
       _markers.add(pickupMarker);
       _mapMarkerSink.add(_markers);
 
-      oldPin = LatLng(double.parse(devicelist.lat.toString()),
-          double.parse(devicelist.lng.toString()));
+      oldPin = LatLng(double.parse(devicelist.lat.toString()), double.parse(devicelist.lng.toString()));
 
       final GoogleMapController controller = await _controller.future;
       controller.moveCamera(CameraUpdate.newCameraPosition(cPosition));
       first = false;
     }
-    // var pinPosition =  LatLng(
-    //     double.parse(value.data![0][2]), double.parse(value.data![0][3]));
-    // _markers.removeWhere((m) => m.markerId.value == args.imei);
 
-    // getAddress(double.parse(devicelist.lat.toString()),
-    // double.parse(devicelist.lng.toString()));
     if (!first) {
       Future.delayed(const Duration(seconds: 2)).then((value) {
         if (oldPin != pinPosition) {
           animateCar(
-              oldPin!.latitude,
-              oldPin!.longitude,
-              pinPosition.latitude,
-              pinPosition.longitude,
-              _mapMarkerSink,
-              this,
-              _mapController,
-              markerIcon);
+            oldPin!.latitude,
+            oldPin!.longitude,
+            pinPosition.latitude,
+            pinPosition.longitude,
+            _mapMarkerSink,
+            this,
+            _mapController,
+            markerIcon,
+          );
         }
       });
     }
@@ -529,6 +459,7 @@ class _LiveMapScreenState extends State<LiveMapScreen>
     var devicemodel = devicesList
         .where((i) => i.deviceData!.imei!.contains(StaticVarMethod.imei))
         .single;
+
     if (devicemodel != null) {
       updateMarker(devicemodel);
       isLoading = false;
@@ -536,10 +467,6 @@ class _LiveMapScreenState extends State<LiveMapScreen>
     } else {
       isLoading = false;
       noData = true;
-      // setState(() {
-      //   isLoading = false;
-      //   noData = true;
-      // });
     }
 
     final double boxImageSize = (MediaQuery.of(context).size.width / 12);
@@ -551,8 +478,6 @@ class _LiveMapScreenState extends State<LiveMapScreen>
           ? !noData
               ? Stack(children: <Widget>[
                   buildMap(),
-                  // speedometer(),
-
                   Positioned(
                     bottom: 220,
                     left: 16,
@@ -575,8 +500,6 @@ class _LiveMapScreenState extends State<LiveMapScreen>
                             ),
                           ],
                         ),
-                        // color: Colors.white,
-                        //color: Color(0x99FFFFFF),
                         child: Column(
                           children: [
                             Text('' + fspeed,
@@ -597,28 +520,6 @@ class _LiveMapScreenState extends State<LiveMapScreen>
                       ),
                     ),
                   ),
-
-                  // Positioned(
-                  //   top: 50,
-                  //   left: 16,
-                  //   child: GestureDetector(
-                  //     onTap: () {
-                  //       Navigator.pop(context);
-                  //     },
-                  //     child: Container(
-                  //       padding: EdgeInsets.all(5),
-                  //       width: 36,
-                  //       height: 36,
-                  //       child:    Container(
-                  //           padding: EdgeInsets.all(3),
-                  //           child: Icon(Icons.arrow_back,
-                  //             color: Color(0xff0D3D65),
-                  //             size: 25,
-                  //           )
-                  //       ),
-                  //     ),
-                  //   ),
-                  // ),
                   Positioned(
                     top: 60,
                     right: 16,
@@ -633,18 +534,13 @@ class _LiveMapScreenState extends State<LiveMapScreen>
                         decoration: new BoxDecoration(
                           color: Colors.white,
                           shape: BoxShape.rectangle,
-                          // borderRadius:BorderRadius.only(topLeft:Radius.circular(8),topRight:Radius.circular(8)),
                           borderRadius: BorderRadius.circular(30),
                           boxShadow: [
                             BoxShadow(
                               color: Colors.black26,
-                              // blurRadius: 10.0,
-                              //offset: const Offset(0.0, 10.0),
                             ),
                           ],
                         ),
-                        // color: Colors.white,
-                        //color: Color(0x99FFFFFF),
                         child: Container(
                           padding: EdgeInsets.all(3),
                           child: ClipRRect(
@@ -674,18 +570,13 @@ class _LiveMapScreenState extends State<LiveMapScreen>
                         decoration: new BoxDecoration(
                           color: Colors.white,
                           shape: BoxShape.rectangle,
-                          // borderRadius:BorderRadius.only(topLeft:Radius.circular(8),topRight:Radius.circular(8)),
                           borderRadius: BorderRadius.circular(30),
                           boxShadow: [
                             BoxShadow(
                               color: Colors.black26,
-                              // blurRadius: 10.0,
-                              //offset: const Offset(0.0, 10.0),
                             ),
                           ],
                         ),
-                        // color: Colors.white,
-                        //color: Color(0x99FFFFFF),
                         child: Icon(
                           Icons.traffic_outlined,
                           color: Color(0xff0D3D65),
@@ -706,31 +597,11 @@ class _LiveMapScreenState extends State<LiveMapScreen>
                                     "," +
                                     StaticVarMethod.lng.toString()) +
                                 "&travelmode=walking";
-                        // String url ="https://www.google.com/maps/dir/?api=1&destination="
-                        //     + ("31.5121208" + ","
-                        //         + "74.3189183") + "&travelmode=walking";
-                        // https://www.google.com/maps/dir/31.5121208,74.3189183/31.5082421,74.315528/@31.5101906,74.3150513,17z/data=!3m1!4b1!4m2!4m1!3e2
-                        // final url="https://www.google.com/maps/dir/"+ StaticVarMethod.lat.toString() + ","+ StaticVarMethod.lng.toString() + "/"+location.latitude.toString()+","+location.longitude.toString()+"/@"+location.latitude.toString()+","+location.longitude.toString()+",15z/data=!4m2!4m1!3e0";
-                        //  final url ='https://www.google.streetview:cbll=${StaticVarMethod.lat},${StaticVarMethod.lng}';
-                        /*    if (await canLaunchUrl(Uri.parse(url))) {
-                  await launchUrl(Uri.parse(url));
-                } else {
-                  throw 'Could not launch $url';
-                }*/
-
                         if (await canLaunchUrl(Uri.parse(url))) {
                           await launchUrl(Uri.parse(url));
                         } else {
                           throw 'Could not open the map.';
                         }
-
-                        // Navigator.push(
-                        //     context,
-                        //     MaterialPageRoute(
-                        //         builder: (context) => Browser(
-                        //           dashboardName: "Distance",
-                        //           dashboardURL: url,
-                        //         )));
                       },
                       child: Container(
                         padding: EdgeInsets.all(5),
@@ -739,18 +610,13 @@ class _LiveMapScreenState extends State<LiveMapScreen>
                         decoration: new BoxDecoration(
                           color: Colors.white,
                           shape: BoxShape.rectangle,
-                          // borderRadius:BorderRadius.only(topLeft:Radius.circular(8),topRight:Radius.circular(8)),
                           borderRadius: BorderRadius.circular(30),
                           boxShadow: [
                             BoxShadow(
                               color: Colors.black26,
-                              // blurRadius: 10.0,
-                              //offset: const Offset(0.0, 10.0),
                             ),
                           ],
                         ),
-                        // color: Colors.white,
-                        //color: Color(0x99FFFFFF),
                         child: Container(
                           padding: EdgeInsets.all(3),
                           child: ClipRRect(
@@ -786,18 +652,13 @@ class _LiveMapScreenState extends State<LiveMapScreen>
                         decoration: new BoxDecoration(
                           color: Colors.white,
                           shape: BoxShape.rectangle,
-                          // borderRadius:BorderRadius.only(topLeft:Radius.circular(8),topRight:Radius.circular(8)),
                           borderRadius: BorderRadius.circular(30),
                           boxShadow: [
                             BoxShadow(
                               color: Colors.black26,
-                              // blurRadius: 10.0,
-                              //offset: const Offset(0.0, 10.0),
                             ),
                           ],
                         ),
-                        // color: Colors.white,
-                        //color: Color(0x99FFFFFF),
                         child: Icon(
                           FontAwesomeIcons.streetView,
                           color: Color(0xff0D3D65),
@@ -806,7 +667,6 @@ class _LiveMapScreenState extends State<LiveMapScreen>
                       ),
                     ),
                   ),
-
                   Positioned(
                     top: 220,
                     right: 16,
@@ -827,18 +687,13 @@ class _LiveMapScreenState extends State<LiveMapScreen>
                         decoration: new BoxDecoration(
                           color: Colors.white,
                           shape: BoxShape.rectangle,
-                          // borderRadius:BorderRadius.only(topLeft:Radius.circular(8),topRight:Radius.circular(8)),
                           borderRadius: BorderRadius.circular(30),
                           boxShadow: [
                             BoxShadow(
                               color: Colors.black26,
-                              // blurRadius: 10.0,
-                              //offset: const Offset(0.0, 10.0),
                             ),
                           ],
                         ),
-                        // color: Colors.white,
-                        //color: Color(0x99FFFFFF),
                         child: Container(
                           padding: EdgeInsets.all(6),
                           child: ClipRRect(
@@ -868,18 +723,13 @@ class _LiveMapScreenState extends State<LiveMapScreen>
                         decoration: new BoxDecoration(
                           color: Colors.white,
                           shape: BoxShape.rectangle,
-                          // borderRadius:BorderRadius.only(topLeft:Radius.circular(8),topRight:Radius.circular(8)),
                           borderRadius: BorderRadius.circular(30),
                           boxShadow: [
                             BoxShadow(
                               color: Colors.black26,
-                              // blurRadius: 10.0,
-                              //offset: const Offset(0.0, 10.0),
                             ),
                           ],
                         ),
-                        // color: Colors.white,
-                        //color: Color(0x99FFFFFF),
                         child: Container(
                           padding: EdgeInsets.all(3),
                           child: ClipRRect(
@@ -895,52 +745,6 @@ class _LiveMapScreenState extends State<LiveMapScreen>
                       ),
                     ),
                   ),
-                  Positioned(
-                    top: 300,
-                    right: 16,
-                    child: GestureDetector(
-                      onTap: () async {
-                        /*setState(() {
-                  _showMarker = (_showMarker) ? false : true;
-                  for (int a = 0; a < _allMarker.length; a++) {
-                    if(_allMarker[MarkerId(a.toString())]!=null){
-                      _allMarker[MarkerId(a.toString())] =
-                          _allMarker[MarkerId(a.toString())]!.copyWith(
-                            visibleParam: _showMarker,
-                          );
-                    }
-                  }
-                });*/
-                      },
-                      child: Container(
-                        padding: EdgeInsets.all(5),
-                        width: 36,
-                        height: 36,
-                        decoration: new BoxDecoration(
-                          color: Colors.white,
-                          shape: BoxShape.rectangle,
-                          // borderRadius:BorderRadius.only(topLeft:Radius.circular(8),topRight:Radius.circular(8)),
-                          borderRadius: BorderRadius.circular(30),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black26,
-                              // blurRadius: 10.0,
-                              //offset: const Offset(0.0, 10.0),
-                            ),
-                          ],
-                        ),
-                        // color: Colors.white,
-                        //color: Color(0x99FFFFFF),
-                        child: Icon(
-                          Icons.refresh,
-                          color: Colors.black26,
-                          size: 25,
-                        ),
-                      ),
-                    ),
-                  ),
-
-                  ////////////left icons///////
                   Positioned(
                     bottom: 420,
                     left: 16,
@@ -959,21 +763,15 @@ class _LiveMapScreenState extends State<LiveMapScreen>
                         decoration: new BoxDecoration(
                           color: Colors.white,
                           shape: BoxShape.rectangle,
-                          //borderRadius:BorderRadius.only(topLeft:Radius.circular(8),topRight:Radius.circular(8)),
                           borderRadius: BorderRadius.circular(30),
                           boxShadow: [
                             BoxShadow(
                               color: Colors.black26,
-                              // blurRadius: 10.0,
-                              //offset: const Offset(0.0, 10.0),
                             ),
                           ],
                         ),
-                        // color: Colors.white,
-                        //color: Color(0x99FFFFFF),
                         child: Icon(
                           Icons.lock_person,
-                          //color: Colors.white,
                           size: 25,
                         ),
                       ),
@@ -997,18 +795,13 @@ class _LiveMapScreenState extends State<LiveMapScreen>
                         decoration: new BoxDecoration(
                           color: Colors.white,
                           shape: BoxShape.rectangle,
-                          //borderRadius:BorderRadius.only(topLeft:Radius.circular(8),topRight:Radius.circular(8)),
                           borderRadius: BorderRadius.circular(30),
                           boxShadow: [
                             BoxShadow(
                               color: Colors.black26,
-                              // blurRadius: 10.0,
-                              //offset: const Offset(0.0, 10.0),
                             ),
                           ],
                         ),
-                        // color: Colors.white,
-                        //color: Color(0x99FFFFFF),
                         child: Icon(
                           Icons.play_circle,
                           color: Colors.black,
@@ -1017,7 +810,6 @@ class _LiveMapScreenState extends State<LiveMapScreen>
                       ),
                     ),
                   ),
-
                   Positioned(
                     bottom: 340,
                     left: 16,
@@ -1035,25 +827,18 @@ class _LiveMapScreenState extends State<LiveMapScreen>
                         decoration: new BoxDecoration(
                           color: Colors.white,
                           shape: BoxShape.rectangle,
-                          //borderRadius:BorderRadius.only(topLeft:Radius.circular(8),topRight:Radius.circular(8)),
                           borderRadius: BorderRadius.circular(30),
                           boxShadow: [
                             BoxShadow(
                               color: Colors.black26,
-                              // blurRadius: 10.0,
-                              //offset: const Offset(0.0, 10.0),
                             ),
                           ],
                         ),
-                        // color: Colors.white,
-                        //color: Color(0x99FFFFFF),
                         child: Icon(
                           Icons.query_stats_outlined,
                           color: Colors.black,
                           size: 20,
-                        ), /*Icon(Icons.refresh,
-                  color: Colors.white,
-                  size: 25,*/
+                        ),
                       ),
                     ),
                   ),
@@ -1075,25 +860,18 @@ class _LiveMapScreenState extends State<LiveMapScreen>
                         decoration: new BoxDecoration(
                           color: Colors.white,
                           shape: BoxShape.rectangle,
-                          //borderRadius:BorderRadius.only(topLeft:Radius.circular(8),topRight:Radius.circular(8)),
                           borderRadius: BorderRadius.circular(30),
                           boxShadow: [
                             BoxShadow(
                               color: Colors.black26,
-                              // blurRadius: 10.0,
-                              //offset: const Offset(0.0, 10.0),
                             ),
                           ],
                         ),
-                        // color: Colors.white,
-                        //color: Color(0x99FFFFFF),
                         child: Icon(
                           Icons.info_outline,
                           color: Colors.black,
                           size: 20,
-                        ), /*Icon(Icons.refresh,
-                  color: Colors.white,
-                  size: 25,*/
+                        ),
                       ),
                     ),
                   ),
@@ -1123,9 +901,6 @@ class _LiveMapScreenState extends State<LiveMapScreen>
                   margin: EdgeInsets.only(left: 20, right: 20),
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
-                      // border: Border.all(
-                      //   color: Colors.black,
-                      // ),
                       borderRadius: BorderRadius.all(Radius.circular(5)),
                       color: colormain!),
                   padding: EdgeInsets.all(5),
@@ -1182,21 +957,8 @@ class _LiveMapScreenState extends State<LiveMapScreen>
                                       color: Colors.white,
                                     ),
                                   ),
-
-                                  // Text(('validity').tr(),style: TextStyle(
-                                  //     fontSize: 11.0,
-                                  //     color: MyColor.primaryColor),),
-                                  // Padding(padding: EdgeInsets.only(left: 5)),
-                                  // Text(devicesSettingsList![args.imei][33] != '0000-00-00' ? Util.dateToDays(devicesSettingsList![args.imei][33]).toString()+" days" : "-",
-                                  //   style: TextStyle(
-                                  //       fontSize: 11.0,
-                                  //       fontWeight: FontWeight.bold,
-                                  //       color: MyColor.primaryColor),),
                                 ],
                               ),
-                              // Text(device.data!.isNotEmpty ? device.data![0][6].toString() + " Km/hr" : "0 Km/hr",style: TextStyle(
-                              //     fontSize: 11.0,
-                              //     color: MyColor.primaryColor),),
                             ],
                           )
                         ],
@@ -1278,92 +1040,6 @@ class _LiveMapScreenState extends State<LiveMapScreen>
     return Stack(
       children: <Widget>[
         Container(child: googleMap),
-        // Padding(
-        //   padding: const EdgeInsets.fromLTRB(0, 50, 5, 0),
-        //   child: Align(
-        //     alignment: Alignment.topRight,
-        //     child: Column(
-        //       children: <Widget>[
-        //         Padding(
-        //           padding: const EdgeInsets.fromLTRB(0, 30, 5, 0),
-        //           child: Align(
-        //             alignment: Alignment.topRight,
-        //             child: Column(
-        //               children: <Widget>[
-        //                 FloatingActionButton(
-        //                   heroTag: "mapType",
-        //                   onPressed: _onMapTypeButtonPressed,
-        //                   materialTapTargetSize: MaterialTapTargetSize.padded,
-        //                   backgroundColor: _mapTypeBackgroundColor,
-        //                   foregroundColor: _mapTypeForegroundColor,
-        //                   mini: true,
-        //                   child: const Icon(Icons.map, size: 30.0),
-        //                 ),
-        //                 FloatingActionButton(
-        //                   heroTag: "traffic",
-        //                   onPressed: _trafficEnabledPressed,
-        //                   mini: true,
-        //                   materialTapTargetSize: MaterialTapTargetSize.padded,
-        //                   backgroundColor: _trafficBackgroundButtonColor,
-        //                   foregroundColor: _trafficForegroundButtonColor,
-        //                   child: const Icon(Icons.traffic, size: 30.0),
-        //                 ),
-        //                 FloatingActionButton(
-        //                   heroTag: "route",
-        //                   onPressed: () async{
-        //                     String origin = "device.data![0][2].toString()"; // lat,long like 123.34,68.56
-        //                     if (Platform.isAndroid) {
-        //                       String query = Uri.encodeComponent(origin);
-        //                      String url =
-        //                       "https://www.google.com/maps/search/?api=1&query=$query";
-        //                       await launch(url);
-        //                     } else {
-        //                       String urlAppleMaps =
-        //                       'https://maps.apple.com/?q=$origin';
-        //                       String url =
-        //                       "comgooglemaps://?saddr=&daddr=$origin&directionsmode=driving";
-        //                       if (await canLaunch(url)) {
-        //                     await launch(url);
-        //                     } else {
-        //                     if (await canLaunch(url)) {
-        //                     await launch(url);
-        //                     } else if (await canLaunch(
-        //                     urlAppleMaps)) {
-        //                     await launch(urlAppleMaps);
-        //                     } else {
-        //                     throw 'Could not launch $url';
-        //                     }
-        //                     throw 'Could not launch $url';
-        //                     }
-        //                   }
-        //                   },
-        //                   mini: true,
-        //                   materialTapTargetSize: MaterialTapTargetSize.padded,
-        //                   backgroundColor: Colors.white,
-        //                   foregroundColor: MyColor.primaryColor,
-        //                   child: const Icon(Icons.directions, size: 30.0),
-        //                 ),
-        //
-        //                 // FloatingActionButton(
-        //                 //   heroTag: "sensors",
-        //                 //   onPressed: (){
-        //                 //     Navigator.pushNamed(context, "/sensorsScreen",
-        //                 //         arguments:DeviceManageArguments(args.imei));
-        //                 //   },
-        //                 //   mini: true,
-        //                 //   materialTapTargetSize: MaterialTapTargetSize.padded,
-        //                 //   backgroundColor: Colors.white,
-        //                 //   foregroundColor: MyColor.primaryColor,
-        //                 //   child: const Icon(Icons.sensors_sharp, size: 30.0),
-        //                 // ),
-        //               ],
-        //             ),
-        //           ),
-        //         ),
-        //       ],
-        //     ),
-        //   ),
-        // ),
       ],
     );
   }
@@ -1376,11 +1052,8 @@ class _LiveMapScreenState extends State<LiveMapScreen>
     String totaldistance = "0";
     String distance = "0";
 
-    // <info><event>0</event><sat>13</sat><hdop>0.9</hdop><odometer>678030</odometer>
-    // <status>61</status><ignition>false</ignition><input>0</input><output>0</output>
-    // <power>12.51</power><battery>4.07</battery><adc2>0</adc2><adc3>0</adc3><sequence>80</sequence>
-    // <distance>0</distance><totaldistance>639240.95</totaldistance><motion>false</motion>
-    // <valid>true</valid><enginehours>51916</enginehours><gsmsignal>13</gsmsignal></info>
+    double lat = devicemodel.lat!.toDouble();
+    double lng = devicemodel.lng!.toDouble();
 
     if (other.contains("<ignition>")) {
       const start = "<ignition>";
@@ -1413,7 +1086,6 @@ class _LiveMapScreenState extends State<LiveMapScreen>
       double dis =
           double.parse(other.substring(startIndex + start.length, endIndex));
       totaldistance = (dis / 1000).toStringAsFixed(2);
-      // totaldistance = other.substring(startIndex + start.length, endIndex);
     }
     if (other.contains("<distance>")) {
       const start = "<distance>";
@@ -1447,8 +1119,6 @@ class _LiveMapScreenState extends State<LiveMapScreen>
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
                     Container(
-                      //margin: EdgeInsets.fromLTRB(12, 6, 12, 6),
-
                       child: Row(children: [
                         Expanded(
                             child: Container(
@@ -1456,19 +1126,14 @@ class _LiveMapScreenState extends State<LiveMapScreen>
                                 child: Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceAround,
-                                  // crossAxisAlignment: CrossAxisAlignment.start,
                                   children: <Widget>[
                                     Align(
                                       alignment: Alignment.topLeft,
                                       child: Container(
-                                        // margin: EdgeInsets.only(top: 5),
                                         child: Text(
-                                            '' + /*StaticVarMethod.imei*/
-                                                StaticVarMethod.deviceName,
+                                            '' + StaticVarMethod.deviceName,
                                             style: TextStyle(
                                                 fontSize: 10,
-                                                //height: 0.8,
-                                                // fontFamily: 'digital_font'
                                                 fontWeight: FontWeight.bold)),
                                       ),
                                     ),
@@ -1486,7 +1151,6 @@ class _LiveMapScreenState extends State<LiveMapScreen>
                                                   }
                                                 });
                                               }
-                                              // Fluttertoast.showToast(msg: 'Down', toastLength: Toast.LENGTH_SHORT);
                                             },
                                             child: Icon(
                                                 Icons.arrow_drop_down_sharp,
@@ -1497,7 +1161,6 @@ class _LiveMapScreenState extends State<LiveMapScreen>
                                     Align(
                                       alignment: Alignment.centerRight,
                                       child: Container(
-                                        // margin: EdgeInsets.only(top: 5),
                                         child: Text(
                                             (speedo! > 0)
                                                 ? 'Moving ' + fstopDuration
@@ -1507,8 +1170,6 @@ class _LiveMapScreenState extends State<LiveMapScreen>
                                                 color: (speedo! > 0)
                                                     ? Colors.green
                                                     : Colors.grey,
-                                                //height: 0.8,
-                                                // fontFamily: 'digital_font'
                                                 fontWeight: FontWeight.bold)),
                                       ),
                                     )
@@ -1530,7 +1191,6 @@ class _LiveMapScreenState extends State<LiveMapScreen>
                                     child: Container(
                                         padding: EdgeInsets.all(8),
                                         child: Column(children: <Widget>[
-                                          //Icon(Icons.engineering,size:imageSize),
                                           Image.asset(
                                             "assets/sensorsicon/engineon.png",
                                             height: imageSize,
@@ -1568,22 +1228,6 @@ class _LiveMapScreenState extends State<LiveMapScreen>
                                     onTap: () {},
                                     child: Container(
                                         padding: EdgeInsets.all(8),
-
-                                        /*  decoration: new BoxDecoration(
-                                    color: Colors.white,
-                                    shape: BoxShape.rectangle,
-                                    borderRadius:BorderRadius.all(Radius.circular(15)),
-                                    // borderRadius: BorderRadius.circular(8),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black26,
-                                        blurRadius: 10.0,
-                                        //offset: const Offset(0.0, 10.0),
-                                      ),
-                                    ],
-                                  ),*/
-                                        // color: Colors.white,
-                                        //color: Color(0x99FFFFFF),
                                         child: Column(children: <Widget>[
                                           Image.asset(
                                               "assets/sensorsicon/locationon.png",
@@ -1598,13 +1242,6 @@ class _LiveMapScreenState extends State<LiveMapScreen>
                                               color: Color(0xff777777),
                                             ),
                                           ),
-                                          /*(productData.params?.gpslev != null)
-                                        ? Text('${productData.params!.gpslev}',
-                                        style: TextStyle(
-                                            fontSize: 7,
-                                            height: 1,
-                                            color: SOFT_GREY))
-                                        :*/
                                           Text(
                                             sat,
                                             style: TextStyle(
@@ -1626,22 +1263,6 @@ class _LiveMapScreenState extends State<LiveMapScreen>
                                     onTap: () {},
                                     child: Container(
                                         padding: EdgeInsets.all(8),
-
-                                        /* decoration: new BoxDecoration(
-                                    color: Colors.white,
-                                    shape: BoxShape.rectangle,
-                                    borderRadius:BorderRadius.all(Radius.circular(15)),
-                                    // borderRadius: BorderRadius.circular(8),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black26,
-                                        blurRadius: 10.0,
-                                        //offset: const Offset(0.0, 10.0),
-                                      ),
-                                    ],
-                                  ),*/
-                                        // color: Colors.white,
-                                        //color: Color(0x99FFFFFF),
                                         child: Column(children: <Widget>[
                                           Image.asset(
                                               "assets/sensorsicon/speedometeron.png",
@@ -1670,37 +1291,6 @@ class _LiveMapScreenState extends State<LiveMapScreen>
                                 ],
                               ),
                             ),
-                            // Expanded(
-                            //   child: Column(
-                            //     children: <Widget>[
-                            //       GestureDetector(
-                            //         onTap: () {
-                            //
-                            //
-                            //           //_onMapTypeButtonPressed();
-                            //         },
-                            //         child: Container(
-                            //             padding: EdgeInsets.all(8),
-                            //             child: Column(children: <Widget>[
-                            //               Image.asset(
-                            //                   "assets/sensorsicon/connectedon.png",
-                            //                   height: imageSize,
-                            //                   width: imageSize),
-                            //               Text('GSM Level',
-                            //                   style: TextStyle(
-                            //                       fontSize: 7,
-                            //                       height: 1.5,
-                            //                       color: SOFT_GREY)),
-                            //                Text('NaN',
-                            //                   style: TextStyle(
-                            //                       fontSize: 7,
-                            //                       height: 1,
-                            //                       color: SOFT_GREY))
-                            //             ])),
-                            //       ),
-                            //     ],
-                            //   ),
-                            // ),
                             Expanded(
                               child: Column(
                                 children: <Widget>[
@@ -1708,22 +1298,6 @@ class _LiveMapScreenState extends State<LiveMapScreen>
                                     onTap: () {},
                                     child: Container(
                                         padding: EdgeInsets.all(8),
-
-                                        /*decoration: new BoxDecoration(
-                                    color: Colors.white,
-                                    shape: BoxShape.rectangle,
-                                    borderRadius:BorderRadius.all(Radius.circular(15)),
-                                    // borderRadius: BorderRadius.circular(8),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black26,
-                                        blurRadius: 10.0,
-                                        //offset: const Offset(0.0, 10.0),
-                                      ),
-                                    ],
-                                  ),*/
-                                        // color: Colors.white,
-                                        //color: Color(0x99FFFFFF),
                                         child: Column(children: <Widget>[
                                           Image.asset(
                                               "assets/sensorsicon/hour24on.png",
@@ -1739,8 +1313,7 @@ class _LiveMapScreenState extends State<LiveMapScreen>
                                             ),
                                           ),
                                           Text(
-                                            enginehours +
-                                                ' h' /*+ productData.engineHours.toString()*/,
+                                            enginehours + ' h',
                                             style: TextStyle(
                                               fontSize: 9,
                                               fontWeight: FontWeight.w600,
@@ -1753,199 +1326,8 @@ class _LiveMapScreenState extends State<LiveMapScreen>
                                 ],
                               ),
                             ),
-                            // Expanded(
-                            //   child: Column(
-                            //     children: <Widget>[
-                            //       GestureDetector(
-                            //         onTap: () {
-                            //
-                            //
-                            //           //_onMapTypeButtonPressed();
-                            //         },
-                            //         child: Container(
-                            //             padding: EdgeInsets.all(8),
-                            //
-                            //             /* decoration: new BoxDecoration(
-                            //               color: Colors.white,
-                            //               shape: BoxShape.rectangle,
-                            //               borderRadius:BorderRadius.all(Radius.circular(15)),
-                            //               // borderRadius: BorderRadius.circular(8),
-                            //               boxShadow: [
-                            //                 BoxShadow(
-                            //                   color: Colors.black26,
-                            //                   blurRadius: 10.0,
-                            //                   //offset: const Offset(0.0, 10.0),
-                            //                 ),
-                            //               ],
-                            //             ),*/
-                            //             // color: Colors.white,
-                            //             //color: Color(0x99FFFFFF),
-                            //             child: Column(children: <Widget>[
-                            //               Image.asset("assets/sensorsicon/batteryon.png",
-                            //                   height: imageSize, width: imageSize),
-                            //               Text('Battery',
-                            //                   style: TextStyle(
-                            //                       fontSize: 7,
-                            //                       height: 1.5,
-                            //                       color: SOFT_GREY))
-                            //             ])),
-                            //       ),
-                            //     ],
-                            //   ),
-                            // ),
                           ],
                         )),
-                    /* Container(
-                //margin: EdgeInsets.fromLTRB(12, 6, 12, 6),
-
-                child: Row(
-                    children: [
-
-                      Expanded(
-                          child:Card(
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              elevation: 2,
-                              color: Colors.white,
-                              child: Container(
-                                  margin: EdgeInsets.fromLTRB(6, 6, 6, 6),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: <Widget>[
-                                      ClipRRect(
-                                          borderRadius:
-                                          BorderRadius.all(Radius.circular(4)),
-                                          child: Image.asset("assets/images/icons8-clock-100.png", height: 25,width: 25)),
-                                      SizedBox(
-                                        width: 10,
-                                      ),
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            Container(
-                                              // margin: EdgeInsets.only(top: 5),
-                                              child: Text(''+fUpdateTime,
-                                                  style: TextStyle(
-                                                      fontSize: 12,
-                                                      height: 0.8,
-                                                      fontFamily: 'digital_font'
-                                                    // fontWeight: FontWeight.bold
-                                                  )),
-                                            ),
-                                            Container(
-                                              // margin: EdgeInsets.only(top: 5),
-                                              child: Row(
-                                                children: [
-                                                  */ /*Icon(Icons.location_on,
-                                                      color: Colors.blue, size: 12),*/ /*
-                                                  Text('Last Update',
-                                                      style: TextStyle(
-                                                        fontSize: 10,
-                                                        height: 1.6,
-                                                        //color: Colors.blue
-                                                        fontWeight: FontWeight.bold,
-                                                      ))
-                                                ],
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      )
-                                    ],
-                                  )
-                              ))
-                      ),
-                      Expanded(
-                          child:Card(
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              elevation: 2,
-                              color: Colors.white,
-                              child: Container(
-                                  margin: EdgeInsets.fromLTRB(12, 6, 12, 6),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: <Widget>[
-                                      ClipRRect(
-                                          borderRadius:
-                                          BorderRadius.all(Radius.circular(4)),
-                                          child: Image.asset("assets/images/routeicon.png", height: 25,width: 25)),
-                                      SizedBox(
-                                        width: 10,
-                                      ),
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            */ /* Text(
-                                              '_productData[index].name',
-                                              style: TextStyle(
-                                                  fontSize: 13,
-                                                  color: Colors.blue
-                                              ),
-                                              maxLines: 3,
-                                              overflow: TextOverflow.ellipsis,
-                                            ),*/ /*
-                                            Container(
-                                              margin: EdgeInsets.only(top: 5),
-                                              child: Text(''+ftotalDistance,
-                                                  style: TextStyle(
-                                                      fontSize: 13,
-                                                      fontWeight: FontWeight.bold,
-                                                      fontFamily: 'digital_font'
-                                                  )),
-                                            ),
-                                            */ /*  Container(
-                                              margin: EdgeInsets.only(top: 5),
-                                              child: Row(
-                                                children: [
-                                                  Icon(Icons.location_on,
-                                                      color: Colors.blue, size: 12),
-                                                  Text(' ',
-                                                      style: TextStyle(
-                                                          fontSize: 11,
-                                                          color: Colors.blue
-                                                      ))
-                                                ],
-                                              ),
-                                            ),
-                                            Container(
-                                              margin: EdgeInsets.only(top: 5),
-                                              child: Row(
-                                                children: [
-                                                  // _globalWidget.createRatingBar(rating: _productData[index].rating!, size: 12),
-                                                  Text('(tests)', style: TextStyle(
-                                                      fontSize: 11,
-                                                      color: Colors.blue
-                                                  ))
-                                                ],
-                                              ),
-                                            ),
-                                            Container(
-                                              margin: EdgeInsets.only(top: 5),
-                                              child: Text(' '+'Sale',
-                                                  style: TextStyle(
-                                                      fontSize: 11,
-                                                      color: Colors.blue
-                                                  )),
-                                            ),*/ /*
-                                          ],
-                                        ),
-                                      )
-                                    ],
-                                  ))
-                          )
-                      ),
-
-                    ]
-                ),
-              ),*/
-
                     Container(
                         decoration: new BoxDecoration(
                           color: Colors.green.shade50,
@@ -1953,35 +1335,17 @@ class _LiveMapScreenState extends State<LiveMapScreen>
                           borderRadius: BorderRadius.only(
                               bottomLeft: Radius.circular(15),
                               bottomRight: Radius.circular(15)),
-                          // borderRadius: BorderRadius.circular(8),
                           boxShadow: [
                             BoxShadow(
                               color: Colors.black26,
-                              //blurRadius: 10.0,
-                              //offset: const Offset(0.0, 10.0),
                             ),
                           ],
                         ),
                         child: GestureDetector(
                             onTap: () async {
-                              final url =
-                                  'https://www.google.com/maps/search/?api=1&query=${lati},${lngi}';
-                              /*    if (await canLaunchUrl(Uri.parse(url))) {
-                      await launchUrl(Uri.parse(url));
-                      } else {
-                      throw 'Could not launch $url';
-                      }*/
-                              // address = "Loading....";
-                              //setState(() {});
-                              //getAddress(lati,lngi);\
-
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => Browser(
-                                            dashboardName: "Location",
-                                            dashboardURL: url,
-                                          )));
+                              setState(() {
+                                getAddress(lat, lng);
+                              });
                             },
                             child: new Row(children: <Widget>[
                               Container(
@@ -1998,6 +1362,7 @@ class _LiveMapScreenState extends State<LiveMapScreen>
                                   child: new Text(
                                     address,
                                     overflow: TextOverflow.ellipsis,
+                                    maxLines: 3,
                                     style: new TextStyle(
                                       fontSize: 13.0,
                                       fontFamily: 'Roboto',
@@ -2007,12 +1372,6 @@ class _LiveMapScreenState extends State<LiveMapScreen>
                                   ),
                                 ),
                               ),
-                              /* Expanded(
-                          child: Text(address,
-                              style: TextStyle(
-                                  fontSize: 13, color: Colors.blue),
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis))*/
                             ]))),
                   ],
                 ),
