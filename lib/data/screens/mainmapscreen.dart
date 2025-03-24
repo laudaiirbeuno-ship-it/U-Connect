@@ -104,7 +104,6 @@ class _mainmapscreen extends State<mainmapscreen> {
       double course = 0,
       Color color = Colors.red,
       bool showtitle = true}) async {
-
     return getMarkerIcon(iconpath, label, color, course, showtitle);
   }
 
@@ -181,7 +180,6 @@ class _mainmapscreen extends State<mainmapscreen> {
       body: Stack(
         children: [
           _buildGoogleMap(),
-
           Positioned(
             top: 30,
             left: 22,
@@ -279,15 +277,15 @@ class _mainmapscreen extends State<mainmapscreen> {
                 //color: Color(0x99FFFFFF),
                 child: (_showMarker)
                     ? Icon(
-                  Icons.place,
-                  color: Colors.black,
-                  size: 20,
-                )
+                        Icons.place,
+                        color: Colors.black,
+                        size: 20,
+                      )
                     : Icon(
-                  Icons.place_outlined,
-                  color: Colors.black,
-                  size: 20,
-                ),
+                        Icons.place_outlined,
+                        color: Colors.black,
+                        size: 20,
+                      ),
               ),
             ),
           ),
@@ -313,15 +311,15 @@ class _mainmapscreen extends State<mainmapscreen> {
                 //color: Color(0x99FFFFFF),
                 child: (_showTitle)
                     ? Icon(
-                  Icons.label,
-                  color: Colors.black,
-                  size: 20,
-                )
+                        Icons.label,
+                        color: Colors.black,
+                        size: 20,
+                      )
                     : Icon(
-                  Icons.label_outline,
-                  color: Colors.black,
-                  size: 20,
-                ),
+                        Icons.label_outline,
+                        color: Colors.black,
+                        size: 20,
+                      ),
               ),
             ),
           ),
@@ -330,7 +328,7 @@ class _mainmapscreen extends State<mainmapscreen> {
             left: 16,
             child: GestureDetector(
               onTap: () async {
-                 _recenterall();
+                _recenterall();
               },
               child: Container(
                   padding: EdgeInsets.all(5),
@@ -712,15 +710,15 @@ class _mainmapscreen extends State<mainmapscreen> {
                 ),
                 child: (_trafficEnabled)
                     ? Icon(
-                  Icons.traffic,
-                  color: Colors.black,
-                  size: 20,
-                )
+                        Icons.traffic,
+                        color: Colors.black,
+                        size: 20,
+                      )
                     : Icon(
-                  Icons.traffic_outlined,
-                  color: Colors.black,
-                  size: 20,
-                ),
+                        Icons.traffic_outlined,
+                        color: Colors.black,
+                        size: 20,
+                      ),
               ),
             ),
           ),
@@ -956,10 +954,8 @@ class _mainmapscreen extends State<mainmapscreen> {
                     padding: const EdgeInsets.only(top: 30.0, bottom: 20),
                     child: Text(
                       "SELECIONE UM DISPOSITIVO",
-                      style: Theme.of(context)
-                          .textTheme
-                          .titleLarge!
-                          .copyWith(fontWeight: FontWeight.bold, color: Colors.black),
+                      style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                          fontWeight: FontWeight.bold, color: Colors.black),
                     ),
                   ),
                   // END 2
@@ -978,7 +974,8 @@ class _mainmapscreen extends State<mainmapscreen> {
                       ),
                       onChanged: (value) {
                         setState(() {
-                          searchQueryDevice = value; // Atualiza o texto de busca
+                          searchQueryDevice =
+                              value; // Atualiza o texto de busca
                         });
                       },
                     ),
@@ -1012,80 +1009,85 @@ class _mainmapscreen extends State<mainmapscreen> {
         return true;
       }
       // Caso contrário, verifica se o nome do dispositivo contém o texto de busca (ignorando case)
-      return device.name!.toLowerCase().contains(searchQueryDevice.toLowerCase());
+      return device.name!
+          .toLowerCase()
+          .contains(searchQueryDevice.toLowerCase());
     }).toList();
 
     return filteredDevices
         .asMap()
         .map(
-            (index, element) => MapEntry(
+          (index, element) => MapEntry(
             element.id,
             InkWell(
-                onTap: () {
-                  setState(() {
-                    if (mounted) {
-                      _showDeviceById = element.id!;
-                    }
-                    _latlng.clear();
-                    _markers.clear();
-                    _allMarker.clear();
-                    updateMarker();
-                  });
-                  Navigator.pop(ctx);
-                },
-                child: Padding(
-                    padding: const EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10),
-                    child: Column(
-                        children: [
+              onTap: () {
+                setState(() {
+                  if (mounted) {
+                    _showDeviceById = element.id!;
+                  }
+                  _latlng.clear();
+                  _markers.clear();
+                  _allMarker.clear();
+                  updateMarker();
+                });
+                Navigator.pop(ctx);
+              },
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10),
+                child: Column(
+                  children: [
                     Row(
-                    children: [
-                    Container(
-                    height: 25.0,
-                        width: 25.0,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: _showDeviceById == element.id!
-                              ? Colors.black
-                              : Theme.of(context).colorScheme.onPrimary,
-                          border: Border.all(color: Colors.black),
-                        ),
-                        child: Padding(
+                      children: [
+                        Container(
+                          height: 25.0,
+                          width: 25.0,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: _showDeviceById == element.id!
+                                ? Colors.black
+                                : Theme.of(context).colorScheme.onPrimary,
+                            border: Border.all(color: Colors.black),
+                          ),
+                          child: Padding(
                             padding: const EdgeInsets.all(2.0),
                             child: _showDeviceById == element.id!
-                                ?Icon(
-                              Icons.check,
-                              size: 17.0,
-                              color: Theme.of(context).colorScheme.onPrimary,
-                            )
+                                ? Icon(
+                                    Icons.check,
+                                    size: 17.0,
+                                    color:
+                                        Theme.of(context).colorScheme.onPrimary,
+                                  )
                                 : Icon(
-                              Icons.check_box_outline_blank,
-                              size: 17.0,
-                              color: Theme.of(context).colorScheme.onPrimary,
-                            ),
+                                    Icons.check_box_outline_blank,
+                                    size: 17.0,
+                                    color:
+                                        Theme.of(context).colorScheme.onPrimary,
+                                  ),
+                          ),
                         ),
-                    ),
-                      Padding(
-                        padding: const EdgeInsetsDirectional.only(
-                          start: 15.0,
+                        Padding(
+                          padding: const EdgeInsetsDirectional.only(
+                            start: 15.0,
+                          ),
+                          child: Text(
+                            element.name!,
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleMedium!
+                                .copyWith(color: Colors.black),
+                          ),
                         ),
-                        child: Text(
-                          element.name!,
-                          style: Theme.of(context)
-                              .textTheme
-                              .titleMedium!
-                              .copyWith(color: Colors.black),
-                        ),
-                      ),
-                    ],
+                      ],
                     ),
-                        ],
-                    ),
+                  ],
                 ),
+              ),
             ),
-            ),
-    ).values.toList();
+          ),
+        )
+        .values
+        .toList();
   }
-
 
   List<Widget> getVehiclesList(BuildContext ctx) {
     return devicesList
@@ -1096,7 +1098,7 @@ class _mainmapscreen extends State<mainmapscreen> {
             InkWell(
               onTap: () {
                 setState(() {
-                  if(mounted) {
+                  if (mounted) {
                     _showDeviceById = element.id!;
                     _allMarker.clear();
                     _latlng.clear();
@@ -1120,40 +1122,35 @@ class _mainmapscreen extends State<mainmapscreen> {
                               color: _showDeviceById == element.id!
                                   ? Colors.black
                                   : Theme.of(context).colorScheme.onPrimary,
-                              border: Border.all(color: Colors.black)
-                          ),
+                              border: Border.all(color: Colors.black)),
                           child: Padding(
                             padding: const EdgeInsets.all(2.0),
                             child: _showDeviceById == element.id!
                                 ? Icon(
-                              Icons.check,
-                              size: 17.0,
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onPrimary,
-                            )
+                                    Icons.check,
+                                    size: 17.0,
+                                    color:
+                                        Theme.of(context).colorScheme.onPrimary,
+                                  )
                                 : Icon(
-                              Icons.check_box_outline_blank,
-                              size: 17.0,
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onPrimary,
-                            ),
+                                    Icons.check_box_outline_blank,
+                                    size: 17.0,
+                                    color:
+                                        Theme.of(context).colorScheme.onPrimary,
+                                  ),
                           ),
                         ),
-
                         Padding(
-                          padding: const EdgeInsetsDirectional.only(
-                            start: 15.0,
-                          ),
+                            padding: const EdgeInsetsDirectional.only(
+                              start: 15.0,
+                            ),
                             child: Text(
                               element.name!,
                               style: Theme.of(context)
                                   .textTheme
                                   .titleMedium!
                                   .copyWith(color: Colors.black),
-                            )
-                        ),
+                            )),
                       ],
                     ),
                   ],
@@ -1161,7 +1158,8 @@ class _mainmapscreen extends State<mainmapscreen> {
               ),
             ),
           ),
-        ).values
+        )
+        .values
         .toList();
   }
 
@@ -1298,7 +1296,6 @@ class _mainmapscreen extends State<mainmapscreen> {
                                                 )
                                                 //   )
                                                 ),
-
                                             Row(children: [
                                               Container(
                                                 margin:
@@ -1331,7 +1328,6 @@ class _mainmapscreen extends State<mainmapscreen> {
                                                 ),
                                               ),
                                             ]),
-
                                             Row(
                                                 mainAxisAlignment:
                                                     MainAxisAlignment.start,
@@ -1377,8 +1373,7 @@ class _mainmapscreen extends State<mainmapscreen> {
                                                       ),
                                                     ),
                                                   ),
-                                                ]
-                                            ),
+                                                ]),
                                           ],
                                         ),
                                       )
@@ -1442,11 +1437,7 @@ class _mainmapscreen extends State<mainmapscreen> {
               //           height: 30, width: 30),
               //     )
               // ),
-
-            ])
-
-
-        );
+            ]));
   }
 
   Widget prefixIcon(speed, stopDuration, statuscolor) {
@@ -1494,7 +1485,7 @@ class _mainmapscreen extends State<mainmapscreen> {
 
   void _recenterall() {
     CameraUpdate u2 =
-    CameraUpdate.newLatLngBounds(_boundsFromLatLngList(_latlng), 200);
+        CameraUpdate.newLatLngBounds(_boundsFromLatLngList(_latlng), 200);
     this._controller.moveCamera(u2).then((void v) {
       _check(u2, this._controller);
       // Ajuste o zoom após recarregar
@@ -1586,7 +1577,6 @@ class _mainmapscreen extends State<mainmapscreen> {
   }
 
   updateMarker() {
-
     try {
       _initialPosition = LatLng(
           devicesList[0].lat!.toDouble(), devicesList[0].lng!.toDouble());
@@ -1597,10 +1587,8 @@ class _mainmapscreen extends State<mainmapscreen> {
       // return model;
     }
 
-
     for (int i = 0; i < devicesList.length; i++) {
-
-      if( _showDeviceById == devicesList[i].id) {
+      if (_showDeviceById == devicesList[i].id) {
         String other = devicesList[i].deviceData!.traccar!.other.toString();
 
         String baseUrl = "https://web.unnicatelemetria.com.br/";
@@ -1621,30 +1609,23 @@ class _mainmapscreen extends State<mainmapscreen> {
           var label;
 
           if (devicesList[i].speed!.toInt() > 0) {
-
             color = Colors.green;
             label = devicesList[i].name.toString() +
                 '(' +
                 devicesList[i].speed!.toString() +
                 ' km)';
-
           } else if (devicesList[i].online!.contains('engine')) {
             color = Colors.yellow;
             label = devicesList[i].name.toString();
-
           } else if (devicesList[i].online!.contains('online')) {
             color = Colors.green;
             label = devicesList[i].name.toString();
-
           } else if (devicesList[i].online!.contains('ack')) {
             color = Colors.red;
             label = devicesList[i].name.toString();
-
           } else if (devicesList[i].online!.contains('offline')) {
-
             color = Colors.blue;
             label = devicesList[i].name.toString();
-
           }
 
           double lat = devicesList[i].lat as double;
@@ -1654,12 +1635,11 @@ class _mainmapscreen extends State<mainmapscreen> {
           _latlng.add(position);
 
           _createImageLabel(
-              iconpath: deviceIconFullPath,
-              label: label,
-              course: devicesList[i].course.toDouble(),
-              color: color,
-              showtitle: _showTitle
-          )
+                  iconpath: deviceIconFullPath,
+                  label: label,
+                  course: devicesList[i].course.toDouble(),
+                  color: color,
+                  showtitle: _showTitle)
               .then((BitmapDescriptor customIcon) {
             _mapLoading = false;
             _allMarker[MarkerId(i.toString())] = Marker(
@@ -1673,7 +1653,6 @@ class _mainmapscreen extends State<mainmapscreen> {
                   setState(() {
                     isshowvehicledetail = true;
                   });
-
                 },
                 anchor: Offset(0.5, 0.5),
                 icon: customIcon);
@@ -1708,7 +1687,8 @@ class _mainmapscreen extends State<mainmapscreen> {
   }
 }
 
-Future<BitmapDescriptor> getMarkerIcon(String imagePath, String infoText, Color color, double rotateDegree, bool _showTitle) async {
+Future<BitmapDescriptor> getMarkerIcon(String imagePath, String infoText,
+    Color color, double rotateDegree, bool _showTitle) async {
   final ui.PictureRecorder pictureRecorder = ui.PictureRecorder();
   final Canvas canvas = Canvas(pictureRecorder);
 
