@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+
 import 'package:location/location.dart';
 import 'package:maktrogps/config/apps/ecommerce/global_style.dart';
 import 'package:maktrogps/config/custom_image_assets.dart';
@@ -30,6 +30,9 @@ import '../../config/constant.dart';
 import '../../mvvm/view_model/objects.dart';
 import '../model/devices.dart';
 import 'livetrack.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart' as gmaps;
+import 'package:flutter_google_street_view/flutter_google_street_view.dart'
+    as streetview;
 
 class mainmapscreen extends StatefulWidget {
   @override
@@ -40,7 +43,7 @@ class _mainmapscreen extends State<mainmapscreen> {
   // initialize global widget
   final _globalWidget = GlobalWidget();
 
-  late GoogleMapController _controller;
+  late gmaps.GoogleMapController _controller;
   bool _mapLoading = true;
   Timer? _timerDummy;
 
@@ -48,20 +51,20 @@ class _mainmapscreen extends State<mainmapscreen> {
   bool _showTitle = true;
   double _currentZoom = 100;
 
-  LatLng _initialPosition = LatLng(35.168033, 74.900467);
+  gmaps.LatLng _initialPosition = gmaps.LatLng(35.168033, 74.900467);
   Location currentLocation = Location();
-  Set<Marker> _markers = {};
+  Set<gmaps.Marker> _markers = {};
   Map<int, bool> _showDeviceMarker = {};
   int _showDeviceById = 0;
   String searchQueryDevice = "";
 
   /* List<LatLng> _markerList = [];*/
 
-  Map<MarkerId, Marker> _allMarker = {};
-  List<LatLng> _latlng = [];
+  Map<gmaps.MarkerId, gmaps.Marker> _allMarker = {};
+  List<gmaps.LatLng> _latlng = [];
   bool _isBound = false;
   bool _doneListing = false;
-  MapType _currentMapType = MapType.normal;
+  gmaps.MapType _currentMapType = gmaps.MapType.normal;
   bool _trafficEnabled = false;
   bool isshowvehicledetail = false;
   var _trafficButtonColor = Colors.grey[700];
@@ -76,6 +79,9 @@ class _mainmapscreen extends State<mainmapscreen> {
 
   List<deviceItems> devicesList = [];
   late ObjectStore objectStore;
+
+  bool _showMiniMap = false;
+  streetview.StreetViewController? _controllerStreetView;
 
   @override
   void initState() {
@@ -97,7 +103,7 @@ class _mainmapscreen extends State<mainmapscreen> {
         .asUint8List();
   }
 
-  Future<BitmapDescriptor> _createImageLabel(
+  Future<gmaps.BitmapDescriptor> _createImageLabel(
       {String iconpath = '',
       String label = 'label',
       double fontSize = 20,
@@ -107,20 +113,20 @@ class _mainmapscreen extends State<mainmapscreen> {
     return getMarkerIcon(iconpath, label, color, course, showtitle);
   }
 
-  void _check(CameraUpdate u, GoogleMapController c) async {
+  void _check(gmaps.CameraUpdate u, gmaps.GoogleMapController c) async {
     c.moveCamera(u);
     _controller.moveCamera(u);
-    LatLngBounds l1 = await c.getVisibleRegion();
-    LatLngBounds l2 = await c.getVisibleRegion();
+    gmaps.LatLngBounds l1 = await c.getVisibleRegion();
+    gmaps.LatLngBounds l2 = await c.getVisibleRegion();
 
     if (l1.southwest.latitude == -90 || l2.southwest.latitude == -90)
       _check(u, c);
   }
 
-  LatLngBounds _boundsFromLatLngList(List<LatLng> list) {
+  gmaps.LatLngBounds _boundsFromLatLngList(List<gmaps.LatLng> list) {
     assert(list.isNotEmpty);
     double? x0, x1, y0, y1;
-    for (LatLng latLng in list) {
+    for (gmaps.LatLng latLng in list) {
       if (x0 == null) {
         x0 = x1 = latLng.latitude;
         y0 = y1 = latLng.longitude;
@@ -131,12 +137,12 @@ class _mainmapscreen extends State<mainmapscreen> {
         if (latLng.longitude < y0!) y0 = latLng.longitude;
       }
     }
-    return LatLngBounds(
-        northeast: LatLng(x1!, y1!), southwest: LatLng(x0!, y0!));
+    return gmaps.LatLngBounds(
+        northeast: gmaps.LatLng(x1!, y1!), southwest: gmaps.LatLng(x0!, y0!));
   }
 
   // when the Google Maps Camera is change, get the current position
-  void _onGeoChanged(CameraPosition position) {
+  void _onGeoChanged(gmaps.CameraPosition position) {
     _currentZoom = position.zoom;
   }
 
@@ -256,9 +262,9 @@ class _mainmapscreen extends State<mainmapscreen> {
                 setState(() {
                   _showMarker = (_showMarker) ? false : true;
                   for (int a = 0; a < _allMarker.length; a++) {
-                    if (_allMarker[MarkerId(a.toString())] != null) {
-                      _allMarker[MarkerId(a.toString())] =
-                          _allMarker[MarkerId(a.toString())]!.copyWith(
+                    if (_allMarker[gmaps.MarkerId(a.toString())] != null) {
+                      _allMarker[gmaps.MarkerId(a.toString())] =
+                          _allMarker[gmaps.MarkerId(a.toString())]!.copyWith(
                         visibleParam: _showMarker,
                       );
                     }
@@ -782,8 +788,8 @@ class _mainmapscreen extends State<mainmapscreen> {
 
                 currentZoomLevel = currentZoomLevel + 2;
                 _controller.animateCamera(
-                  CameraUpdate.newCameraPosition(
-                    CameraPosition(
+                  gmaps.CameraUpdate.newCameraPosition(
+                    gmaps.CameraPosition(
                       target: _initialPosition,
                       zoom: 15.0,
                     ),
@@ -822,8 +828,8 @@ class _mainmapscreen extends State<mainmapscreen> {
                 currentZoomLevel = currentZoomLevel - 2;
                 if (currentZoomLevel < 0) currentZoomLevel = 0;
                 _controller.animateCamera(
-                  CameraUpdate.newCameraPosition(
-                    CameraPosition(
+                  gmaps.CameraUpdate.newCameraPosition(
+                    gmaps.CameraPosition(
                       target: _initialPosition,
                       zoom: currentZoomLevel,
                     ),
@@ -1228,166 +1234,218 @@ class _mainmapscreen extends State<mainmapscreen> {
     } else {
       statuscolor = Colors.red;
     }
-    return Positioned(
-        bottom: 100,
-        right: 0,
-        left: 0,
-        child: Align(
-            alignment: Alignment.bottomCenter,
-            //left: 16,
-            child: Container(
-              margin: EdgeInsets.fromLTRB(3, 0, 3, 0),
-              child: Card(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  elevation: 2,
-                  color: Colors.white,
-                  child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        prefixIcon(devicelist.speed, devicelist.stopDuration,
-                            statuscolor),
-                        Expanded(
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(10.0)),
-                            ),
-                            padding: EdgeInsets.fromLTRB(10, 2, 10, 0),
-                            margin: EdgeInsets.only(left: 5),
-                            child: Column(
-                              children: [
-                                GestureDetector(
-                                  onTap: () {
-                                    Fluttertoast.showToast(
-                                        msg: 'Clique ${devicelist.name}',
-                                        toastLength: Toast.LENGTH_SHORT);
-                                  },
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: <Widget>[
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Container(
-                                                margin:
-                                                    EdgeInsets.only(top: 12),
-                                                child:
-                                                    //Center(
-                                                    Text(
-                                                  '' +
-                                                      devicelist.name
-                                                          .toString(),
-                                                  style: TextStyle(
-                                                      fontSize: 16,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      color:
-                                                          Colors.blue.shade900),
-                                                  maxLines: 3,
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                )
-                                                //   )
-                                                ),
-                                            Row(children: [
-                                              Container(
-                                                margin:
-                                                    EdgeInsets.only(top: 10),
-                                                padding: EdgeInsets.all(5),
 
-                                                decoration: BoxDecoration(
-                                                  color: statuscolor,
-                                                  borderRadius:
-                                                      BorderRadius.all(
-                                                          Radius.circular(
-                                                              10.0)),
-                                                ),
-                                                // color: statuscolor,
-                                                child: Row(
-                                                  children: [
-                                                    Text(
-                                                        (speed > 0)
-                                                            ? 'Em movimento: ' +
-                                                                devicelist
-                                                                    .stopDuration!
-                                                            : 'Parado: ' +
-                                                                devicelist
-                                                                    .stopDuration!,
-                                                        style: TextStyle(
-                                                            fontSize: 14,
-                                                            color:
-                                                                Colors.white))
-                                                  ],
+    return Positioned(
+      bottom: 100,
+      right: 0,
+      left: 0,
+      child: Align(
+        alignment: Alignment.bottomCenter,
+        //left: 16,
+        child: Container(
+          margin: EdgeInsets.fromLTRB(3, 0, 3, 0),
+          child: Card(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+            elevation: 2,
+            color: Colors.white,
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    _buildStreetView(lat, lng),
+                  ],
+                ),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    prefixIcon(
+                        devicelist.speed, devicelist.stopDuration, statuscolor),
+                    Expanded(
+                      child: Container(
+                        decoration: const BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.all(Radius.circular(10.0)),
+                        ),
+                        padding: const EdgeInsets.fromLTRB(10, 2, 10, 0),
+                        margin: const EdgeInsets.only(left: 5),
+                        child: Column(
+                          children: [
+                            GestureDetector(
+                              onTap: () {
+                                Fluttertoast.showToast(
+                                    msg: 'Clique ${devicelist.name}',
+                                    toastLength: Toast.LENGTH_SHORT);
+                              },
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: <Widget>[
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        //NOME DISPOSITIVO
+                                        Container(
+                                            margin: EdgeInsets.only(top: 12),
+                                            child:
+                                                //Center(
+                                                Text(
+                                              '' + devicelist.name.toString(),
+                                              style: TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.blue.shade900),
+                                              maxLines: 3,
+                                              overflow: TextOverflow.ellipsis,
+                                            )
+                                            //   )
+                                            ),
+                                        // STATUS EM MOVIMENTO OU PARADO
+                                        Row(children: [
+                                          Container(
+                                            margin: EdgeInsets.only(top: 10),
+                                            padding: EdgeInsets.all(5),
+
+                                            decoration: BoxDecoration(
+                                              color: statuscolor,
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(10.0)),
+                                            ),
+                                            // color: statuscolor,
+                                            child: Row(
+                                              children: [
+                                                Text(
+                                                    (speed > 0)
+                                                        ? 'Em movimento: ' +
+                                                            devicelist
+                                                                .stopDuration!
+                                                        : 'Parado: ' +
+                                                            devicelist
+                                                                .stopDuration!,
+                                                    style: TextStyle(
+                                                        fontSize: 14,
+                                                        color: Colors.white))
+                                              ],
+                                            ),
+                                          ),
+                                        ]),
+                                        // ENDEREÇO
+                                        Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.start,
+                                            children: [
+                                              Expanded(
+                                                child: Container(
+                                                  margin: EdgeInsets.only(
+                                                      left: 8,
+                                                      top: 12,
+                                                      bottom: 15),
+                                                  child: Column(
+                                                    children: [
+                                                      GestureDetector(
+                                                        onTap: () {
+                                                          address =
+                                                              "Carregando....";
+                                                          setState(() {});
+                                                          getAddress(lat, lng);
+                                                        },
+                                                        child: RichText(
+                                                          maxLines: 5,
+                                                          textAlign:
+                                                              TextAlign.left,
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                          text: TextSpan(
+                                                              text: address,
+                                                              style: TextStyle(
+                                                                fontSize: 11,
+                                                                color: Colors
+                                                                    .grey
+                                                                    .shade700,
+                                                              ),
+                                                              children: []),
+                                                        ),
+                                                      )
+                                                    ],
+                                                  ),
                                                 ),
                                               ),
                                             ]),
-                                            Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.start,
-                                                children: [
-                                                  Expanded(
-                                                    child: Container(
-                                                      margin: EdgeInsets.only(
-                                                          left: 8,
-                                                          top: 12,
-                                                          bottom: 15),
-                                                      child: Column(
-                                                        children: [
-                                                          GestureDetector(
-                                                            onTap: () {
-                                                              address =
-                                                                  "Carregando....";
-                                                              setState(() {});
-                                                              getAddress(
-                                                                  lat, lng);
-                                                            },
-                                                            child: RichText(
-                                                              maxLines: 5,
-                                                              textAlign:
-                                                                  TextAlign
-                                                                      .left,
-                                                              overflow:
-                                                                  TextOverflow
-                                                                      .ellipsis,
-                                                              text: TextSpan(
-                                                                  text: address,
-                                                                  style:
-                                                                      TextStyle(
-                                                                    fontSize:
-                                                                        11,
-                                                                    color: Colors
-                                                                        .grey
-                                                                        .shade700,
-                                                                  ),
-                                                                  children: []),
-                                                            ),
-                                                          )
-                                                        ],
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ]),
-                                          ],
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                ),
-                              ],
+                                      ],
+                                    ),
+                                  )
+                                ],
+                              ),
                             ),
-                          ),
+                          ],
                         ),
-                        postfixIcon(
-                            devicelist.name, devicelist.id, lat, lng, imei),
-                      ])),
-            )));
+                      ),
+                    ),
+                    postfixIcon(devicelist.name, devicelist.id, lat, lng, imei),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStreetView(double lat, double lng) {
+    return Stack(
+      children: [
+        Container(
+          padding: EdgeInsets.only(bottom: 5),
+          height: (_showMiniMap ?? false) ? 150 : 50,
+          width: MediaQuery.of(context).size.width - 14, // Defina uma largura específica
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(10),
+                topRight: Radius.circular(10),
+                bottomLeft: Radius.zero,
+                bottomRight: Radius.zero),
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(10),
+                topRight: Radius.circular(10),
+                bottomLeft: Radius.zero,
+                bottomRight: Radius.zero),
+            child: streetview.FlutterGoogleStreetView(
+              initPos: streetview.LatLng(lat, lng),
+              onStreetViewCreated: (controller) {
+                _controllerStreetView = controller;
+              },
+            ),
+          ),
+        ),
+        Positioned(
+          right: 10,
+          top: 10,
+          child: GestureDetector(
+            onTap: () {
+              setState(() {
+                if (_showMiniMap == true) {
+                  _showMiniMap = false;
+                } else {
+                  _showMiniMap = true;
+                }
+              });
+            },
+            child: Icon(
+              (_showMiniMap ?? false)
+                  ? Icons.arrow_upward
+                  : Icons.arrow_downward,
+              color: Colors.white,
+            ),
+          ),
+        ),
+      ],
+    );
   }
 
   Widget postfixIcon(name, id, lat, lng, imei) {
@@ -1469,9 +1527,9 @@ class _mainmapscreen extends State<mainmapscreen> {
 
   void _onMapTypeButtonPressed() {
     setState(() {
-      _currentMapType = _currentMapType == MapType.normal
-          ? MapType.satellite
-          : MapType.normal;
+      _currentMapType = _currentMapType == gmaps.MapType.normal
+          ? gmaps.MapType.satellite
+          : gmaps.MapType.normal;
     });
   }
 
@@ -1484,13 +1542,13 @@ class _mainmapscreen extends State<mainmapscreen> {
   }
 
   void _recenterall() {
-    CameraUpdate u2 =
-        CameraUpdate.newLatLngBounds(_boundsFromLatLngList(_latlng), 200);
+    gmaps.CameraUpdate u2 =
+        gmaps.CameraUpdate.newLatLngBounds(_boundsFromLatLngList(_latlng), 200);
     this._controller.moveCamera(u2).then((void v) {
       _check(u2, this._controller);
       // Ajuste o zoom após recarregar
-      _controller.animateCamera(CameraUpdate.newCameraPosition(
-        CameraPosition(
+      _controller.animateCamera(gmaps.CameraUpdate.newCameraPosition(
+        gmaps.CameraPosition(
           target: _initialPosition,
           zoom: 15.0, // Ajuste o valor do zoom aqui para um valor menor
         ),
@@ -1503,22 +1561,22 @@ class _mainmapscreen extends State<mainmapscreen> {
         await getImages("assets/nepalicon/globe.png", 100);
     var location = await currentLocation.getLocation();
 
-    _controller
-        ?.animateCamera(CameraUpdate.newCameraPosition(new CameraPosition(
-      target: LatLng(location.latitude ?? 0.0, location.longitude ?? 0.0),
+    _controller?.animateCamera(
+        gmaps.CameraUpdate.newCameraPosition(gmaps.CameraPosition(
+      target: gmaps.LatLng(location.latitude ?? 0.0, location.longitude ?? 0.0),
       zoom: 15.0,
     )));
     setState(() {
-      _markers.add(Marker(
-          markerId: MarkerId('Home'),
-          icon: BitmapDescriptor.fromBytes(markIcons),
-          position:
-              LatLng(location.latitude ?? 0.0, location.longitude ?? 0.0)));
+      _markers.add(gmaps.Marker(
+          markerId: gmaps.MarkerId('Home'),
+          icon: gmaps.BitmapDescriptor.fromBytes(markIcons),
+          position: gmaps.LatLng(
+              location.latitude ?? 0.0, location.longitude ?? 0.0)));
     });
   }
 
   Widget _buildGoogleMap() {
-    return GoogleMap(
+    return gmaps.GoogleMap(
       mapType: _currentMapType,
       trafficEnabled: _trafficEnabled,
       compassEnabled: false,
@@ -1530,8 +1588,8 @@ class _mainmapscreen extends State<mainmapscreen> {
       myLocationButtonEnabled: false,
       myLocationEnabled: true,
       mapToolbarEnabled: false,
-      markers: Set<Marker>.of(_allMarker.values),
-      initialCameraPosition: CameraPosition(
+      markers: Set<gmaps.Marker>.of(_allMarker.values),
+      initialCameraPosition: gmaps.CameraPosition(
         target: _initialPosition,
         zoom: 15.0,
       ),
@@ -1539,14 +1597,14 @@ class _mainmapscreen extends State<mainmapscreen> {
       onCameraIdle: () {
         if (_isBound == false && _doneListing == true) {
           _isBound = true;
-          CameraUpdate u2 =
-              CameraUpdate.newLatLngBounds(_boundsFromLatLngList(_latlng), 50);
+          gmaps.CameraUpdate u2 = gmaps.CameraUpdate.newLatLngBounds(
+              _boundsFromLatLngList(_latlng), 50);
           this._controller.moveCamera(u2).then((void v) {
             _check(u2, this._controller);
           });
         }
       },
-      onMapCreated: (GoogleMapController controller) {
+      onMapCreated: (gmaps.GoogleMapController controller) {
         _controller = controller;
 
         // we use timer for this demo
@@ -1559,7 +1617,7 @@ class _mainmapscreen extends State<mainmapscreen> {
             // zoom to all marker
             // if (_isBound == false /*&& _doneListing==true*/) {
             //   _isBound = true;
-            //   CameraUpdate u2 = CameraUpdate.newLatLngBounds(
+            //   gmaps.CameraUpdate u2 = gmaps.CameraUpdate.newLatLngBounds(
             //       _boundsFromLatLngList(_latlng), 15.0);
             //   this._controller.moveCamera(u2).then((void v) {
             //     _check(u2, this._controller);
@@ -1578,7 +1636,7 @@ class _mainmapscreen extends State<mainmapscreen> {
 
   updateMarker() {
     try {
-      _initialPosition = LatLng(
+      _initialPosition = gmaps.LatLng(
           devicesList[0].lat!.toDouble(), devicesList[0].lng!.toDouble());
     } catch (Ex) {
       print(Ex);
@@ -1631,7 +1689,7 @@ class _mainmapscreen extends State<mainmapscreen> {
           double lat = devicesList[i].lat as double;
           double lng = devicesList[i].lng as double;
 
-          LatLng position = LatLng(lat, lng);
+          gmaps.LatLng position = gmaps.LatLng(lat, lng);
           _latlng.add(position);
 
           _createImageLabel(
@@ -1640,14 +1698,14 @@ class _mainmapscreen extends State<mainmapscreen> {
                   course: devicesList[i].course.toDouble(),
                   color: color,
                   showtitle: _showTitle)
-              .then((BitmapDescriptor customIcon) {
+              .then((gmaps.BitmapDescriptor customIcon) {
             _mapLoading = false;
-            _allMarker[MarkerId(i.toString())] = Marker(
-                markerId: MarkerId(i.toString()),
+            _allMarker[gmaps.MarkerId(i.toString())] = gmaps.Marker(
+                markerId: gmaps.MarkerId(i.toString()),
                 position: position,
                 onTap: () {
                   _initialPosition =
-                      LatLng(position.latitude, position.longitude);
+                      gmaps.LatLng(position.latitude, position.longitude);
                   StaticVarMethod.imei =
                       StaticVarMethod.devicelist[i].deviceData!.imei.toString();
                   setState(() {
@@ -1687,7 +1745,7 @@ class _mainmapscreen extends State<mainmapscreen> {
   }
 }
 
-Future<BitmapDescriptor> getMarkerIcon(String imagePath, String infoText,
+Future<gmaps.BitmapDescriptor> getMarkerIcon(String imagePath, String infoText,
     Color color, double rotateDegree, bool _showTitle) async {
   final ui.PictureRecorder pictureRecorder = ui.PictureRecorder();
   final Canvas canvas = Canvas(pictureRecorder);
@@ -1807,7 +1865,7 @@ Future<BitmapDescriptor> getMarkerIcon(String imagePath, String infoText,
       await markerAsImage.toByteData(format: ui.ImageByteFormat.png);
   final Uint8List? uint8List = byteData?.buffer.asUint8List();
 
-  return BitmapDescriptor.fromBytes(uint8List!);
+  return gmaps.BitmapDescriptor.fromBytes(uint8List!);
 }
 
 Future<ui.Image> getImageFromPath(String imagePath) async {
