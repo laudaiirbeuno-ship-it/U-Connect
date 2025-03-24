@@ -9,7 +9,9 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+// import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:flutter_google_street_view/flutter_google_street_view.dart';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:maktrogps/bloc/kmandfuelhistory/bloc/kmandfuelhistory_bloc.dart';
@@ -83,7 +85,7 @@ class _listscreen extends State<listscreen>
   bool _loading = true;
 
   Set<Marker> markers = new Set();
-  final Completer<GoogleMapController> _mapController = Completer();
+  // final Completer<GoogleMapController> _mapController = Completer();
 
   Color _color1 = Color(0xff777777);
   Color _color2 = Color(0xFF515151);
@@ -98,14 +100,17 @@ class _listscreen extends State<listscreen>
 
   int _tabIndex = 0;
 
+
   bool _mapLoading = true;
-  GoogleMapController? _controller;
+  StreetViewController? _controller;
   static Color primaryDark = const Color.fromARGB(255, 13, 61, 101);
   double _currentZoom = 14;
 
 //  final LatLng _initialPosition = LatLng(-6.168033, 106.900467);
 
   Marker? _marker;
+
+  Map<int, bool> _showMiniMap = {};
 
   late BitmapDescriptor _markerDirection = BitmapDescriptor.defaultMarker;
 
@@ -117,6 +122,7 @@ class _listscreen extends State<listscreen>
     'In Active',
     'Expired'
   ];
+
   int starIndex = 0;
   Color CHARCOAL = Color(0xFF515151);
   bool _searchEnabled = false;
@@ -129,10 +135,8 @@ class _listscreen extends State<listscreen>
   late ObjectStore objectStore;
   String? filterSelected;
 
-  // KmandfuelHistoryBloc kmhistorybloc = KmandfuelHistoryBloc();
   @override
   void initState() {
-    // kmhistorybloc.add(KmandfuelHistoryInitialFetchEvent());
     checkPreference();
     _setSourceAndDestinationIcons();
     filterSelected = carstatusList.first;
@@ -228,6 +232,8 @@ class _listscreen extends State<listscreen>
 
       for (int i = 0; i < StaticVarMethod.devicelist.length; i++) {
         deviceItems model = StaticVarMethod.devicelist.elementAt(i);
+        print("@@@ MODEL: ");
+
         String other = model.deviceData!.traccar!.other.toString();
         String ignition = "false";
         if (other.contains("<ignition>")) {
@@ -624,63 +630,64 @@ class _listscreen extends State<listscreen>
 
     }
 
-    return GestureDetector(
-        onTap: () {
-          StaticVarMethod.deviceName = productData.name.toString();
-          StaticVarMethod.deviceId = productData.id.toString();
-          StaticVarMethod.imei = productData.deviceData!.imei.toString();
-          StaticVarMethod.simno = productData.deviceData!.simNumber.toString();
-          StaticVarMethod.lat = productData.lat!.toDouble();
-          StaticVarMethod.lng = productData.lng!.toDouble();
-          StaticVarMethod.devicestatus = devicestatus;
-          StaticVarMethod.devicestatuscolor = statuscolor;
+    print("@@@ ATUALIZOU");
 
-          showModalBottomSheet<void>(
-            context: context,
-            //isDismissible: false,
-            //barrierColor: Colors.transparent,
-            backgroundColor: Colors.transparent,
-            builder: (BuildContext context) {
-              return Container(
-                  height: MediaQuery.of(context).size.height / 1.6,
-                  child: _showDeliveryPopup());
-            },
-          );
-        },
-        child: Column(
-          children: [
-            Container(
-              margin: EdgeInsets.fromLTRB(3, 0, 3, 3),
-              child: Card(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                elevation: 2,
-                color: statuscolor,
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Color(0xFFF6F6F6),
-                    borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                  ),
-                  padding: EdgeInsets.all(0),
-                  margin: EdgeInsets.only(left: 5),
-                  child: Column(
-                    children: [
-                      _buildGoogleMap(lat, lng, course, imei),
-                      _buildCardSectionOne(productData, labelStatusType, statuscolor),
-                      _buildDivider(),
-                      // Verifica se há sensores antes de chamar a função
-                      if (productData.sensors != null && productData.sensors!.isNotEmpty)
-                        _buildCardSectionSensors(productData),
-                      // _buildDivider(),
-                      _buildCardSectionAddress(productData, lat, lng),
-                    ],
-                  ),
-                ),
+    return Column(
+      children: [
+        Container(
+          margin: EdgeInsets.fromLTRB(0, 0, 3, 3),
+          child: Card(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+            elevation: 0,
+            color: Colors.transparent, // Removendo a cor de fundo
+            child: Container(
+              decoration: BoxDecoration(
+                color: Color(0xFFE9E9E9),
+                borderRadius: BorderRadius.all(Radius.circular(10.0)),
+              ),
+              padding: EdgeInsets.all(0),
+              margin: EdgeInsets.only(left: 5),
+              child: Column(
+                children: [
+                  _buildGoogleMap(lat, lng, course, imei, productData.id),
+                  _buildCardSectionOne(productData, labelStatusType, statuscolor, devicestatus),
+                  _buildDivider(),
+                  if (productData.sensors != null && productData.sensors!.isNotEmpty)
+                    _buildCardSectionSensors(productData),
+                  _buildCardSectionAddress(productData, lat, lng),
+                ],
               ),
             ),
-          ],
-        )
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _collapseMapContainer(int deviceId) {
+    return Container(
+      padding: EdgeInsets.all(10),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          GestureDetector(
+            onTap: () {
+              setState(() {
+                if(_showMiniMap[deviceId] == true) {
+                  _showMiniMap[deviceId] = false;
+                }else{
+                  _showMiniMap[deviceId] = true;
+                }
+              });
+            },
+            child: Icon(
+              (_showMiniMap[deviceId] ?? true) ? Icons.arrow_upward : Icons.arrow_downward,
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -912,7 +919,7 @@ class _listscreen extends State<listscreen>
     );
   }
 
-  Widget _buildCardSectionOne(deviceItems productData, String labelStatusType, Color statusColor) {
+  Widget _buildCardSectionOne(deviceItems productData, String labelStatusType, Color statusColor, String devicestatus) {
     String baseUrl = "https://web.unnicatelemetria.com.br/";
     String? deviceIconPath = productData.icon?.path;
     String deviceIconFullPath = baseUrl + (deviceIconPath ?? '');
@@ -939,75 +946,99 @@ class _listscreen extends State<listscreen>
         break;
     }
 
-    return Container(
-      padding: EdgeInsets.all(10),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          // Ícone e Informações do Veículo
-          Row(
+    return GestureDetector(
+        onTap: () {
+          StaticVarMethod.deviceName = productData.name.toString();
+          StaticVarMethod.deviceId = productData.id.toString();
+          StaticVarMethod.imei = productData.deviceData!.imei.toString();
+          StaticVarMethod.simno = productData.deviceData!.simNumber.toString();
+          StaticVarMethod.lat = productData.lat!.toDouble();
+          StaticVarMethod.lng = productData.lng!.toDouble();
+          StaticVarMethod.devicestatus = devicestatus;
+          StaticVarMethod.devicestatuscolor = statusColor;
+
+          showModalBottomSheet<void>(
+            context: context,
+            //isDismissible: false,
+            //barrierColor: Colors.transparent,
+            backgroundColor: Colors.transparent,
+            builder: (BuildContext context) {
+              return Container(
+                  height: MediaQuery.of(context).size.height / 1.6,
+                  child: _showDeliveryPopup());
+            },
+          );
+        },
+        child: Container(
+          padding: EdgeInsets.all(10),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // Ícone do carro
+              // Ícone e Informações do Veículo
+              Row(
+                children: [
+                  // Ícone do carro
+                  Container(
+                    padding: EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      border: Border.all(color: Colors.white),
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                    child: Image.network(
+                      deviceIconFullPath, // URL do ícone do carro
+                      width: 40, // Largura do ícone
+                      height: 40, // Altura do ícone
+                      fit: BoxFit.scaleDown, // Ajusta a imagem para caber no container
+                      errorBuilder: (context, error, stackTrace) {
+                        return Icon(
+                          Icons.directions_car_filled, // Ícone padrão em caso de erro
+                          color: Colors.black,
+                        );
+                      },
+                    ),
+                  ),
+                  SizedBox(width: 10), // Espaçamento entre o ícone e o texto
+                  Container(
+                    width: 130, // Defina a largura fixa desejada
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          deviceName, // Número do veículo
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis, // Adiciona reticências se o texto for muito longo
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 15,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              // Botão de Status
               Container(
-                padding: EdgeInsets.all(6),
+                padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                 decoration: BoxDecoration(
-                  color: Colors.white,
-                  border: Border.all(color: Colors.white),
+                  border: Border.all(
+                    color: statusColor,
+                    width: 2,
+                  ),
                   borderRadius: BorderRadius.circular(5),
                 ),
-                child: Image.network(
-                  deviceIconFullPath, // URL do ícone do carro
-                  width: 40, // Largura do ícone
-                  height: 40, // Altura do ícone
-                  fit: BoxFit.scaleDown, // Ajusta a imagem para caber no container
-                  errorBuilder: (context, error, stackTrace) {
-                    return Icon(
-                      Icons.directions_car_filled, // Ícone padrão em caso de erro
-                      color: Colors.black,
-                    );
-                  },
-                ),
-              ),
-              SizedBox(width: 10), // Espaçamento entre o ícone e o texto
-              Container(
-                width: 130, // Defina a largura fixa desejada
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      deviceName, // Número do veículo
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis, // Adiciona reticências se o texto for muito longo
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 15,
-                      ),
-                    ),
-                  ],
+                child: Text(
+                  labelStatus, // Texto do botão
+                  style: TextStyle(
+                    color: statusColor,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ],
           ),
-          // Botão de Status
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-            decoration: BoxDecoration(
-              border: Border.all(
-                color: statusColor,
-                width: 2,
-              ),
-              borderRadius: BorderRadius.circular(5),
-            ),
-            child: Text(
-              labelStatus, // Texto do botão
-              style: TextStyle(
-                color: statusColor,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-        ],
-      ),
+        )
     );
   }
 
@@ -1373,40 +1404,40 @@ class _listscreen extends State<listscreen>
   }
 
   // add marker
-  Set<Marker> getmarkers(double lat, double lng, double course, String imei) {
-    LatLng position = LatLng(lat, lng);
+  // Set<Marker> getmarkers(double lat, double lng, double course, String imei) {
+  //   LatLng position = LatLng(lat, lng);
 
-    // set initial marker
-    markers.add(Marker(
-      markerId: MarkerId(imei),
-      anchor: Offset(0.5, 0.5),
-      position: position,
-      rotation: course,
-      icon: _markerDirection,
-    ));
+  //   // set initial marker
+  //   markers.add(Marker(
+  //     markerId: MarkerId(imei),
+  //     anchor: Offset(0.5, 0.5),
+  //     position: position,
+  //     rotation: course,
+  //     icon: _markerDirection,
+  //   ));
 
-    if (_controller != null) {
-      _controller!
-          .animateCamera(CameraUpdate.newLatLngZoom(LatLng(lat, lng), 15));
-    }
+  //   if (_controller != null) {
+  //     _controller!
+  //         .animateCamera(CameraUpdate.newLatLngZoom(LatLng(lat, lng), 15));
+  //   }
 
-    return markers;
-  }
+  //   return markers;
+  // }
 
-  void _check(CameraUpdate u, GoogleMapController c) async {
-    c.moveCamera(u);
-    _controller!.moveCamera(u);
-    LatLngBounds l1 = await c.getVisibleRegion();
-    LatLngBounds l2 = await c.getVisibleRegion();
+  // void _check(CameraUpdate u, GoogleMapController c) async {
+  //   c.moveCamera(u);
+  //   _controller!.moveCamera(u);
+  //   LatLngBounds l1 = await c.getVisibleRegion();
+  //   LatLngBounds l2 = await c.getVisibleRegion();
 
-    if (l1.southwest.latitude == -90 || l2.southwest.latitude == -90)
-      _check(u, c);
-  }
+  //   if (l1.southwest.latitude == -90 || l2.southwest.latitude == -90)
+  //     _check(u, c);
+  // }
 
   // when the Google Maps Camera is change, get the current position
-  void _onGeoChanged(CameraPosition position) {
-    _currentZoom = position.zoom;
-  }
+  // void _onGeoChanged(CameraPosition position) {
+  //   _currentZoom = position.zoom;
+  // }
 
   Future<BitmapDescriptor> getBitmapDescriptorFromUrl(String url) async {
     // Baixe a imagem da URL
@@ -1422,75 +1453,70 @@ class _listscreen extends State<listscreen>
   }
 
   // GOOGLE MAP WIDGET
-  Widget _buildGoogleMap(double lat, double lng, double course, String imei) {
-    return Container(
-        padding: EdgeInsets.only(bottom: 5),
-        height: 150,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(10),
-              topRight: Radius.circular(10),
-              bottomLeft: Radius.zero,
-              bottomRight: Radius.zero),
-          // Ajuste o valor conforme necessário
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black12, // Sombra opcional
-              // spreadRadius: 1,
-              blurRadius: 5,
-              offset: Offset(0, 1), // Sombra abaixo do container
-            ),
-          ],
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(10),
-              topRight: Radius.circular(10),
-              bottomLeft: Radius.zero,
-              bottomRight: Radius.zero),
-          child: GoogleMap(
-            mapType: MapType.normal,
-            trafficEnabled: false,
-            //compassEnabled: true,
-            rotateGesturesEnabled: true,
-            scrollGesturesEnabled: true,
-            tiltGesturesEnabled: true,
-            zoomControlsEnabled: false,
-            zoomGesturesEnabled: true,
-            myLocationButtonEnabled: false,
-            myLocationEnabled: true,
-            mapToolbarEnabled: true,
-            markers: getmarkers(lat, lng, course, imei),
-            //markers: Set.of((_marker != null) ? [_marker!] : []),
-            initialCameraPosition: CameraPosition(
-              target: LatLng(lat, lng),
-              zoom: _currentZoom,
-            ),
-            // onCameraMove: _onGeoChanged,
-            onCameraMove: (cameraPosition) {
-              lat = cameraPosition.target.longitude; //gets the center longitude
-              lng = cameraPosition.target.latitude; //gets the center lattitude
-            },
-            onMapCreated: (GoogleMapController controller) {
-              _controller = controller;
-              Timer(Duration(milliseconds: 500), () {
-                setState(() {
-                  _mapLoading = true;
-
-                  _controller!.animateCamera(
-                      CameraUpdate.newLatLngZoom(LatLng(lat, lng), 17));
-                  // Fluttertoast.showToast(
-                  //     msg:
-                  //     '_controller.animateCamera(CameraUpdate.newLatLngZoom(LatLng(lat, lng), 17));',
-                  //     toastLength: Toast.LENGTH_SHORT);
+  Widget _buildGoogleMap(double lat, double lng, double course, String imei, int deviceId) {
+    return Stack(
+      children: [
+        Container(
+          padding: EdgeInsets.only(bottom: 5),
+          height: (_showMiniMap[deviceId] ?? false) ? 150 : 50,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(10),
+                topRight: Radius.circular(10),
+                bottomLeft: Radius.zero,
+                bottomRight: Radius.zero),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black12,
+                blurRadius: 4,
+                offset: Offset(0, 1),
+              ),
+            ],
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(10),
+                topRight: Radius.circular(10),
+                bottomLeft: Radius.zero,
+                bottomRight: Radius.zero),
+            child: FlutterGoogleStreetView(
+              initPos: LatLng(lat, lng),
+              onStreetViewCreated: (controller) {
+                _controller = controller;
+                Timer(Duration(milliseconds: 500), () {
+                  setState(() {
+                    _mapLoading = true;
+                    // _controller!.animateTo(
+                    //   position: LatLng(lat, lng),
+                    //   zoom: 17,
+                    // );
+                  });
                 });
+              },
+            ),
+          ),
+        ),
+        Positioned(
+          right: 10,
+          top: 10,
+          child: GestureDetector(
+            onTap: () {
+              setState(() {
+                if (_showMiniMap[deviceId] == true) {
+                  _showMiniMap[deviceId] = false;
+                } else {
+                  _showMiniMap[deviceId] = true;
+                }
               });
             },
-            onTap: (pos) {
-              print('currentZoom : $_currentZoom');
-            },
+            child: Icon(
+              (_showMiniMap[deviceId] ?? false) ? Icons.arrow_upward : Icons.arrow_downward,
+              color: Colors.white,
+            ),
           ),
-        ));
+        ),
+      ],
+    );
   }
 
   void showPopupDeleteFavorite(index, boxImageSize) {

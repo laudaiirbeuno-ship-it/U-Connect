@@ -51,6 +51,9 @@ class _mainmapscreen extends State<mainmapscreen> {
   LatLng _initialPosition = LatLng(35.168033, 74.900467);
   Location currentLocation = Location();
   Set<Marker> _markers = {};
+  Map<int, bool> _showDeviceMarker = {};
+  int _showDeviceById = 0;
+  String searchQueryDevice = "";
 
   /* List<LatLng> _markerList = [];*/
 
@@ -94,25 +97,6 @@ class _mainmapscreen extends State<mainmapscreen> {
         .asUint8List();
   }
 
-/*
-  Future<Null> _initImage() async {
-    final ByteData dataElderly =
-    await rootBundle.load('assets/images/direction.png');
-    _iconFacebook = await _loadImage(Uint8List.view(dataElderly.buffer));
-  }
-
-  Future<ui.Image> _loadImage(List<int> img) async {
-    final IMG.Image image = IMG.decodeImage(img)!;
-    final IMG.Image resized = IMG.copyResize(image, width: _iconFacebookSize.toInt());
-    final List<int> resizedBytes = IMG.encodePng(resized);
-
-    final Completer<ui.Image> completer = Completer();
-    ui.decodeImageFromList(Uint8List.fromList(resizedBytes), (ui.Image img) {
-      return completer.complete(img);
-    });
-    return completer.future;
-  }*/
-
   Future<BitmapDescriptor> _createImageLabel(
       {String iconpath = '',
       String label = 'label',
@@ -124,10 +108,6 @@ class _mainmapscreen extends State<mainmapscreen> {
     return getMarkerIcon(iconpath, label, color, course, showtitle);
   }
 
-  /* start additional function for camera update
-  - we get this function from the internet
-  - if we don't use this function, the camera will not work properly (Zoom to marker sometimes not work)
-  */
   void _check(CameraUpdate u, GoogleMapController c) async {
     c.moveCamera(u);
     _controller.moveCamera(u);
@@ -270,46 +250,6 @@ class _mainmapscreen extends State<mainmapscreen> {
                   )
                 : Container(),
           ),
-
-          // Positioned(
-          //   top: 40,
-          //   right: 16,
-          //   child: GestureDetector(
-          //     onTap: () async {
-          //       _searchEnabled =
-          //       _searchEnabled == false ? true : false;
-          //
-          //       setState(() {
-          //
-          //       });
-          //     },
-          //     child: Container(
-          //       padding: EdgeInsets.all(6),
-          //       width: 36,
-          //       height: 36,
-          //       decoration: new BoxDecoration(
-          //         color: Colors.white,
-          //         shape: BoxShape.rectangle,
-          //         // borderRadius:BorderRadius.only(topLeft:Radius.circular(8),topRight:Radius.circular(8)),
-          //         // borderRadius: BorderRadius.circular(8),
-          //         boxShadow: [
-          //           BoxShadow(
-          //             color: Colors.black26,
-          //             blurRadius: 10.0,
-          //             // offset: const Offset(0.0, 1.0),
-          //           ),
-          //         ],
-          //       ),
-          //       // color: Colors.white,
-          //       //color: Color(0x99FFFFFF),
-          //       child: Icon(
-          //         (_searchEnabled)?Icons.close:Icons.search,
-          //         color: Colors.black45,
-          //         size: 30,
-          //       ),
-          //     ),
-          //   ),
-          // ),
           Positioned(
             top: 242,
             right: 16,
@@ -334,14 +274,6 @@ class _mainmapscreen extends State<mainmapscreen> {
                 decoration: new BoxDecoration(
                   color: Colors.white,
                   shape: BoxShape.rectangle,
-                  // borderRadius: BorderRadius.circular(8),
-                  // boxShadow: [
-                  //   BoxShadow(
-                  //     color: Colors.black26,
-                  //     blurRadius: 10.0,
-                  //     offset: const Offset(0.0, 10.0),
-                  //   ),
-                  // ],
                 ),
                 // color: Colors.white,
                 //color: Color(0x99FFFFFF),
@@ -355,13 +287,7 @@ class _mainmapscreen extends State<mainmapscreen> {
                   Icons.place_outlined,
                   color: Colors.black,
                   size: 20,
-                ), /*Icon(
-                  (_showMarker)
-                      ? Icons.location_on
-                      : Icons.location_off,
-                  color: Colors.grey[700],
-                  size: 20,
-                ),*/
+                ),
               ),
             ),
           ),
@@ -382,14 +308,6 @@ class _mainmapscreen extends State<mainmapscreen> {
                 decoration: new BoxDecoration(
                   color: Colors.white,
                   shape: BoxShape.rectangle,
-                  //borderRadius: BorderRadius.circular(8),
-                  // boxShadow: [
-                  //   BoxShadow(
-                  //     color: Colors.black26,
-                  //     blurRadius: 10.0,
-                  //     offset: const Offset(0.0, 10.0),
-                  //   ),
-                  // ],
                 ),
                 // color: Colors.white,
                 //color: Color(0x99FFFFFF),
@@ -669,7 +587,6 @@ class _mainmapscreen extends State<mainmapscreen> {
                                                   height: 10,
                                                   width: 10,
                                                   color: Color(0xffF03B3B),
-                                                  //  color: Color(0xff04ACEB),
                                                 )),
                                               ),
                                               SizedBox(width: 2),
@@ -785,8 +702,6 @@ class _mainmapscreen extends State<mainmapscreen> {
                 decoration: new BoxDecoration(
                   color: Colors.white,
                   shape: BoxShape.rectangle,
-                  //borderRadius:BorderRadius.only(bottomLeft:Radius.circular(8),bottomRight:Radius.circular(8)),
-                  //borderRadius: BorderRadius.circular(8),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black26,
@@ -852,18 +767,7 @@ class _mainmapscreen extends State<mainmapscreen> {
                   decoration: new BoxDecoration(
                     color: Colors.white,
                     shape: BoxShape.rectangle,
-                    // borderRadius:BorderRadius.only(topLeft:Radius.circular(8),topRight:Radius.circular(8)),
-                    // borderRadius: BorderRadius.circular(8),
-                    // boxShadow: [
-                    //   BoxShadow(
-                    //     color: Colors.black26,
-                    //     blurRadius: 10.0,
-                    //     offset: const Offset(0.0, 10.0),
-                    //   ),
-                    // ],
                   ),
-                  // color: Colors.white,
-                  //color: Color(0x99FFFFFF),
                   child: Icon(
                     Icons.my_location,
                     color: Colors.black,
@@ -895,8 +799,6 @@ class _mainmapscreen extends State<mainmapscreen> {
                 decoration: new BoxDecoration(
                   color: Colors.white,
                   shape: BoxShape.rectangle,
-                  // borderRadius:BorderRadius.only(topLeft:Radius.circular(8),topRight:Radius.circular(8)),
-                  // borderRadius: BorderRadius.circular(8),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black26,
@@ -905,8 +807,6 @@ class _mainmapscreen extends State<mainmapscreen> {
                     ),
                   ],
                 ),
-                // color: Colors.white,
-                //color: Color(0x99FFFFFF),
                 child: Icon(
                   Icons.zoom_in,
                   color: Colors.grey[700],
@@ -939,8 +839,6 @@ class _mainmapscreen extends State<mainmapscreen> {
                   decoration: new BoxDecoration(
                     color: Colors.white,
                     shape: BoxShape.rectangle,
-                    // borderRadius:BorderRadius.only(bottomLeft:Radius.circular(8),bottomRight:Radius.circular(8)),
-                    //borderRadius: BorderRadius.circular(8),
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black26,
@@ -949,8 +847,6 @@ class _mainmapscreen extends State<mainmapscreen> {
                       ),
                     ],
                   ),
-                  // color: Colors.white,
-                  //color: Color(0x99FFFFFF),
                   child: Icon(
                     Icons.zoom_out,
                     color: Colors.grey[700],
@@ -958,36 +854,6 @@ class _mainmapscreen extends State<mainmapscreen> {
                   )),
             ),
           ),
-
-          // Positioned(
-          //   bottom: 160,
-          //   left: 16,
-          //   child: GestureDetector(
-          //     onTap: () async {
-          //
-          //     },
-          //     child: Container(
-          //         padding: EdgeInsets.all(5),
-          //         width: 36,
-          //         height: 36,
-          //         decoration: new BoxDecoration(
-          //           color: Colors.white,
-          //           shape: BoxShape.rectangle,
-          //           //borderRadius:BorderRadius.only(bottomLeft:Radius.circular(8),bottomRight:Radius.circular(8)),
-          //           //borderRadius: BorderRadius.circular(8),
-          //           boxShadow: [
-          //             BoxShadow(
-          //               color: Colors.black26,
-          //               blurRadius: 10.0,
-          //               offset: const Offset(0.0, 10.0),
-          //             ),
-          //           ],
-          //         ),
-          //         // color: Colors.white,
-          //         //color: Color(0x99FFFFFF),
-          //         child: Center(child: Text("$_start" + "s"))),
-          //   ),
-          // ),
           Positioned(
             bottom: 120,
             left: 16,
@@ -1002,8 +868,6 @@ class _mainmapscreen extends State<mainmapscreen> {
                   decoration: new BoxDecoration(
                     color: Colors.white,
                     shape: BoxShape.rectangle,
-                    //borderRadius:BorderRadius.only(bottomLeft:Radius.circular(8),bottomRight:Radius.circular(8)),
-                    //borderRadius: BorderRadius.circular(8),
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black26,
@@ -1018,31 +882,26 @@ class _mainmapscreen extends State<mainmapscreen> {
                       height: 25, width: 25)),
             ),
           ),
-          (isshowvehicledetail) ? _buildVehicleDetail() : Container(),
-          /*Positioned(
-            top: 60,
-            left: 16,
+          Positioned(
+            right: (MediaQuery.of(context).size.width / 2) - 10,
+            bottom: 120,
             child: GestureDetector(
               onTap: () {
-                setState(() {
-
-                });
+                openSelectDeviceModal();
               },
               child: Container(
-                padding: EdgeInsets.all(5),
-                width: 36,
-                height: 36,
-                color: Color(0x99FFFFFF),
+                width: 30,
+                height: 30,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                ),
                 child: Icon(
-                  (_showMarker)
-                      ? Icons.location_on
-                      : Icons.location_off,
-                  color: Colors.grey[700],
-                  size: 26,
+                  Icons.arrow_upward,
                 ),
               ),
             ),
-          ),*/
+          ),
+          (isshowvehicledetail) ? _buildVehicleDetail() : Container(),
           (_mapLoading)
               ? Container(
                   width: MediaQuery.of(context).size.width,
@@ -1056,6 +915,254 @@ class _mainmapscreen extends State<mainmapscreen> {
         ],
       ),
     );
+  }
+
+  void openSelectDeviceModal() {
+    showModalBottomSheet(
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(40.0),
+          topRight: Radius.circular(40.0),
+        ),
+      ),
+      isScrollControlled: true,
+      context: context,
+      builder: (context) {
+        return Wrap(
+          children: [
+            Padding(
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  // START 1
+                  Padding(
+                    padding: const EdgeInsets.only(top: 10.0),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20.0),
+                        color: Colors.black,
+                      ),
+                      height: 5,
+                      width: MediaQuery.of(context).size.width * 0.3,
+                    ),
+                  ),
+                  // END 1
+
+                  // START 2
+                  Padding(
+                    padding: const EdgeInsets.only(top: 30.0, bottom: 20),
+                    child: Text(
+                      "SELECIONE UM DISPOSITIVO",
+                      style: Theme.of(context)
+                          .textTheme
+                          .titleLarge!
+                          .copyWith(fontWeight: FontWeight.bold, color: Colors.black),
+                    ),
+                  ),
+                  // END 2
+
+                  // START 3 - Campo de busca
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                    child: TextField(
+                      decoration: InputDecoration(
+                        hintText: "Buscar dispositivo...",
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10.0),
+                          borderSide: BorderSide(color: Colors.grey),
+                        ),
+                        prefixIcon: Icon(Icons.search),
+                      ),
+                      onChanged: (value) {
+                        setState(() {
+                          searchQueryDevice = value; // Atualiza o texto de busca
+                        });
+                      },
+                    ),
+                  ),
+                  // END 3
+
+                  // START 4
+                  SingleChildScrollView(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: getFilteredVehiclesList(context),
+                    ),
+                  ),
+
+                  SizedBox(height: 50)
+                  // END 4
+                ],
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  List<Widget> getFilteredVehiclesList(BuildContext ctx) {
+    // Filtra a lista de dispositivos com base no texto de busca
+    final filteredDevices = devicesList.where((device) {
+      // Se o campo de busca estiver vazio, retorna true para todos os dispositivos
+      if (searchQueryDevice.isEmpty) {
+        return true;
+      }
+      // Caso contrário, verifica se o nome do dispositivo contém o texto de busca (ignorando case)
+      return device.name!.toLowerCase().contains(searchQueryDevice.toLowerCase());
+    }).toList();
+
+    return filteredDevices
+        .asMap()
+        .map(
+            (index, element) => MapEntry(
+            element.id,
+            InkWell(
+                onTap: () {
+                  setState(() {
+                    if (mounted) {
+                      _showDeviceById = element.id!;
+                    }
+                    _latlng.clear();
+                    _markers.clear();
+                    _allMarker.clear();
+                    updateMarker();
+                  });
+                  Navigator.pop(ctx);
+                },
+                child: Padding(
+                    padding: const EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10),
+                    child: Column(
+                        children: [
+                    Row(
+                    children: [
+                    Container(
+                    height: 25.0,
+                        width: 25.0,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: _showDeviceById == element.id!
+                              ? Colors.black
+                              : Theme.of(context).colorScheme.onPrimary,
+                          border: Border.all(color: Colors.black),
+                        ),
+                        child: Padding(
+                            padding: const EdgeInsets.all(2.0),
+                            child: _showDeviceById == element.id!
+                                ?Icon(
+                              Icons.check,
+                              size: 17.0,
+                              color: Theme.of(context).colorScheme.onPrimary,
+                            )
+                                : Icon(
+                              Icons.check_box_outline_blank,
+                              size: 17.0,
+                              color: Theme.of(context).colorScheme.onPrimary,
+                            ),
+                        ),
+                    ),
+                      Padding(
+                        padding: const EdgeInsetsDirectional.only(
+                          start: 15.0,
+                        ),
+                        child: Text(
+                          element.name!,
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleMedium!
+                              .copyWith(color: Colors.black),
+                        ),
+                      ),
+                    ],
+                    ),
+                        ],
+                    ),
+                ),
+            ),
+            ),
+    ).values.toList();
+  }
+
+
+  List<Widget> getVehiclesList(BuildContext ctx) {
+    return devicesList
+        .asMap()
+        .map(
+          (index, element) => MapEntry(
+            element.id,
+            InkWell(
+              onTap: () {
+                setState(() {
+                  if(mounted) {
+                    _showDeviceById = element.id!;
+                    _allMarker.clear();
+                    _latlng.clear();
+                    updateMarker();
+                    // RESTO DAS AÇÕES NECESSÁRIAS
+                  }
+                });
+                Navigator.pop(ctx);
+              },
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(20.0, 10.0, 20.0, 10),
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          height: 25.0,
+                          width: 25.0,
+                          decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: _showDeviceById == element.id!
+                                  ? Colors.black
+                                  : Theme.of(context).colorScheme.onPrimary,
+                              border: Border.all(color: Colors.black)
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(2.0),
+                            child: _showDeviceById == element.id!
+                                ? Icon(
+                              Icons.check,
+                              size: 17.0,
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onPrimary,
+                            )
+                                : Icon(
+                              Icons.check_box_outline_blank,
+                              size: 17.0,
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onPrimary,
+                            ),
+                          ),
+                        ),
+
+                        Padding(
+                          padding: const EdgeInsetsDirectional.only(
+                            start: 15.0,
+                          ),
+                            child: Text(
+                              element.name!,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleMedium!
+                                  .copyWith(color: Colors.black),
+                            )
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ).values
+        .toList();
   }
 
   void _filterdata(String val) async {
@@ -1157,7 +1264,7 @@ class _mainmapscreen extends State<mainmapscreen> {
                                 GestureDetector(
                                   onTap: () {
                                     Fluttertoast.showToast(
-                                        msg: 'Click ${devicelist.name}',
+                                        msg: 'Clique ${devicelist.name}',
                                         toastLength: Toast.LENGTH_SHORT);
                                   },
                                   child: Row(
@@ -1170,8 +1277,6 @@ class _mainmapscreen extends State<mainmapscreen> {
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
                                           children: [
-                                            //Row(children:[Text("Some Data"), Spacer(), Text("Some Data")]),
-
                                             Container(
                                                 margin:
                                                     EdgeInsets.only(top: 12),
@@ -1212,10 +1317,10 @@ class _mainmapscreen extends State<mainmapscreen> {
                                                   children: [
                                                     Text(
                                                         (speed > 0)
-                                                            ? 'Moving since: ' +
+                                                            ? 'Em movimento: ' +
                                                                 devicelist
                                                                     .stopDuration!
-                                                            : 'Stopped since: ' +
+                                                            : 'Parado: ' +
                                                                 devicelist
                                                                     .stopDuration!,
                                                         style: TextStyle(
@@ -1242,7 +1347,7 @@ class _mainmapscreen extends State<mainmapscreen> {
                                                           GestureDetector(
                                                             onTap: () {
                                                               address =
-                                                                  "Loading....";
+                                                                  "Carregando....";
                                                               setState(() {});
                                                               getAddress(
                                                                   lat, lng);
@@ -1264,64 +1369,16 @@ class _mainmapscreen extends State<mainmapscreen> {
                                                                     color: Colors
                                                                         .grey
                                                                         .shade700,
-                                                                    //fontWeight: FontWeight.bold
                                                                   ),
                                                                   children: []),
-                                                            ), /*Text(address,
-                                                  style: TextStyle(
-                                                      fontSize: 12, color: Colors.blue),
-                                                  maxLines: 2,
-                                                  overflow: TextOverflow.ellipsis)*/
+                                                            ),
                                                           )
                                                         ],
                                                       ),
                                                     ),
                                                   ),
-                                                  /*Container(
-                                                margin:
-                                                    EdgeInsets.only(top: 10),
-                                                child: Text(
-                                                  'Loc: ' +address,
-                                                  style: TextStyle(
-                                                    fontSize: 11,
-                                                    //color: _color2
-                                                  ),
-                                                  maxLines: 4,
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                ),
-                                              ),*/
-                                                ]),
-
-                                            /*Row(children: [
-                                              Container(
-                                                margin: EdgeInsets.only(top: 5),
-                                                child: Row(
-                                                  children: [
-                                                    Text(
-                                                        (speed > 0)
-                                                            ? 'Moving since: ' +
-                                                                devicelist
-                                                                    .stopDuration!
-                                                            : 'Stopped since: ' +
-                                                                devicelist
-                                                                    .stopDuration!,
-                                                        style: TextStyle(
-                                                            fontSize: 11,
-                                                            color: statuscolor))
-                                                  ],
-                                                ),
-                                              ),
-                                              Spacer(),
-                                              Container(
-                                                margin: EdgeInsets.only(top: 5),
-                                                child: Text(
-                                                    devicelist.time.toString(),
-                                                    style: TextStyle(
-                                                        fontSize: 11,
-                                                        color: SOFT_GREY)),
-                                              )
-                                            ]),*/
+                                                ]
+                                            ),
                                           ],
                                         ),
                                       )
@@ -1365,35 +1422,30 @@ class _mainmapscreen extends State<mainmapscreen> {
                     child: Image.asset("assets/nepalicon/cancel.png",
                         height: 20, width: 20),
                   )),
-              Container(
-                  //width: 40,
-                  margin: EdgeInsets.only(top: 10, right: 10),
-                  child: GestureDetector(
-                    onTap: () {
-                      StaticVarMethod.deviceName = name.toString();
-                      StaticVarMethod.deviceId = id.toString();
-                      StaticVarMethod.lat = lat;
-                      StaticVarMethod.lng = lng;
-                      StaticVarMethod.imei = imei.toString();
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => LiveMapScreen()),
-                      );
-                    },
-                    child: Image.asset("assets/nepalicon/live_tracking.png",
-                        height: 30, width: 30),
-                  )),
-              /*    Text("Live",
-                  style: TextStyle(
-                      fontSize: 12,
-                      //fontWeight: FontWeight.bold,
-                      color: statuscolor)),*/
+              // Container(
+              //     //width: 40,
+              //     margin: EdgeInsets.only(top: 10, right: 10),
+              //     child: GestureDetector(
+              //       onTap: () {
+              //         StaticVarMethod.deviceName = name.toString();
+              //         StaticVarMethod.deviceId = id.toString();
+              //         StaticVarMethod.lat = lat;
+              //         StaticVarMethod.lng = lng;
+              //         StaticVarMethod.imei = imei.toString();
+              //         Navigator.push(
+              //           context,
+              //           MaterialPageRoute(
+              //               builder: (context) => LiveMapScreen()),
+              //         );
+              //       },
+              //       child: Image.asset("assets/nepalicon/live_tracking.png",
+              //           height: 30, width: 30),
+              //     )
+              // ),
+
             ])
 
-        /* child: Icon(Icons.notifications,
-          size: 25,
-          color:Colors.grey.shade700),*/
+
         );
   }
 
@@ -1411,7 +1463,7 @@ class _mainmapscreen extends State<mainmapscreen> {
                       fontSize: 26,
                       fontWeight: FontWeight.bold,
                       color: statuscolor)),
-              Text(/*"KM/H"*/ 'mph',
+              Text(/*"KM/H"*/ 'km/h',
                   style: TextStyle(
                       fontSize: 12,
                       //fontWeight: FontWeight.bold,
@@ -1423,28 +1475,6 @@ class _mainmapscreen extends State<mainmapscreen> {
           color:Colors.grey.shade700),*/
         );
   }
-
-  late Timer _timer;
-  int _start = 10;
-
-  // void startTimer() {
-  //   const oneSec = const Duration(seconds: 1);
-  //   _timer = new Timer.periodic(
-  //     oneSec,
-  //     (Timer timer) {
-  //       if (_start == 0) {
-  //         setState(() {
-  //           _start = 10;
-  //           // timer.cancel();
-  //         });
-  //       } else {
-  //         setState(() {
-  //           _start--;
-  //         });
-  //       }
-  //     },
-  //   );
-  // }
 
   void _onMapTypeButtonPressed() {
     setState(() {
@@ -1494,21 +1524,6 @@ class _mainmapscreen extends State<mainmapscreen> {
           position:
               LatLng(location.latitude ?? 0.0, location.longitude ?? 0.0)));
     });
-    /*  currentLocation.onLocationChanged.listen((LocationData loc){
-
-      _controller?.animateCamera(CameraUpdate.newCameraPosition(new CameraPosition(
-        target: LatLng(loc.latitude ?? 0.0,loc.longitude?? 0.0),
-        zoom: 12.0,
-      )));
-      print(loc.latitude);
-      print(loc.longitude);
-      setState(() {
-        _markers.add(Marker(markerId: MarkerId('Home'),
-            icon: BitmapDescriptor.fromBytes(markIcons),
-            position: LatLng(loc.latitude ?? 0.0, loc.longitude ?? 0.0)
-        ));
-      });
-    });*/
   }
 
   Widget _buildGoogleMap() {
@@ -1582,94 +1597,97 @@ class _mainmapscreen extends State<mainmapscreen> {
       // return model;
     }
 
-    //_allMarker.clear();
+
     for (int i = 0; i < devicesList.length; i++) {
 
-      String other = devicesList[i].deviceData!.traccar!.other.toString();
+      if( _showDeviceById == devicesList[i].id) {
+        String other = devicesList[i].deviceData!.traccar!.other.toString();
 
-      String baseUrl = "https://web.unnicatelemetria.com.br/";
-      String? deviceIconPath = devicesList[i].icon?.path;
-      String deviceIconFullPath = baseUrl + (deviceIconPath ?? '');
+        String baseUrl = "https://web.unnicatelemetria.com.br/";
+        String? deviceIconPath = devicesList[i].icon?.path;
+        String deviceIconFullPath = baseUrl + (deviceIconPath ?? '');
 
-      String ignition = "false";
+        String ignition = "false";
 
-      if (other.contains("<ignition>")) {
-        const start = "<ignition>";
-        const end = "</ignition>";
-        final startIndex = other.indexOf(start);
-        final endIndex = other.indexOf(end, startIndex + start.length);
-        ignition = other.substring(startIndex + start.length, endIndex);
-      }
-      if (devicesList[i].lat != 0) {
-        var color;
-        var label;
-
-        if (devicesList[i].speed!.toInt() > 0) {
-
-          color = Colors.green;
-          label = devicesList[i].name.toString() +
-              '(' +
-              devicesList[i].speed!.toString() +
-              ' km)';
-
-        } else if (devicesList[i].online!.contains('engine')) {
-          color = Colors.yellow;
-          label = devicesList[i].name.toString();
-
-        } else if (devicesList[i].online!.contains('online')) {
-          color = Colors.green;
-          label = devicesList[i].name.toString();
-
-        } else if (devicesList[i].online!.contains('ack')) {
-          color = Colors.red;
-          label = devicesList[i].name.toString();
-
-        } else if (devicesList[i].online!.contains('offline')) {
-
-          color = Colors.blue;
-          label = devicesList[i].name.toString();
-
+        if (other.contains("<ignition>")) {
+          const start = "<ignition>";
+          const end = "</ignition>";
+          final startIndex = other.indexOf(start);
+          final endIndex = other.indexOf(end, startIndex + start.length);
+          ignition = other.substring(startIndex + start.length, endIndex);
         }
+        if (devicesList[i].lat != 0) {
+          var color;
+          var label;
 
-        double lat = devicesList[i].lat as double;
-        double lng = devicesList[i].lng as double;
-        // String iconpath = devicesList[i].icon!.path.toString();
-        //double angle =  devicesList[i].course as double;
-        LatLng position = LatLng(lat, lng);
-        _latlng.add(position);
-        _createImageLabel(
-                iconpath: deviceIconFullPath,
-                label: label,
-                course: devicesList[i].course.toDouble(),
-                color: color,
-                showtitle: _showTitle)
-            .then((BitmapDescriptor customIcon) {
-          _mapLoading = false;
-          _allMarker[MarkerId(i.toString())] = Marker(
-              markerId: MarkerId(i.toString()),
-              position: position,
-              onTap: () {
-                _initialPosition =
-                    LatLng(position.latitude, position.longitude);
-                StaticVarMethod.imei =
-                    StaticVarMethod.devicelist[i].deviceData!.imei.toString();
-                setState(() {
-                  isshowvehicledetail = true;
-                });
+          if (devicesList[i].speed!.toInt() > 0) {
 
-              },
-              anchor: Offset(0.5, 0.5),
-              icon: customIcon);
-        });
+            color = Colors.green;
+            label = devicesList[i].name.toString() +
+                '(' +
+                devicesList[i].speed!.toString() +
+                ' km)';
 
-        if (i == devicesList.length - 1) {
-          _doneListing = true;
+          } else if (devicesList[i].online!.contains('engine')) {
+            color = Colors.yellow;
+            label = devicesList[i].name.toString();
+
+          } else if (devicesList[i].online!.contains('online')) {
+            color = Colors.green;
+            label = devicesList[i].name.toString();
+
+          } else if (devicesList[i].online!.contains('ack')) {
+            color = Colors.red;
+            label = devicesList[i].name.toString();
+
+          } else if (devicesList[i].online!.contains('offline')) {
+
+            color = Colors.blue;
+            label = devicesList[i].name.toString();
+
+          }
+
+          double lat = devicesList[i].lat as double;
+          double lng = devicesList[i].lng as double;
+
+          LatLng position = LatLng(lat, lng);
+          _latlng.add(position);
+
+          _createImageLabel(
+              iconpath: deviceIconFullPath,
+              label: label,
+              course: devicesList[i].course.toDouble(),
+              color: color,
+              showtitle: _showTitle
+          )
+              .then((BitmapDescriptor customIcon) {
+            _mapLoading = false;
+            _allMarker[MarkerId(i.toString())] = Marker(
+                markerId: MarkerId(i.toString()),
+                position: position,
+                onTap: () {
+                  _initialPosition =
+                      LatLng(position.latitude, position.longitude);
+                  StaticVarMethod.imei =
+                      StaticVarMethod.devicelist[i].deviceData!.imei.toString();
+                  setState(() {
+                    isshowvehicledetail = true;
+                  });
+
+                },
+                anchor: Offset(0.5, 0.5),
+                icon: customIcon);
+          });
+
+          if (i == devicesList.length - 1) {
+            _doneListing = true;
+          }
         }
       }
     }
   }
 
-  String address = "Clik here for address!";
+  String address = "Clique para ver o endereço!";
 
   String getAddress(lat, lng) {
     if (lat != null) {
@@ -1680,18 +1698,17 @@ class _mainmapscreen extends State<mainmapscreen> {
                 setState(() {}),
               }
             else
-              {address = "Address not found"}
+              {address = "Endereço não encontrado"}
           });
     } else {
-      address = "Address not found";
+      address = "Endereço não encontrado";
     }
     print(address);
     return address;
   }
 }
 
-Future<BitmapDescriptor> getMarkerIcon(String imagePath, String infoText,
-    Color color, double rotateDegree, bool _showTitle) async {
+Future<BitmapDescriptor> getMarkerIcon(String imagePath, String infoText, Color color, double rotateDegree, bool _showTitle) async {
   final ui.PictureRecorder pictureRecorder = ui.PictureRecorder();
   final Canvas canvas = Canvas(pictureRecorder);
 

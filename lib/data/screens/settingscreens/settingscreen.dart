@@ -961,13 +961,8 @@ class _settingscreenState extends State<settingscreen> {
                 child: Container(
                     alignment: Alignment.center,
                     padding: EdgeInsets.fromLTRB(12, 12, 2, 12),
-                    // padding: EdgeInsets.fromLTRB(12, 10, 2, 10),
                     decoration: BoxDecoration(
                       color: Colors.grey.shade300,
-                      /* border: Border.all(
-                        width: 1,
-                        color: Colors.grey[300]!
-                    ),*/
                       borderRadius: BorderRadius.all(
                           Radius.circular(10) //         <--- border radius here
                           ),
@@ -1728,7 +1723,8 @@ class _settingscreenState extends State<settingscreen> {
                                     .textTheme
                                     .titleMedium!
                                     .copyWith(color: Colors.black),
-                              ))
+                              )
+                          )
                         ],
                       ),
                     ],
