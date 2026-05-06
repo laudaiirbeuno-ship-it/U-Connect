@@ -1,0 +1,93 @@
+workflows:
+  ios_compile_only:
+    name: iOS Compile Only (No Code Sign)
+    max_build_duration: 120
+    instance_type: mac_mini_m2
+
+    environment:
+      flutter: 3.35.5
+      xcode: latest
+      cocoapods: default
+
+    scripts:
+      - name: Validate project root
+        script: |
+          pwd
+          ls -la
+          test -f pubspec.yaml || (echo "pubspec.yaml nao encontrado na raiz do projeto" && exit 1)
+
+      - name: Flutter pub get
+        script: |
+          flutter --version
+          flutter doctor -v
+          flutter clean
+          flutter pub get
+
+      - name: Install CocoaPods
+        script: |
+          cd ios
+          pod install --repo-update
+          cd ..
+
+      - name: Compile iOS (no code signing)
+        script: |
+          flutter build ios --release --no-codesign
+
+    artifacts:
+      - build/ios/iphoneos/*.app
+      - /tmp/xcodebuild_logs/*.log
+      - flutter_drive.log
+
+  ios_release:
+    name: iOS Release (TestFlight)
+    max_build_duration: 120
+    instance_type: mac_mini_m2
+
+    environment:
+      flutter: 3.35.5
+      xcode: latest
+      cocoapods: default
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.uconnect.app
+      vars:
+        XCODE_WORKSPACE: "ios/Runner.xcworkspace"
+        XCODE_SCHEME: "Runner"
+
+    scripts:
+      - name: Validate project root
+        script: |
+          pwd
+          ls -la
+          test -f pubspec.yaml || (echo "pubspec.yaml nao encontrado na raiz do projeto" && exit 1)
+
+      - name: Flutter pub get
+        script: |
+          flutter --version
+          flutter doctor -v
+          flutter clean
+          flutter pub get
+
+      - name: Install CocoaPods
+        script: |
+          cd ios
+          pod install --repo-update
+          cd ..
+
+      - name: Configure iOS code signing
+        script: |
+          xcode-project use-profiles
+
+      - name: Build IPA
+        script: |
+          flutter build ipa --release --build-number=$BUILD_NUMBER
+
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+      - flutter_drive.log
+
+    publishing:
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: true
