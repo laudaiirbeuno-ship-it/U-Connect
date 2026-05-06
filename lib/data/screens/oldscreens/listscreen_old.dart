@@ -2,42 +2,33 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:animated_text_kit/animated_text_kit.dart';
-import 'package:blinking_text/blinking_text.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:jiffy/jiffy.dart';
-import 'package:maktrogps/config/constant.dart';
-import 'package:maktrogps/config/static.dart';
-import 'package:maktrogps/data/datasources.dart';
-import 'package:maktrogps/data/model/devices.dart';
-import 'package:maktrogps/data/model/loginModel.dart';
-import 'package:maktrogps/data/model/product_model.dart';
-import 'package:maktrogps/data/screens/historyscreen.dart';
-import 'package:maktrogps/data/screens/livetrackoriginal.dart';
-import 'package:maktrogps/data/screens/mainmapscreenoriginal.dart';
-import 'package:maktrogps/data/screens/notificationscreen.dart';
-import 'package:maktrogps/data/screens/optionsscreen/alloptions.dart';
-import 'package:maktrogps/data/screens/playback.dart';
-import 'package:maktrogps/data/screens/playbackscreen.dart';
-import 'package:maktrogps/data/screens/playbackselection.dart';
-import 'package:maktrogps/data/screens/reports/reportselection.dart';
-import 'package:maktrogps/data/screens/reports/vehicle_info.dart';
-import 'package:maktrogps/data/screens/testscreens/livelocation.dart';
-import 'package:maktrogps/mapconfig/CustomColor.dart';
-import 'package:maktrogps/ui/reusable/cache_image_network.dart';
-import 'package:maktrogps/ui/reusable/global_function.dart';
-import 'package:maktrogps/ui/reusable/global_widget.dart';
-import 'package:maktrogps/ui/reusable/shimmer_loading.dart';
+import 'package:uconnect/config/constant.dart';
+import 'package:uconnect/config/static.dart';
+import 'package:uconnect/data/datasources.dart';
+import 'package:uconnect/data/model/devices.dart';
+import 'package:uconnect/data/model/loginModel.dart';
+import 'package:uconnect/data/model/product_model.dart';
+import 'package:uconnect/data/screens/historyscreen.dart';
+import 'package:uconnect/data/screens/notificationscreen.dart';
+import 'package:uconnect/data/screens/optionsscreen/alloptions.dart';
+import 'package:uconnect/data/screens/reports/reportselection.dart';
+import 'package:uconnect/data/screens/testscreens/livelocation.dart';
+import 'package:uconnect/mapconfig/CustomColor.dart';
+import 'package:uconnect/ui/reusable/cache_image_network.dart';
+import 'package:uconnect/ui/reusable/global_function.dart';
+import 'package:uconnect/ui/reusable/global_widget.dart';
+import 'package:uconnect/ui/reusable/shimmer_loading.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../livetrack.dart';
-import '../reports/kmdetail.dart';
 
 class listscreen extends StatefulWidget {
   @override

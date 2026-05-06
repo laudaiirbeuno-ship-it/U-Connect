@@ -1,6 +1,5 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:maktrogps/config/static.dart';
+import 'package:uconnect/config/static.dart';
 
 
 class PushNotificationService {
@@ -25,20 +24,25 @@ class PushNotificationService {
 
    // String username =  StaticVarMethod.notificationToken;
     username = username.replaceAll(RegExp('[^A-Za-z0-9]'), '');
-    print(username); //Output: FLUTTERCAMPUS2324
+    print("📱 Username para topic: $username"); //Output: FLUTTERCAMPUS2324
     //String username = "shoaib1234";
 
-    if (username == null) {
+    if (username.isEmpty) {
+      print("⚠️ Username vazio, não será possível subscrever ao topic");
       return;
     }
 
-    if (isEnabled == null || isEnabled) {
+    if (isEnabled) {
       _fcm!.subscribeToTopic(username).then((_) {
-        print("subscribed to topic " + username);
+        print("✅ Subscribed to topic: $username");
+      }).catchError((e) {
+        print("❌ Erro ao subscrever ao topic: $e");
       });
     } else {
       _fcm!.unsubscribeFromTopic(username).then((_) {
-        print("unsubscribed to topic " + username);
+        print("✅ Unsubscribed from topic: $username");
+      }).catchError((e) {
+        print("❌ Erro ao cancelar subscrição do topic: $e");
       });
     }
   }

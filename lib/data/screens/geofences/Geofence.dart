@@ -8,9 +8,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:maktrogps/model/User.dart';
-import 'package:maktrogps/theme/CustomColor.dart';
-import 'package:maktrogps/ui/custom_icon.dart';
+import 'package:uconnect/model/User.dart';
+import 'package:uconnect/theme/CustomColor.dart';
+import 'package:uconnect/ui/custom_icon.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'GeofenceList.dart';

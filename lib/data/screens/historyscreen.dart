@@ -1,10 +1,12 @@
 import 'dart:async';
 
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:maktrogps/config/static.dart';
-import 'package:maktrogps/data/datasources.dart';
-import 'package:maktrogps/data/model/history.dart';
-import 'package:maktrogps/ui/reusable/global_widget.dart';
+import 'package:uconnect/config/static.dart';
+import 'package:uconnect/data/datasources.dart';
+import 'package:uconnect/data/model/history.dart';
+import 'package:uconnect/ui/reusable/global_widget.dart';
+import 'package:uconnect/ui/reusable/reusable_fluid_bottom_nav.dart';
+import 'package:uconnect/ui/reusable/floating_menu_drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
@@ -16,6 +18,7 @@ class historyscreen extends StatefulWidget {
 class _historyscreenState extends State<historyscreen> {
   // initialize global widget
   final _globalWidget = GlobalWidget();
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   late GoogleMapController _controller;
   bool _mapLoading = true;
@@ -137,6 +140,8 @@ class _historyscreenState extends State<historyscreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
+      drawer: FloatingMenuDrawer(),
       backgroundColor: Colors.white,
       appBar: _globalWidget.globalAppBar(),
       body: Stack(
@@ -152,6 +157,7 @@ class _historyscreenState extends State<historyscreen> {
           ):SizedBox.shrink()
         ],
       ),
+      bottomNavigationBar: ReusableFluidBottomNav(scaffoldKey: _scaffoldKey),
     );
   }
 

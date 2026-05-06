@@ -3,7 +3,7 @@ this is global style
 This file is used to styling a whole application
  */
 
-import 'package:maktrogps/config/apps/ecommerce/constant.dart';
+import 'package:uconnect/config/apps/ecommerce/constant.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 

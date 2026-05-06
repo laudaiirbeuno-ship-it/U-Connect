@@ -4,18 +4,16 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:jiffy/jiffy.dart';
-import 'package:maktrogps/bloc/history/bloc/history_bloc.dart';
-import 'package:maktrogps/bottom_navigation/bottom_navigation.dart';
-import 'package:maktrogps/config/static.dart';
-import 'package:maktrogps/data/gpsserver/datasources.dart';
+import 'package:uconnect/bloc/history/bloc/history_bloc.dart';
+import 'package:uconnect/config/static.dart';
+import 'package:uconnect/data/gpsserver/datasources.dart';
 
-import 'package:maktrogps/data/model/PlayBackRoute.dart';
-import 'package:maktrogps/data/model/events.dart';
-import 'package:maktrogps/data/model/history.dart';
-import 'package:maktrogps/data/screens/playback.dart';
+import 'package:uconnect/data/model/PlayBackRoute.dart';
+import 'package:uconnect/data/model/events.dart';
+import 'package:uconnect/data/model/history.dart';
 
 
-import 'package:maktrogps/mapconfig/CommonMethod.dart';
+import 'package:uconnect/mapconfig/CommonMethod.dart';
 
 import 'package:http/http.dart' as http;
 
@@ -138,11 +136,12 @@ class _tripinfoscreenState extends State<tripinfoscreen> {
             StaticVarMethod.fromtime = str2;
             StaticVarMethod.todate =str3 ;
             StaticVarMethod.totime = str4;
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => PlaybackPage()),
-            );
+            // PlaybackPage removido - não é mais necessário
+            // Navigator.push(
+            //   context,
+            //   MaterialPageRoute(
+            //       builder: (context) => PlaybackPage()),
+            // );
 
           },
           child: Card(

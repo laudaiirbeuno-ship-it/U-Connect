@@ -8,16 +8,14 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:maktrogps/data/datasources.dart';
-import 'package:maktrogps/data/model/PermissionModel.dart';
+import 'package:uconnect/data/datasources.dart';
+import 'package:uconnect/data/model/PermissionModel.dart';
 
-import 'package:maktrogps/model/User.dart';
+import 'package:uconnect/model/User.dart';
 
-import 'package:maktrogps/theme/CustomColor.dart';
-import 'package:maktrogps/ui/custom_icon.dart';
+import 'package:uconnect/theme/CustomColor.dart';
+import 'package:uconnect/ui/custom_icon.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-import 'GeofenceList.dart';
 
 class GeofenceAddPage extends StatefulWidget {
   @override
@@ -117,7 +115,7 @@ class _GeofenceAddPageState extends State<GeofenceAddPage> {
   void addFenceMarker() {
     if (addClicked) {
       setState(() {
-        _myPainterToBitmap('newFence', "marker")
+        _myPainterToBitmap('Nova cerca', "marker")
             .then((BitmapDescriptor bitmapDescriptor) {
           _markers.add(Marker(
             markerId: MarkerId("marker"),
@@ -150,34 +148,30 @@ class _GeofenceAddPageState extends State<GeofenceAddPage> {
   }
 
   void submitFence() {
-   // _showProgress(true);
+    // _showProgress(true);
 
-    Map<String, String> geoPoint = <String, String>{
-      'lat': _circles.first.center.latitude.toString(),
-      'lng': _circles.first.center.longitude.toString()
-    };
+    final center = _circles.first.center;
 
-    Map<String, String> requestBody = <String, String>{
-      'name': _fenceName.text,
-      'polygon_color': "#c191c4",
-      'polygon': '',
-      'type': 'circle',
-      'center': json.encode(geoPoint),
-      'radius': _valRadius.toString(),
-    };
-
-
-    gpsapis.addGeofence(requestBody).then((value) => {
-          Fluttertoast.showToast(
-              msg: "fenceAddedSuccessfully",
-              toastLength: Toast.LENGTH_SHORT,
-              gravity: ToastGravity.CENTER,
-              timeInSecForIosWeb: 1,
-              backgroundColor: Colors.green,
-              textColor: Colors.white,
-              fontSize: 16.0),
-          //_showProgress(false)
-        });
+    gpsapis.addGeofence(
+      name: _fenceName.text,
+      active: true,
+      type: 'circle',
+      lat: center.latitude,
+      lng: center.longitude,
+      radius: _valRadius,
+      polygon_color: "#c191c4",
+    ).then((value) {
+      Fluttertoast.showToast(
+        msg: "fenceAddedSuccessfully",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.green,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
+      //_showProgress(false)
+    });
   }
 
   void updateFence(id) {
@@ -185,7 +179,7 @@ class _GeofenceAddPageState extends State<GeofenceAddPage> {
     permissionModel.deviceId = 23;
     permissionModel.geofenceId = id;
 
-   // var perm = json.encode(permissionModel);
+    // var perm = json.encode(permissionModel);
     // APIService.addPermission(perm.toString()).then((value) => {
     //       if (value.statusCode == 204)
     //         {
@@ -217,12 +211,22 @@ class _GeofenceAddPageState extends State<GeofenceAddPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Add Geofences Map",
-            style: TextStyle(color: CustomColor.secondaryColor)),
+        title: Text(
+          "Mapa de criação de cerca virtual",
+          style: TextStyle(color: CustomColor.secondaryColor),
+        ),
         iconTheme: IconThemeData(
           color: CustomColor.secondaryColor, //change your color here
         ),
-        backgroundColor: primaryDark,
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0xFF1976D2), Color(0xFF001F5C)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
       ),
       body: Stack(children: <Widget>[
         GoogleMap(
@@ -300,39 +304,48 @@ class _GeofenceAddPageState extends State<GeofenceAddPage> {
                   child: Row(
                     children: <Widget>[
                       Container(
-
                           width: MediaQuery.of(context).size.width * 0.90,
-                          padding: EdgeInsets.only(left:15.0),
+                          padding: EdgeInsets.only(left: 15.0),
                           child: TextField(
                             controller: _fenceName,
                             decoration: new InputDecoration(
-                                labelText: 'Fence Name'),
+                              labelText: 'Nome da cerca',
+                            ),
                           )),
                     ],
                   )),
-              new Container(
-                  width: MediaQuery.of(context).size.width * 0.97,
-                  padding: EdgeInsets.only(left :15.0),
-                  child: Row(
+              SizedBox(
+                height: 12,
+              ),
+              Container(
+                  // width: MediaQuery.of(context).size.width * 0.97,
+                  padding: EdgeInsets.only(left: 15.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      Text('Radius'),
-                      Container(
-                          width: MediaQuery.of(context).size.width * 0.65,
-                          child: Slider(
-                            activeColor: primaryDark,
-                            value: _valRadius,
-                            onChanged: (newSliderValue) {
-                              setState(() {
-                                _valRadius = newSliderValue;
-                                updateNewCircle(_valRadius);
-                              });
-                            },
-                            min: 100,
-                            max: _valRadiusMax,
-                          )),
-                      Text(
-                        _valRadius.toStringAsFixed(0),
-                        style: TextStyle(fontSize: 12),
+                      Text('Raio de alcance'),
+                      Row(
+                        children: [
+                          Container(
+                            width: 300,
+                            child: Slider(
+                              activeColor: primaryDark,
+                              value: _valRadius,
+                              onChanged: (newSliderValue) {
+                                setState(() {
+                                  _valRadius = newSliderValue;
+                                  updateNewCircle(_valRadius);
+                                });
+                              },
+                              min: 100,
+                              max: _valRadiusMax,
+                            ),
+                          ),
+                          Text(
+                            _valRadius.toStringAsFixed(0),
+                            style: TextStyle(fontSize: 12),
+                          ),
+                        ],
                       ),
                     ],
                   )),
@@ -344,8 +357,8 @@ class _GeofenceAddPageState extends State<GeofenceAddPage> {
                           width: MediaQuery.of(context).size.width * 0.86,
                           child: ElevatedButton(
                             style: ElevatedButton.styleFrom(
-                             backgroundColor: primaryDark // foreground
-                            ),
+                                backgroundColor: primaryDark // foreground
+                                ),
                             onPressed: () {
                               if (_fenceName.text.isNotEmpty) {
                                 submitFence();
@@ -360,7 +373,7 @@ class _GeofenceAddPageState extends State<GeofenceAddPage> {
                                     fontSize: 16.0);
                               }
                             },
-                            child: Text('Add New Geofence'),
+                            child: Text('Adicionar nova cerca'),
                           )),
                     ],
                   )),

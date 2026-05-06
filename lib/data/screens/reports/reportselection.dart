@@ -7,20 +7,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:maktrogps/config/custom_image_assets.dart';
-import 'package:maktrogps/config/static.dart';
-import 'package:maktrogps/data/datasources.dart';
-import 'package:maktrogps/data/screens/playback.dart';
-import 'package:maktrogps/data/screens/reports/ReportEvent.dart';
-import 'package:maktrogps/data/screens/reports/ReportStop.dart';
-import 'package:maktrogps/mapconfig/CommonMethod.dart';
-import 'package:maktrogps/ui/reusable/global_widget.dart';
+import 'package:uconnect/config/custom_image_assets.dart';
+import 'package:uconnect/config/static.dart';
+import 'package:uconnect/data/datasources.dart';
+import 'package:uconnect/mapconfig/CommonMethod.dart';
+import 'package:uconnect/ui/reusable/global_widget.dart';
 import 'dart:ui' as ui;
 import 'package:image/image.dart' as IMG;
-import 'package:maktrogps/utils/Consts.dart';
+import 'package:uconnect/utils/Consts.dart';
 import 'package:intl/intl.dart';
-
 import '../../../config/Session.dart';
+import 'report_event.dart';
+import 'package:flutter_time_picker_spinner/flutter_time_picker_spinner.dart';
+import 'package:uconnect/ui/reusable/custom_app_bar.dart';
+import 'package:uconnect/ui/reusable/standard_header.dart';
+import 'package:uconnect/ui/reusable/reusable_fluid_bottom_nav.dart';
+import 'package:uconnect/ui/reusable/floating_menu_drawer.dart';
 
 class reportselection extends StatefulWidget {
   @override
@@ -29,6 +31,8 @@ class reportselection extends StatefulWidget {
 
 class _reportselection extends State<reportselection> {
   // initialize global widget
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  bool _showFilters = false;
 
   bool _doneListing = false;
   //date time hepers
@@ -86,820 +90,697 @@ class _reportselection extends State<reportselection> {
     }
 
     setState(() {});
-
-    /*  if (locationList.isEmpty) {
-
-      }*/
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
+      drawer: FloatingMenuDrawer(),
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        title: Row(
-          spacing: 16,
-          children: [
-            Icon(
-              Icons.summarize_outlined,
-              color: Colors.black,
-            ),
-            Text(
-              '' + StaticVarMethod.deviceName,
-              style: TextStyle(
-                color: Colors.black,
-              ),
-            )
-          ],
-        ),
-        iconTheme: IconThemeData(
-          color: Colors.black, //change your color here
-        ),
-        actions: <Widget>[
-          // action button
-        ],
-        backgroundColor: Colors.grey[300],
-      ), //_globalWidget.globalAppBar(),
-      body: Stack(
-        children: [
-          reportControls(),
-        ],
+      appBar: StandardHeader(
+        title: StaticVarMethod.deviceName,
+        icon: Icons.insert_chart,
+      ),
+      bottomNavigationBar: ReusableFluidBottomNav(scaffoldKey: _scaffoldKey),
+      body: SingleChildScrollView(
+        child: reportControls(),
       ),
     );
   }
 
   void showStopDialog(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
-    Dialog simpleDialog = Dialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(3.0),
-        ),
-        child: StatefulBuilder(
-            builder: (BuildContext context, StateSetter setState) {
-          return Container(
-            height: size.height * 0.5,
-            padding: const EdgeInsets.all(20.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: <Widget>[
-                Column(
-                  children: <Widget>[
-                    Text(getTranslated(context, 'selectReport')!),
-                    const Divider(),
-                    Padding(
-                      padding:
-                          const EdgeInsets.only(left: 10, right: 10, top: 10),
-                      child: SizedBox(
-                          height: size.height * 0.3,
-                          child: SingleChildScrollView(
-                              child: Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: <Widget>[
-                              RadioListTile(
-                                  title: Text(getTranslated(
-                                      context, 'dayWiseInformation')!),
-                                  value: "Daily Travel Report",
-                                  groupValue: _stopFilter,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      _stopFilter = value;
-                                    });
-                                  }),
-                              RadioListTile(
-                                  title: Text(
-                                      getTranslated(context, 'travel_sheet')!),
-                                  value: "Travel Summary Bulk",
-                                  groupValue: _stopFilter,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      _stopFilter = value;
-                                    });
-                                  }),
-                              RadioListTile(
-                                  title: Text(getTranslated(
-                                      context, 'generalInformationMerged')!),
-                                  value: "Task Report",
-                                  groupValue: _stopFilter,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      _stopFilter = value;
-                                    });
-                                  }),
-                              RadioListTile(
-                                  title:
-                                      Text(getTranslated(context, 'history')!),
-                                  value: "Vehicle History",
-                                  groupValue: _stopFilter,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      _stopFilter = value;
-                                    });
-                                  }),
-                              RadioListTile(
-                                  title: Text(getTranslated(
-                                      context, 'travel_sheet_custom')!),
-                                  value: "Traval Summary with Playback Image",
-                                  groupValue: _stopFilter,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      _stopFilter = value;
-                                    });
-                                  }),
-                              RadioListTile(
-                                  title: Text(getTranslated(
-                                      context, 'general_information')!),
-                                  value: "General information",
-                                  groupValue: _stopFilter,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      _stopFilter = value;
-                                    });
-                                  }),
-                              RadioListTile(
-                                  title: Text(getTranslated(
-                                      context, 'drives_and_stops_drivers')!),
-                                  value: "Drives and stops",
-                                  groupValue: _stopFilter,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      _stopFilter = value;
-                                    });
-                                  }),
-                              RadioListTile(
-                                  title: Text(
-                                      getTranslated(context, 'geofence_in')!),
-                                  value: "Geofence in/out",
-                                  groupValue: _stopFilter,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      _stopFilter = value;
-                                    });
-                                  }),
-                              RadioListTile(
-                                  title:
-                                      Text(getTranslated(context, 'events')!),
-                                  value: "Events",
-                                  groupValue: _stopFilter,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      _stopFilter = value;
-                                    });
-                                  }),
-                              RadioListTile(
-                                  title: Text(getTranslated(
-                                      context, 'work_hours_Daily')!),
-                                  value: "Work hours daily",
-                                  groupValue: _stopFilter,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      _stopFilter = value;
-                                    });
-                                  }),
-                            ],
-                          ))),
+    showDialog(
+      context: context,
+      builder: (context) {
+        Size size = MediaQuery.of(context).size;
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return Dialog(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20)),
+              child: Container(
+                padding: const EdgeInsets.all(20),
+                constraints: BoxConstraints(maxHeight: size.height * 0.75),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Text(
+                      'Selecionar relatório',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF003087),
+                      ),
                     ),
+                    const SizedBox(height: 10),
                     const Divider(),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            foregroundColor: Colors.white,
-                            backgroundColor: Colors.red, // foreground
-                          ),
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                          child: Text(
-                            getTranslated(context, 'cancel')!,
-                            style:
-                                TextStyle(fontSize: 15.0, color: Colors.white),
-                          ),
-                        ),
-                        SizedBox(
-                          width: 20,
-                        ),
-                        ElevatedButton(
-                          onPressed: () {
-                            _selectedReport = _stopFilter;
 
-                            Navigator.pop(context);
-                          },
-                          child: Text(
-                            getTranslated(context, 'ok')!,
-                            style:
-                                TextStyle(fontSize: 15.0, color: Colors.white),
+                    // Lista de relatórios
+                    Expanded(
+                      child: SingleChildScrollView(
+                        child: Column(
+                          children: [
+                            RadioListTile(
+                              title: Text(getTranslated(
+                                  context, 'dayWiseInformation')!),
+                              value: "Daily Travel Report",
+                              groupValue: _stopFilter,
+                              activeColor: Color(0xFF003087),
+                              onChanged: (value) {
+                                setState(() => _stopFilter = value);
+                              },
+                            ),
+                            RadioListTile(
+                              title:
+                                  Text(getTranslated(context, 'travel_sheet')!),
+                              value: "Travel Summary Bulk",
+                              groupValue: _stopFilter,
+                              activeColor: Color(0xFF003087),
+                              onChanged: (value) {
+                                setState(() => _stopFilter = value);
+                              },
+                            ),
+                            RadioListTile(
+                              title: Text(getTranslated(
+                                  context, 'generalInformationMerged')!),
+                              value: "Task Report",
+                              groupValue: _stopFilter,
+                              activeColor: Color(0xFF003087),
+                              onChanged: (value) {
+                                setState(() => _stopFilter = value);
+                              },
+                            ),
+                            RadioListTile(
+                              title: Text(getTranslated(context, 'history')!),
+                              value: "Vehicle History",
+                              groupValue: _stopFilter,
+                              activeColor: Color(0xFF003087),
+                              onChanged: (value) {
+                                setState(() => _stopFilter = value);
+                              },
+                            ),
+                            RadioListTile(
+                              title: Text(getTranslated(
+                                  context, 'travel_sheet_custom')!),
+                              value: "Traval Summary with Playback Image",
+                              groupValue: _stopFilter,
+                              activeColor: Color(0xFF003087),
+                              onChanged: (value) {
+                                setState(() => _stopFilter = value);
+                              },
+                            ),
+                            RadioListTile(
+                              title: Text(getTranslated(
+                                  context, 'general_information')!),
+                              value: "General information",
+                              groupValue: _stopFilter,
+                              activeColor: Color(0xFF003087),
+                              onChanged: (value) {
+                                setState(() => _stopFilter = value);
+                              },
+                            ),
+                            RadioListTile(
+                              title: Text(getTranslated(
+                                  context, 'drives_and_stops_drivers')!),
+                              value: "Drives and stops",
+                              groupValue: _stopFilter,
+                              activeColor: Color(0xFF003087),
+                              onChanged: (value) {
+                                setState(() => _stopFilter = value);
+                              },
+                            ),
+                            RadioListTile(
+                              title:
+                                  Text(getTranslated(context, 'geofence_in')!),
+                              value: "Geofence in/out",
+                              groupValue: _stopFilter,
+                              activeColor: Color(0xFF003087),
+                              onChanged: (value) {
+                                setState(() => _stopFilter = value);
+                              },
+                            ),
+                            RadioListTile(
+                              title: Text(getTranslated(context, 'events')!),
+                              value: "Events",
+                              groupValue: _stopFilter,
+                              activeColor: Color(0xFF003087),
+                              onChanged: (value) {
+                                setState(() => _stopFilter = value);
+                              },
+                            ),
+                            RadioListTile(
+                              title: Text(
+                                  getTranslated(context, 'work_hours_Daily')!),
+                              value: "Work hours daily",
+                              groupValue: _stopFilter,
+                              activeColor: Color(0xFF003087),
+                              onChanged: (value) {
+                                setState(() => _stopFilter = value);
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 16),
+                    const Divider(),
+                    const SizedBox(height: 10),
+
+                    // Botões
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        // Cancelar
+                        ElevatedButton(
+                          onPressed: () => Navigator.pop(context),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.red,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 20, vertical: 12),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(30)),
+                          ),
+                          child: const Text('Cancelar'),
+                        ),
+
+                        // OK com degradê
+                        Container(
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: [Color(0xFF003087), Color(0xFF0077D7)],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                          child: ElevatedButton(
+                            onPressed: () {
+                              _selectedReport = _stopFilter;
+                              Navigator.pop(context);
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.transparent,
+                              shadowColor: Colors.transparent,
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 24, vertical: 12),
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(30)),
+                            ),
+                            child: const Text('OK',
+                                style: TextStyle(color: Colors.white)),
                           ),
                         ),
                       ],
-                    )
+                    ),
                   ],
-                )
-              ],
-            ),
-          );
-        }));
-    showDialog(
-        context: context, builder: (BuildContext context) => simpleDialog);
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
   }
 
   Widget reportControls() {
     return Container(
-      padding: EdgeInsets.only(left: 15, right: 15, top: 10, bottom: 30),
+      padding: EdgeInsets.all(20),
       decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(20), topRight: Radius.circular(20)),
-          boxShadow: <BoxShadow>[
-            BoxShadow(
-                blurRadius: 20,
-                offset: Offset.zero,
-                color: Colors.grey.withOpacity(0.5))
-          ]),
+        color: Colors.white,
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(20),
+          topRight: Radius.circular(20),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 10,
+            offset: Offset(0, -2),
+          )
+        ],
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: <Widget>[
+        children: [
+          // Card "Veículo Selecionado"
           Container(
-              margin: EdgeInsets.only(top: 10, left: 15, right: 15),
-              child: Card(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                elevation: 2,
-                //color: Colors.grey.shade900,
-                //shadowColor: Colors.pink,
-                child: GestureDetector(
-                  onTap: () {
-                    showStopDialog(context);
-                  },
-                  child: Container(
-                      decoration: BoxDecoration(color: Colors.grey[300]),
-                      padding: EdgeInsets.only(
-                        left: 100,
-                        right: 100,
-                        top: 15,
-                        bottom: 15,
-                      ),
-                      child: Text(
-                        getTranslated(context, 'selectReport')!,
-                        style: const TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 15,
-                        ),
-                        textAlign: TextAlign.left,
-                      )),
-                ),
-              )),
-          Container(
-            margin: EdgeInsets.only(top: 20, left: 15, right: 15),
-            padding: EdgeInsets.only(left: 10, right: 10),
+            width: double.infinity,
+            padding: EdgeInsets.all(16),
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(15.0),
               color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.grey.shade200),
             ),
-            child: Card(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Veículo Selecionado',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                  ),
                 ),
-                elevation: 2,
-                //color: Colors.grey.shade900,
-                //shadowColor: Colors.pink,
-                child: Container(
-                    padding: EdgeInsets.only(left: 10, right: 10),
-                    child: DropdownSearch(
-                      items: _devicesListstr,
-                      popupProps: const PopupProps.menu(
-                        showSearchBox: true,
-                        fit: FlexFit.loose,
-                        searchFieldProps: const TextFieldProps(
-                          cursorColor: Colors.red,
-                        ),
+                SizedBox(height: 12),
+                Row(
+                  children: [
+                    Icon(Icons.directions_car,
+                        color: Color(0xFF1976D2), size: 20),
+                    SizedBox(width: 8),
+                    Text(
+                      StaticVarMethod.deviceName,
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Color(0xFF1976D2),
                       ),
-                      dropdownDecoratorProps: DropDownDecoratorProps(
-                          dropdownSearchDecoration: InputDecoration(
-                              //labelText: "Location",
-                              hintText:
-                                  getTranslated(context, 'selectVehicle')!,
-                              border: InputBorder.none)),
-                      onChanged: (dynamic value) {
-                        for (int i = 0;
-                            i < StaticVarMethod.devicelist.length;
-                            i++) {
-                          if (value != null) {
-                            if (StaticVarMethod.devicelist
-                                .elementAt(i)
-                                .name!
-                                .contains(value)) {
-                              StaticVarMethod.deviceId = StaticVarMethod
-                                  .devicelist
-                                  .elementAt(i)
-                                  .id
-                                  .toString();
-                              print("value: " + value);
-                              break;
-                            }
-                          }
-                        }
-                        setState(() {
-                          //_selectedReport = value;
-                        });
-                      },
-                    ))),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 4),
+                Text(
+                  StaticVarMethod.imei ?? 'IMEI não disponível',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey[600],
+                  ),
+                ),
+              ],
+            ),
           ),
 
+          SizedBox(height: 16),
+          // Card "Tipo de Relatório"
           Container(
-            margin: EdgeInsets.only(left: 40, right: 40, top: 10, bottom: 0),
-            width: MediaQuery.of(context).size.width,
-            decoration: BoxDecoration(color: Colors.white),
-            child: DropdownButtonHideUnderline(
-              child: Padding(
-                padding: const EdgeInsets.only(left: 10.0),
-                child: DropdownButton<String>(
-                  isDense: false,
-                  icon: Icon(Icons.keyboard_arrow_down_sharp),
-                  value: _chosenValue,
-                  //elevation: 5,
-                  style: TextStyle(color: Colors.black),
-
-                  items: <String>[
-                    '1 min',
-                    '2 min',
-                    '5 min',
-                    '10 min',
-                    '30 min',
-                    '1 Hours',
-                    '5 Hours',
-                  ].map<DropdownMenuItem<String>>((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(
-                        value,
-                        style: TextStyle(fontSize: 14),
-                      ),
-                    );
-                  }).toList(),
-                  hint: Padding(
-                    padding: const EdgeInsets.only(right: 20),
-                    child: Text(
-                      "1 min",
+            width: double.infinity,
+            padding: EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.grey.shade200),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Tipo de Relatório',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                  ),
+                ),
+                SizedBox(height: 12),
+                Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [Color(0xFF001F5C), Color(0xFF1976D2)],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: ElevatedButton.icon(
+                    icon:
+                        Icon(Icons.description, color: Colors.white, size: 20),
+                    onPressed: () => showStopDialog(context),
+                    label: Text(
+                      'Selecionar relatório',
                       style: TextStyle(
-                          color: Colors.grey,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600),
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 16,
+                      ),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.transparent,
+                      shadowColor: Colors.transparent,
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
                   ),
-                  onChanged: (String? value) {
-                    setState(() {
-                      _chosenValue = value!;
-                    });
-                  },
-                ),
-              ),
-            ),
-          ),
-          Container(
-            margin: EdgeInsets.all(20),
-            child: Row(
-              children: [
-                Expanded(
-                    child: OutlinedButton(
-                        onPressed: () {
-                          setState(() {
-                            _selectedperiod = 0;
-                            showReport();
-                          });
-                        },
-                        style: ButtonStyle(
-                            minimumSize: MaterialStateProperty.all(Size(0, 45)),
-                            overlayColor:
-                                MaterialStateProperty.all(Colors.transparent),
-                            shape: MaterialStateProperty.all(
-                                RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20.0),
-                            )),
-                            side: MaterialStateProperty.all(
-                              BorderSide(color: Colors.grey, width: 1.0),
-                            )),
-                        child: Text(
-                          'Utlimas horas',
-                          style: TextStyle(
-                              color: Colors.grey,
-                              //fontWeight: FontWeight.bold,
-                              fontSize: 13),
-                          textAlign: TextAlign.center,
-                        ))),
-                SizedBox(
-                  width: 10,
-                ),
-                Expanded(
-                    child: OutlinedButton(
-                        onPressed: () {
-                          setState(() {
-                            _selectedperiod = 1;
-                            showReport();
-                          });
-                        },
-                        style: ButtonStyle(
-                            minimumSize: MaterialStateProperty.all(Size(0, 45)),
-                            overlayColor:
-                                MaterialStateProperty.all(Colors.transparent),
-                            shape: MaterialStateProperty.all(
-                                RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20.0),
-                            )),
-                            side: MaterialStateProperty.all(
-                              BorderSide(color: Colors.grey, width: 1.0),
-                            )),
-                        child: Text(
-                          getTranslated(context, 'today')!,
-                          style: TextStyle(
-                              color: Colors.grey,
-                              //fontWeight: FontWeight.bold,
-                              fontSize: 13),
-                          textAlign: TextAlign.center,
-                        ))),
-                SizedBox(
-                  width: 10,
-                ),
-                Expanded(
-                    child: OutlinedButton(
-                        onPressed: () {
-                          setState(() {
-                            _selectedperiod = 2;
-                            showReport();
-                          });
-                        },
-                        style: ButtonStyle(
-                            minimumSize: MaterialStateProperty.all(Size(0, 45)),
-                            overlayColor:
-                                MaterialStateProperty.all(Colors.transparent),
-                            shape: MaterialStateProperty.all(
-                                RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20.0),
-                            )),
-                            side: MaterialStateProperty.all(
-                              BorderSide(color: Colors.grey, width: 0.5),
-                            )),
-                        child: Text(
-                          getTranslated(context, 'yesterday')!,
-                          style: TextStyle(
-                              color: Colors.grey,
-                              //fontWeight: FontWeight.bold,
-                              fontSize: 13),
-                          textAlign: TextAlign.center,
-                        ))),
-                SizedBox(
-                  width: 3,
                 ),
               ],
             ),
           ),
+
+          SizedBox(height: 16),
+
+          // Card "Período Rápido"
           Container(
-            margin: EdgeInsets.only(left: 20, right: 20),
-            child: Row(
+            width: double.infinity,
+            padding: EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.grey.shade200),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(
-                    child: OutlinedButton(
-                        onPressed: () {
-                          setState(() {
-                            _selectedperiod = 3;
-                            showReport();
-                          });
-                        },
-                        style: ButtonStyle(
-                            minimumSize: MaterialStateProperty.all(Size(0, 45)),
-                            overlayColor:
-                                MaterialStateProperty.all(Colors.transparent),
-                            shape: MaterialStateProperty.all(
-                                RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20.0),
-                            )),
-                            side: MaterialStateProperty.all(
-                              BorderSide(color: Colors.grey, width: 1.0),
-                            )),
-                        child: Text(
-                          'Before 2 days',
-                          style: TextStyle(
-                              color: Colors.grey,
-                              //fontWeight: FontWeight.bold,
-                              fontSize: 11),
-                          textAlign: TextAlign.center,
-                        ))),
-                SizedBox(
-                  width: 10,
-                ),
-                Expanded(
-                    child: OutlinedButton(
-                        onPressed: () {
-                          setState(() {
-                            _selectedperiod = 4;
-                          });
-                        },
-                        style: ButtonStyle(
-                            minimumSize: MaterialStateProperty.all(Size(0, 45)),
-                            overlayColor:
-                                MaterialStateProperty.all(Colors.transparent),
-                            shape: MaterialStateProperty.all(
-                                RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20.0),
-                            )),
-                            side: MaterialStateProperty.all(
-                              BorderSide(color: Colors.grey, width: 1.0),
-                            )),
-                        child: Text(
-                          getTranslated(context, 'last7days')!,
-                          style: TextStyle(
-                              color: Colors.grey,
-                              //fontWeight: FontWeight.bold,
-                              fontSize: 11),
-                          textAlign: TextAlign.center,
-                        ))),
-                SizedBox(
-                  width: 10,
-                ),
-                Expanded(
-                    child: OutlinedButton(
-                        onPressed: () {
-                          /* Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => mainmapscreen()),
-                          );*/
-                          //Fluttertoast.showToast(msg: 'Item has been added to Shopping Cart');
-                        },
-                        style: ButtonStyle(
-                            minimumSize: MaterialStateProperty.all(Size(0, 45)),
-                            overlayColor:
-                                MaterialStateProperty.all(Colors.transparent),
-                            shape: MaterialStateProperty.all(
-                                RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20.0),
-                            )),
-                            side: MaterialStateProperty.all(
-                              BorderSide(color: Colors.grey, width: 1),
-                            )),
-                        child: Text(
-                          'Ultima semana',
-                          style: TextStyle(
-                              color: Colors.grey,
-                              //fontWeight: FontWeight.bold,
-                              fontSize: 11),
-                          textAlign: TextAlign.center,
-                        ))),
-                SizedBox(
-                  width: 3,
-                ),
-              ],
-            ),
-          ),
-          Container(
-            margin: EdgeInsets.all(10),
-            child: Text(
-              getTranslated(context, 'customDateTIme')!,
-              style: TextStyle(
-                  color: Colors.grey,
-                  //fontWeight: FontWeight.bold,
-                  fontSize: 15),
-              textAlign: TextAlign.center,
-            ),
-          ),
-          Container(
-
-              // margin: EdgeInsets.all(20),
-              child: Column(
-            children: <Widget>[
-              Container(
-
-                  //  margin: EdgeInsets.all(20),
-                  child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blueGrey.shade900,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30.0),
-                        ),
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 15, vertical: 15),
-                        textStyle: TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.bold)),
-                    //color: CustomColor.primaryColor,
-                    onPressed: () => _selectFromDate(context, setState),
-                    child: Text(formatReportDate(_selectedFromDate),
-                        style: TextStyle(color: Colors.white)),
+                Text(
+                  'Período Rápido',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
                   ),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blueGrey.shade900,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30.0),
+                ),
+                SizedBox(height: 12),
+                Container(
+                  width: double.infinity,
+                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.grey.shade300),
+                  ),
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<int>(
+                      isExpanded: true,
+                      icon: Icon(Icons.keyboard_arrow_down,
+                          color: Colors.grey[600]),
+                      value: _selectedperiod,
+                      items: const [
+                        DropdownMenuItem(
+                            value: 0, child: Text('Últimas horas')),
+                        DropdownMenuItem(value: 1, child: Text('Hoje')),
+                        DropdownMenuItem(value: 2, child: Text('Ontem')),
+                        DropdownMenuItem(
+                            value: 3, child: Text('Antes de ontem')),
+                        DropdownMenuItem(
+                            value: 4, child: Text('Últimos 7 dias')),
+                        DropdownMenuItem(
+                            value: 5, child: Text('Última semana')),
+                      ],
+                      onChanged: (int? value) {
+                        if (value != null) {
+                          setState(() {
+                            _selectedperiod = value;
+                            showReport();
+                          });
+                        }
+                      },
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          SizedBox(height: 16),
+
+          // Reorganizar o card "Filtros Avançados" para incluir os pickers dentro dele
+          Container(
+            width: double.infinity,
+            padding: EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.grey.shade200),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Header do card com botão "Refinar"
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text('Filtros Avançados',
+                          style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black87)),
+                    ),
+                    Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [Color(0xFF001F5C), Color(0xFF1976D2)],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
                         ),
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 15, vertical: 15),
-                        textStyle: TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.bold)),
-                    // color: CustomColor.primaryColor,
-                    onPressed: () {
-                      setState(() {
-                        _fromTime(context);
-                      });
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: ElevatedButton.icon(
+                        icon: Icon(Icons.tune, color: Colors.white, size: 16),
+                        onPressed: () {
+                          setState(() {
+                            _showFilters = !_showFilters;
+                          });
+                        },
+                        label: Text('Refinar',
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 14)),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.transparent,
+                          shadowColor: Colors.transparent,
+                          padding:
+                              EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8)),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+
+                // Conteúdo dos filtros (aparece quando _showFilters é true)
+                if (_showFilters) ...[
+                  SizedBox(height: 16),
+                  Container(
+                    margin: EdgeInsets.all(10),
+                    child: Text(
+                      getTranslated(context, 'customDateTIme')!,
+                      style: TextStyle(color: Colors.grey, fontSize: 15),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+
+                  // Campo "De"
+                  const Text(
+                    'De',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                  ),
+                  const SizedBox(height: 6),
+                  GestureDetector(
+                    onTap: () async {
+                      final DateTime? pickedDate = await showDatePicker(
+                        context: context,
+                        initialDate: _selectedFromDate,
+                        firstDate: DateTime(2015, 8),
+                        lastDate: DateTime(2101),
+                        builder: (context, child) {
+                          return Theme(
+                            data: Theme.of(context).copyWith(
+                              colorScheme: ColorScheme.light(
+                                primary: Color(0xFF1976D2),
+                                onPrimary: Colors.white,
+                                surface: Colors.white,
+                                onSurface: Colors.black87,
+                              ),
+                            ),
+                            child: child!,
+                          );
+                        },
+                      );
+                      if (pickedDate != null) {
+                        setState(() {
+                          _selectedFromDate = pickedDate;
+                        });
+                      }
+
+                      final TimeOfDay? pickedTime = await showTimePicker(
+                        context: context,
+                        initialTime: selectedFromTime,
+                        builder: (context, child) {
+                          return Theme(
+                            data: Theme.of(context).copyWith(
+                              colorScheme: ColorScheme.light(
+                                primary: Color(0xFF1976D2),
+                                onPrimary: Colors.white,
+                                surface: Colors.white,
+                                onSurface: Colors.black87,
+                              ),
+                            ),
+                            child: child!,
+                          );
+                        },
+                      );
+                      if (pickedTime != null) {
+                        setState(() {
+                          selectedFromTime = pickedTime;
+                        });
+                      }
                     },
-                    /*style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.red,
-                              animationDuration: 3
-                              ),*/
-                    child: Text(formatReportTime(selectedFromTime),
-                        style: TextStyle(
-                            //backgroundColor: Colors.blue,
-                            color: Colors.white)),
+                    child: Container(
+                      margin: EdgeInsets.only(bottom: 12),
+                      padding:
+                          EdgeInsets.symmetric(vertical: 14, horizontal: 18),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Colors.grey.shade300),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black12,
+                            blurRadius: 4,
+                            offset: Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "${DateFormat('dd MMM. yyyy', 'pt_BR').format(_selectedFromDate)} ${selectedFromTime.format(context)}",
+                            style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.black87,
+                                fontWeight: FontWeight.w500),
+                          ),
+                          Icon(Icons.calendar_today, color: Color(0xFF1976D2)),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  // Campo "Até"
+                  const SizedBox(height: 10),
+                  const Text(
+                    'Até',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                  ),
+                  const SizedBox(height: 6),
+                  GestureDetector(
+                    onTap: () async {
+                      final DateTime? pickedDate = await showDatePicker(
+                        context: context,
+                        initialDate: _selectedToDate,
+                        firstDate: DateTime(2015, 8),
+                        lastDate: DateTime(2101),
+                        builder: (context, child) {
+                          return Theme(
+                            data: Theme.of(context).copyWith(
+                              colorScheme: ColorScheme.light(
+                                primary: Color(0xFF1976D2),
+                                onPrimary: Colors.white,
+                                surface: Colors.white,
+                                onSurface: Colors.black87,
+                              ),
+                            ),
+                            child: child!,
+                          );
+                        },
+                      );
+                      if (pickedDate != null) {
+                        setState(() {
+                          _selectedToDate = pickedDate;
+                        });
+                      }
+
+                      final TimeOfDay? pickedTime = await showTimePicker(
+                        context: context,
+                        initialTime: selectedToTime,
+                        builder: (context, child) {
+                          return Theme(
+                            data: Theme.of(context).copyWith(
+                              colorScheme: ColorScheme.light(
+                                primary: Color(0xFF1976D2),
+                                onPrimary: Colors.white,
+                                surface: Colors.white,
+                                onSurface: Colors.black87,
+                              ),
+                            ),
+                            child: child!,
+                          );
+                        },
+                      );
+                      if (pickedTime != null) {
+                        setState(() {
+                          selectedToTime = pickedTime;
+                        });
+                      }
+                    },
+                    child: Container(
+                      margin: EdgeInsets.only(bottom: 12),
+                      padding:
+                          EdgeInsets.symmetric(vertical: 14, horizontal: 18),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Colors.grey.shade300),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black12,
+                            blurRadius: 4,
+                            offset: Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "${DateFormat('dd MMM. yyyy', 'pt_BR').format(_selectedToDate)} ${selectedToTime.format(context)}",
+                            style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.black87,
+                                fontWeight: FontWeight.w500),
+                          ),
+                          Icon(Icons.calendar_today, color: Color(0xFF1976D2)),
+                        ],
+                      ),
+                    ),
                   ),
                 ],
-              )),
-              Container(
-                  margin: EdgeInsets.only(top: 20 /*,right: 20*/),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.blueGrey.shade900,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(30.0),
-                            ),
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 15, vertical: 15),
-                            textStyle: TextStyle(
-                                fontSize: 16, fontWeight: FontWeight.bold)),
-                        //color: CustomColor.primaryColor,
-                        onPressed: () => _selectToDate(context, setState),
-                        child: Text(formatReportDate(_selectedToDate),
-                            style: TextStyle(color: Colors.white)),
-                      ),
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.blueGrey.shade900,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(30.0),
-                            ),
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 15, vertical: 15),
-                            textStyle: TextStyle(
-                                fontSize: 16, fontWeight: FontWeight.bold)),
-                        // color: CustomColor.primaryColor,
-                        onPressed: () {
-                          setState(() {
-                            _toTime(context);
-                          });
-                        },
-                        child: Text(formatReportTime(selectedToTime),
-                            style: TextStyle(color: Colors.white)),
-                      ),
-                    ],
-                  )),
-            ],
-          )),
-          // Container(
-          //   margin: EdgeInsets.only(top: 20,left: 20,right: 20),
-          //   child: Row(
-          //     children: [
-          //
-          //       Expanded(
-          //           child:OutlinedButton(
-          //               onPressed: () {
-          //                 setState(() {
-          //                   _selectedperiod = 5;
-          //                 });
-          //               },
-          //               style: ButtonStyle(
-          //                   minimumSize: MaterialStateProperty.all(
-          //                       Size(0, 45)
-          //                   ),
-          //                   overlayColor: MaterialStateProperty.all(Colors.transparent),
-          //                   shape: MaterialStateProperty.all(
-          //                       RoundedRectangleBorder(
-          //                         borderRadius: BorderRadius.circular(20.0),
-          //                       )
-          //                   ),
-          //                   side: MaterialStateProperty.all(
-          //                     BorderSide(
-          //                         color: Colors.grey,
-          //                         width: 1.0
-          //                     ),
-          //                   )
-          //               ),
-          //               child: Text(
-          //                 'Select Custom Date & Time',
-          //                 style: TextStyle(
-          //                     color: Colors.grey,
-          //                     fontWeight: FontWeight.bold,
-          //                     fontSize: 15
-          //                 ),
-          //                 textAlign: TextAlign.center,
-          //               )
-          //           )
-          //       ),
-          //       SizedBox(
-          //         width: 3,
-          //       ),
-          //
-          //     ],
-          //   ),
-          // ),
-          //
-          // _selectedperiod == 5
-          //     ?Container(
-          //     child: new Column(
-          //       children: <Widget>[
-          //         Row(
-          //           mainAxisAlignment:
-          //           MainAxisAlignment.spaceBetween,
-          //           children: <Widget>[
-          //             ElevatedButton(
-          //               //color: CustomColor.primaryColor,
-          //               onPressed: () => _selectFromDate(
-          //                   context, setState),
-          //               child: Text(
-          //                   formatReportDate(
-          //                       _selectedFromDate),
-          //                   style: TextStyle(
-          //                       color: Colors.white)),
-          //             ),
-          //             ElevatedButton(
-          //               // color: CustomColor.primaryColor,
-          //               onPressed: () {setState(() {
-          //                 _fromTime(context);  });
-          //
-          //               },
-          //               /*style: ElevatedButton.styleFrom(
-          //                     backgroundColor: Colors.red,
-          //                     animationDuration: 3
-          //                     ),*/
-          //               child: Text(
-          //                   formatReportTime(
-          //                       selectedFromTime),
-          //                   style: TextStyle(
-          //                       backgroundColor: Colors.blue,
-          //                       color: Colors.white)),
-          //             ),
-          //           ],
-          //         ),
-          //         Row(
-          //           mainAxisAlignment:
-          //           MainAxisAlignment.spaceBetween,
-          //           children: <Widget>[
-          //             ElevatedButton(
-          //               //color: CustomColor.primaryColor,
-          //               onPressed: () =>
-          //                   _selectToDate(context, setState),
-          //               child: Text(
-          //                   formatReportDate(_selectedToDate),
-          //                   style: TextStyle(
-          //                       color: Colors.white)),
-          //             ),
-          //             ElevatedButton(
-          //               // color: CustomColor.primaryColor,
-          //               onPressed: () {setState(() {
-          //                 _toTime(context);  });
-          //
-          //               },
-          //               child: Text(
-          //                   formatReportTime(selectedToTime),
-          //                   style: TextStyle(
-          //                       color: Colors.white)),
-          //             ),
-          //           ],
-          //         )
-          //       ],
-          //     ))
-          //     :Container(),
+              ],
+            ),
+          ),
+
+          SizedBox(height: 16),
+
+          // Botão "Gerar Relatório"
           Container(
-            margin: EdgeInsets.symmetric(vertical: 8),
-            alignment: Alignment.center,
-            child: OutlinedButton.icon(
+            width: double.infinity,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Color(0xFF001F5C), Color(0xFF1976D2)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: ElevatedButton.icon(
+              icon: Icon(Icons.description, color: Colors.white, size: 20),
               onPressed: () {
                 showReport();
-                // Fluttertoast.showToast(msg: 'Press Outline Button', toastLength: Toast.LENGTH_SHORT);
               },
-              style: ButtonStyle(
-                  overlayColor: MaterialStateProperty.all(Colors.grey),
-                  shape: MaterialStateProperty.all(RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(26),
-                  )),
-                  side: MaterialStateProperty.all(
-                    BorderSide(color: Colors.grey, width: 1.0),
-                  )),
-              icon: Icon(
-                Icons.file_copy_outlined,
-                size: 24.0,
-                color: Colors.grey,
+              label: Text(
+                'Gerar Relatório',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 16,
+                ),
               ),
-              label: Text(getTranslated(context, 'generateReport')!,
-                  style: TextStyle(color: Colors.grey)),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.transparent,
+                shadowColor: Colors.transparent,
+                padding: EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
             ),
           ),
         ],
@@ -960,9 +841,34 @@ class _reportselection extends State<reportselection> {
         var hour = selectedToTime.hour;
         var minute = selectedToTime.minute;
         toTime = "$hour:$minute:00";
-        //  TimeOfDayFormat.H_colon_mm.toString();
-        //var formattedDate = "${picked.year}-${picked.month}-${picked.day}";
       });
+  }
+
+  Widget _buildDateOrTimeButton(
+      {required String label, required VoidCallback onPressed}) {
+    return Expanded(
+      child: Container(
+        margin: const EdgeInsets.symmetric(
+            horizontal: 6), // espaço lateral entre os botões
+        child: ElevatedButton(
+          onPressed: onPressed,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.blueGrey.shade900,
+            padding: EdgeInsets.symmetric(vertical: 14),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(30),
+            ),
+          ),
+          child: Text(
+            label,
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   void showReport() {
@@ -1161,81 +1067,32 @@ class _reportselection extends State<reportselection> {
     print(toDate);
 
     //Navigator.pop(context);
-    if (_selectedReport.contains("General information")) {
-      StaticVarMethod.reportType = 1;
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => ReportEventPage()),
-      );
-    } else if (_selectedReport.contains("Daily Travel Report")) {
-      StaticVarMethod.reportType = 48;
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => ReportEventPage()),
-        // builder: (context) => ReportStopPage()),
-      );
-    } else if (_selectedReport.contains("Travel Summary Bulk")) {
-      StaticVarMethod.reportType = 2;
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => ReportEventPage()),
-        // builder: (context) => ReportStopPage()),
-      );
-    } else if (_selectedReport.contains("Task Report")) {
-      StaticVarMethod.reportType = 27;
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => ReportEventPage()),
-        // builder: (context) => ReportStopPage()),
-      );
-    } else if (_selectedReport.contains("Vehicle History")) {
-      StaticVarMethod.reportType = 25;
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => ReportEventPage()),
-        // builder: (context) => ReportStopPage()),
-      );
-    } else if (_selectedReport.contains("Traval Summary with Playback Image")) {
-      StaticVarMethod.reportType = 43;
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => ReportEventPage()),
-        // builder: (context) => ReportStopPage()),
-      );
-    } else if (_selectedReport.contains("Drives and stops")) {
-      StaticVarMethod.reportType = 3;
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => ReportEventPage()),
-        // builder: (context) => ReportStopPage()),
-      );
-    } else if (_selectedReport.contains("Events")) {
-      StaticVarMethod.reportType = 8;
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => ReportEventPage()),
-        //  builder: (context) => ReportStopPage()),
-      );
-    } else if (_selectedReport.contains("Geofence in/out")) {
-      StaticVarMethod.reportType = 7;
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => ReportStopPage()),
-      );
-    } else if (_selectedReport.contains("Work hours daily")) {
-      StaticVarMethod.reportType = 48;
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => ReportEventPage()),
-        //  builder: (context) => ReportStopPage()),
+    // Páginas de relatórios removidas
+    Fluttertoast.showToast(msg: "Este relatório não está mais disponível");
+    Widget _buildPeriodButton(String label, int periodId) {
+      return OutlinedButton(
+        onPressed: () {
+          setState(() {
+            _selectedperiod = periodId;
+            showReport();
+          });
+        },
+        style: OutlinedButton.styleFrom(
+          side: BorderSide(color: Colors.grey.shade400),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(30),
+          ),
+          padding: EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: 13,
+            color: Colors.grey.shade700,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
       );
     }
-
-    //,"Drives and stops","Geofence in/out","Events","Work hours daily"
-
-    // getReport(StaticVarMethod.deviceId,StaticVarMethod.fromdate,StaticVarMethod.fromtime,StaticVarMethod.todate,StaticVarMethod.totime);
-    /* Navigator.pushNamed(context, "/reportList",
-        arguments: ReportArguments(device['id'], fromDate, fromTime,
-            toDate, toTime, device["name"], 0));*/
   }
 }

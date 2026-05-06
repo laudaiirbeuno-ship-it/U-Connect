@@ -2,26 +2,26 @@ import 'dart:convert';
 
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'package:maktrogps/bottom_navigation/bottom_navigation.dart';
-import 'package:maktrogps/bottom_navigation/bottom_navigation_01.dart';
-import 'package:maktrogps/config/constant.dart';
-import 'package:maktrogps/config/static.dart';
-import 'package:maktrogps/data/datasources.dart';
-import 'package:maktrogps/data/model/loginModel.dart';
-import 'package:maktrogps/data/screens/listscreen.dart';
-import 'package:maktrogps/data/screens/mainmapscreenoriginal.dart';
-import 'package:maktrogps/data/screens/register_page.dart';
-import 'package:maktrogps/data/screens/registerscreennew.dart';
-import 'package:maktrogps/data/screens/supportscreen.dart';
-import 'package:maktrogps/ui/reusable/global_function.dart';
-import 'package:maktrogps/ui/reusable/global_widget.dart';
+import 'package:uconnect/bottom_navigation/bottom_navigation_01.dart';
+import 'package:uconnect/config/constant.dart';
+import 'package:uconnect/config/static.dart';
+import 'package:uconnect/data/datasources.dart';
+import 'package:uconnect/data/model/loginModel.dart';
+import 'package:uconnect/data/screens/listscreen.dart';
+import 'package:uconnect/data/screens/supportscreen.dart';
+import 'package:uconnect/ui/reusable/global_function.dart';
+import 'package:uconnect/ui/reusable/global_widget.dart';
+import 'package:uconnect/utils/translation_helper.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:universal_io/io.dart';
+import 'package:universal_io/io.dart' show Platform;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:whatsapp_unilink/whatsapp_unilink.dart';
+import 'package:provider/provider.dart';
+import 'package:uconnect/provider/app_settings_provider.dart';
+import 'package:uconnect/ui/widgets/one_nova_era_logo.dart';
 
 import 'browser_module_old/browser.dart';
 
@@ -168,18 +168,74 @@ class _signinState extends State<signinwithbackground1> {
                   builder: (BuildContext context, StateSetter setState) {
                 return Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 30),
-                  child: ListView(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      SizedBox(
-                          height: MediaQuery.of(context).size.height * 0.10),
-
-                      Container(
-                          // margin: EdgeInsets.only(top:50),
-                          alignment: Alignment.topCenter,
-                          child: Image.asset(
-                            StaticVarMethod.splashimageurl,
-                            scale: 3,
-                          )),
+                      // Logo personalizada ou nova imagem padrão
+                      Consumer<AppSettingsProvider>(
+                        builder: (context, settingsProvider, child) {
+                          return Container(
+                            alignment: Alignment.topCenter,
+                            child: settingsProvider.customLogo != null && 
+                                   settingsProvider.customLogo!.existsSync()
+                                ? Image.file(
+                                    settingsProvider.customLogo!,
+                                    width: 280,
+                                    height: 140,
+                                    fit: BoxFit.contain,
+                                    errorBuilder: (context, error, stackTrace) {
+                                      // Em caso de erro, usar logo-main padrão
+                                      return Image.asset(
+                                        'assets/appsicon/logo-main.png',
+                                        width: 280,
+                                        height: 140,
+                                        fit: BoxFit.contain,
+                                        errorBuilder: (context, error, stackTrace) {
+                                          // Fallback para IMG se logo-main não existir
+                                          return Image.asset(
+                                            'assets/appsicon/IMG-20260102-WA0018__1_-removebg-preview (1).png',
+                                            width: 280,
+                                            height: 140,
+                                            fit: BoxFit.contain,
+                                            errorBuilder: (context, error, stackTrace) {
+                                              // Fallback para OneNovaEraLogo se nenhuma imagem existir
+                                              return OneNovaEraLogo(
+                                                width: 280,
+                                                height: 140,
+                                                useCustomStyle: settingsProvider.logoCustomStyle,
+                                              );
+                                            },
+                                          );
+                                        },
+                                      );
+                                    },
+                                  )
+                                : Image.asset(
+                              'assets/appsicon/logo-main.png',
+                              width: 280,
+                              height: 140,
+                              fit: BoxFit.contain,
+                              errorBuilder: (context, error, stackTrace) {
+                                // Fallback para IMG se logo-main não existir
+                                return Image.asset(
+                                  'assets/appsicon/IMG-20260102-WA0018__1_-removebg-preview (1).png',
+                                  width: 280,
+                                  height: 140,
+                                  fit: BoxFit.contain,
+                                  errorBuilder: (context, error, stackTrace) {
+                                    // Fallback para OneNovaEraLogo se nenhuma imagem existir
+                                    return OneNovaEraLogo(
+                                      width: 280,
+                                      height: 140,
+                                      useCustomStyle: settingsProvider.logoCustomStyle,
+                                    );
+                                  },
+                                );
+                              },
+                            ),
+                          );
+                        },
+                      ),
                       const SizedBox(
                         height: 20,
                       ),
@@ -207,7 +263,7 @@ class _signinState extends State<signinwithbackground1> {
                                           BorderSide(color: Colors.transparent),
                                     ),
                                     //labelText: 'Email / IMEI',
-                                    labelText: 'User ID',
+                                    labelText: TranslationHelper.translateSync(context, 'ID do Usuário', 'User ID'),
                                     labelStyle:
                                         TextStyle(color: Colors.grey[500])),
                               ))),
@@ -237,7 +293,7 @@ class _signinState extends State<signinwithbackground1> {
                                     borderSide:
                                         BorderSide(color: Colors.transparent),
                                   ),
-                                  labelText: 'Password',
+                                  labelText: TranslationHelper.translateSync(context, 'Senha', 'Password'),
                                   labelStyle:
                                       TextStyle(color: Colors.grey[500]),
                                   suffixIcon: IconButton(
@@ -268,17 +324,17 @@ class _signinState extends State<signinwithbackground1> {
                               )),
                             ),
                             onPressed: () {
-                              EasyLoading.show(status: 'loading...');
+                              EasyLoading.show(status: TranslationHelper.translateSync(context, 'Carregando...', 'Loading...'));
                               //_globalFunction.showProgressDialog(context);
                               if (_username == null || _username.isEmpty) {
                                 Fluttertoast.showToast(
-                                    msg: 'please provide username !!',
+                                    msg: TranslationHelper.translateSync(context, 'Por favor, informe o ID do usuário!', 'Please provide username!'),
                                     toastLength: Toast.LENGTH_SHORT);
                                 EasyLoading.dismiss();
                               } else if (_password == null ||
                                   _password.isEmpty) {
                                 Fluttertoast.showToast(
-                                    msg: 'please provide username !!',
+                                    msg: TranslationHelper.translateSync(context, 'Por favor, informe a senha!', 'Please provide password!'),
                                     toastLength: Toast.LENGTH_SHORT);
                                 EasyLoading.dismiss();
                               } else {
@@ -290,7 +346,7 @@ class _signinState extends State<signinwithbackground1> {
                               padding: const EdgeInsets.symmetric(vertical: 5),
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
-                                children: const [
+                                children: [
                                   Icon(
                                     Icons.login,
                                     color: Colors.white,
@@ -299,7 +355,7 @@ class _signinState extends State<signinwithbackground1> {
                                     width: 15,
                                   ),
                                   Text(
-                                    'LOGIN',
+                                    TranslationHelper.translateSync(context, 'ENTRAR', 'LOGIN'),
                                     style: TextStyle(
                                         fontSize: 16, color: Colors.white),
                                     textAlign: TextAlign.center,
@@ -351,7 +407,7 @@ class _signinState extends State<signinwithbackground1> {
                       SizedBox(
                         width: 2,
                       ),
-                      Text('Demo User',
+                      Text(TranslationHelper.translateSync(context, 'Usuário Demo', 'Demo User'),
                           style: TextStyle(
                               fontSize: 12,
                               height: 2.0,
@@ -367,10 +423,7 @@ class _signinState extends State<signinwithbackground1> {
               //  _launchURL("http://167.86.91.29/registration/create");
               //  String url ='http://167.86.91.29/registration/create';
               // String url ='http://103.254.84.148/registration/create';
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => RegisterPage()),
-              );
+              // RegisterPage removido - não é mais necessário
             },
             child: Card(
                 shape: RoundedRectangleBorder(
@@ -389,7 +442,7 @@ class _signinState extends State<signinwithbackground1> {
                       SizedBox(
                         width: 5,
                       ),
-                      Text('Sign up',
+                      Text(TranslationHelper.translateSync(context, 'Registrar-se', 'Sign up'),
                           style: TextStyle(
                               fontSize: 12,
                               height: 2.0,
@@ -462,7 +515,7 @@ class _signinState extends State<signinwithbackground1> {
                 child: Column(children: <Widget>[
               Image.asset("assets/images/switchserver.png",
                   height: 30, width: 30),
-              Text('  Switch Server  ',
+              Text(TranslationHelper.translateSync(context, '  Trocar Servidor  ', '  Switch Server  '),
                   style: TextStyle(
                       fontSize: 13,
                       height: 2.0,
@@ -507,6 +560,19 @@ class _signinState extends State<signinwithbackground1> {
           EasyLoading.dismiss();
           prefs.setString('user_api_hash', res.userApiHash!);
 
+          // Enviar token FCM ao servidor após login
+          if (StaticVarMethod.notificationToken.isNotEmpty) {
+            gpsapis.activateFCM(StaticVarMethod.notificationToken).then((fcmResponse) {
+              if (fcmResponse.statusCode == 200 || fcmResponse.statusCode == 201) {
+                print("✅ Token FCM enviado ao servidor após login");
+              } else {
+                print("⚠️ Erro ao enviar token FCM após login: ${fcmResponse.statusCode}");
+              }
+            }).catchError((e) {
+              print("❌ Erro ao enviar token FCM após login: $e");
+            });
+          }
+
           Navigator.push(
             context,
             MaterialPageRoute(
@@ -519,7 +585,7 @@ class _signinState extends State<signinwithbackground1> {
           isLoggedIn = false;
           EasyLoading.dismiss();
           Fluttertoast.showToast(
-              msg: "Login Failed",
+              msg: TranslationHelper.translateSync(context, "Login falhou", "Login Failed"),
               toastLength: Toast.LENGTH_SHORT,
               gravity: ToastGravity.CENTER,
               timeInSecForIosWeb: 1,
@@ -536,8 +602,8 @@ class _signinState extends State<signinwithbackground1> {
             showDialog(
               context: context,
               builder: (context) => new AlertDialog(
-                title: Text("Failed"),
-                content: Text("Login Failed"),
+                title: Text(TranslationHelper.translateSync(context, "Falhou", "Failed")),
+                content: Text(TranslationHelper.translateSync(context, "Login falhou", "Login Failed")),
                 actions: <Widget>[
                   new ElevatedButton(
                     onPressed: () {
@@ -545,7 +611,7 @@ class _signinState extends State<signinwithbackground1> {
                       Navigator.of(context, rootNavigator: true)
                           .pop(); // dismisses only the dialog and returns nothing
                     },
-                    child: new Text("ok"),
+                    child: new Text(TranslationHelper.translateSync(context, "OK", "OK")),
                   ),
                 ],
               ),
@@ -571,7 +637,7 @@ class _signinState extends State<signinwithbackground1> {
         setState(() {});
         EasyLoading.dismiss();
         Fluttertoast.showToast(
-            msg: "Error Msg",
+            msg: TranslationHelper.translateSync(context, "Mensagem de erro", "Error message"),
             toastLength: Toast.LENGTH_SHORT,
             gravity: ToastGravity.CENTER,
             timeInSecForIosWeb: 1,
@@ -698,7 +764,7 @@ class _signinState extends State<signinwithbackground1> {
                                 },
                               ),
                               new Text(
-                                'Custom Server',
+                                TranslationHelper.translateSync(context, 'Servidor Personalizado', 'Custom Server'),
                                 style: new TextStyle(fontSize: 16.0),
                               ),
                             ],
@@ -725,7 +791,7 @@ class _signinState extends State<signinwithbackground1> {
                                               borderSide: BorderSide(
                                                   color: Colors.grey),
                                             ),
-                                            labelText: 'Custom Server',
+                                            labelText: TranslationHelper.translateSync(context, 'Servidor Personalizado', 'Custom Server'),
                                             labelStyle: TextStyle(
                                                 color: Colors.grey[500])),
                                       )
@@ -744,7 +810,7 @@ class _signinState extends State<signinwithbackground1> {
                                   Navigator.of(context).pop();
                                 },
                                 child: Text(
-                                  'Cancel',
+                                  TranslationHelper.translateSync(context, 'Cancelar', 'Cancel'),
                                   style: TextStyle(
                                       fontSize: 18.0, color: Colors.white),
                                 ),
@@ -757,7 +823,7 @@ class _signinState extends State<signinwithbackground1> {
                                   showReport();
                                 },
                                 child: Text(
-                                  'Save',
+                                  TranslationHelper.translateSync(context, 'Salvar', 'Save'),
                                   style: TextStyle(
                                       fontSize: 18.0, color: Colors.white),
                                 ),

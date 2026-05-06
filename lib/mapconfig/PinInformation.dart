@@ -1,7 +1,7 @@
 import 'dart:ui';
 
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:maktrogps/data/model/devices.dart';
+import 'package:uconnect/data/model/devices.dart';
 
 class PinInformation {
   String pinPath;

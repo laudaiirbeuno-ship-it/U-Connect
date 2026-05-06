@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:intl/intl.dart';
-import 'package:maktrogps/data/model/devices.dart';
-import 'package:maktrogps/data/model/events.dart';
-import 'package:maktrogps/data/model/history.dart';
-import 'package:maktrogps/storage/user_repository.dart';
+import 'package:uconnect/data/model/devices.dart';
+import 'package:uconnect/data/model/events.dart';
+import 'package:uconnect/data/model/history.dart';
+import 'package:uconnect/storage/user_repository.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class StaticVarMethod {
@@ -23,8 +23,10 @@ class StaticVarMethod {
   static String simno = "";
   static String phone_no = "+212664719191";
   static String email = "contact@geoflotte.ma";
+  static int notificationCount = 0;
 
   static int reportType = 1;
+  static String? reportName;
 
   static String baseurlall = UserRepository.getServerURL();
   
@@ -60,4 +62,9 @@ class StaticVarMethod {
       DateTime.now().day,
       DateTime.now().hour,
       DateTime.now().minute));
+  
+  // Função para atualizar o contador de notificações não lidas
+  static void updateUnreadNotificationCount() {
+    notificationCount = eventList.where((event) => !event.read).length;
+  }
 }

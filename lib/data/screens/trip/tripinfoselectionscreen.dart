@@ -7,14 +7,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:maktrogps/config/custom_image_assets.dart';
-import 'package:maktrogps/config/static.dart';
-import 'package:maktrogps/data/screens/trip/tripinfoscreen.dart';
-import 'package:maktrogps/mapconfig/CommonMethod.dart';
-import 'package:maktrogps/ui/reusable/global_widget.dart';
+import 'package:uconnect/config/custom_image_assets.dart';
+import 'package:uconnect/config/static.dart';
+import 'package:uconnect/data/screens/trip/tripinfoscreen.dart';
+import 'package:uconnect/mapconfig/CommonMethod.dart';
+import 'package:uconnect/ui/reusable/global_widget.dart';
 import 'dart:ui' as ui;
 import 'package:image/image.dart' as IMG;
-import 'package:maktrogps/utils/Consts.dart';
+import 'package:uconnect/utils/Consts.dart';
 import 'package:intl/intl.dart';
 
 class tripinfoselectionscreen extends StatefulWidget {

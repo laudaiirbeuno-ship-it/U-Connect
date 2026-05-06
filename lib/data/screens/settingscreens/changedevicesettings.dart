@@ -1,22 +1,22 @@
 import 'dart:convert';
 
-import 'package:maktrogps/data/gpsserver/datasources.dart';
+import 'package:uconnect/data/gpsserver/datasources.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:maktrogps/config/apps/ecommerce/constant.dart';
-import 'package:maktrogps/config/apps/food_delivery/global_style.dart';
-import 'package:maktrogps/config/static.dart';
-
-import 'package:maktrogps/data/screens/splashscreen.dart';
+import 'package:uconnect/config/apps/ecommerce/constant.dart';
+import 'package:uconnect/config/apps/food_delivery/global_style.dart';
+import 'package:uconnect/config/static.dart';
+import 'package:uconnect/ui/reusable/custom_app_bar.dart'; // Importe o CustomAppBar
+import 'package:uconnect/data/screens/splashscreen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:universal_io/io.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:maktrogps/data/datasources.dart';
+import 'package:uconnect/data/datasources.dart';
 
 import '../../../config/Session.dart';
-
 
 class changedevicesettings extends StatefulWidget {
   @override
@@ -24,9 +24,21 @@ class changedevicesettings extends StatefulWidget {
 }
 
 class _changedevicesettingsState extends State<changedevicesettings> {
-  List<String> _devicesListstr=[];
-  String device_id="",imei="",devicename="",changetext="";
-  String? protocol,name,map_arrows6,map_icon7,tail_color8,tail_points9,model12,odometertype15,enginehourtype16,odometer17,enginehour18,fcr19,accuracy21;
+  List<String> _devicesListstr = [];
+  String device_id = "", imei = "", devicename = "", changetext = "";
+  String? protocol,
+      name,
+      map_arrows6,
+      map_icon7,
+      tail_color8,
+      tail_points9,
+      model12,
+      odometertype15,
+      enginehourtype16,
+      odometer17,
+      enginehour18,
+      fcr19,
+      accuracy21;
 
   late SharedPreferences prefs;
   @override
@@ -35,18 +47,14 @@ class _changedevicesettingsState extends State<changedevicesettings> {
     super.initState();
   }
 
-
   Future<void> getdeviesList() async {
     prefs = await SharedPreferences.getInstance();
     _devicesListstr.clear();
     for (int i = 0; i < StaticVarMethod.devicelist.length; i++) {
       _devicesListstr.add(StaticVarMethod.devicelist.elementAt(i).name!);
     }
-    setState(() {
-    });
+    setState(() {});
   }
-
-
 
   @override
   void dispose() {
@@ -55,742 +63,791 @@ class _changedevicesettingsState extends State<changedevicesettings> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor:  Colors.grey[300],
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        //elevation: 0,
-        iconTheme: IconThemeData(
-          color: Colors.black, //change your color here
-        ),
-        actions: <Widget>[
-          // action button
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle.light,
+      child: Scaffold(
+        backgroundColor: Colors.grey.shade50,
+        appBar: CustomAppBar(
+            title: "Configurações do Veículo"), // Usando o CustomAppBar
+        body: SingleChildScrollView(
+          padding: EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Seção de Seleção de Veículo
+              _buildVehicleSelectionCard(),
+              SizedBox(height: 20),
 
-        ],
-        backgroundColor: Colors.white,
-        title: Row(
-          spacing: 16,
-          children: [
-            Icon(
-              Icons.car_crash,
-              color: Colors.black,
-            ),
-            Text(
-              getTranslated(context, 'changeVehicleSettings')!,
-              style: TextStyle(color: Colors.black),
-            ),
-          ],
+              // Seção de Configurações Básicas
+              _buildBasicSettingsSection(),
+              SizedBox(height: 20),
+
+              // Seção de Configurações Avançadas
+              _buildAdvancedSettingsSection(),
+              SizedBox(height: 20),
+
+              // Seção de Informações do Veículo
+              _buildVehicleInfoSection(),
+              SizedBox(height: 100), // Espaço para bottom navigation
+            ],
+          ),
         ),
-        //bottom: _reusableWidget.bottomAppBar(),
       ),
-      body: ListView(
+    );
+  }
+
+  Widget _buildVehicleSelectionCard() {
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Color(0xFF001F5C), Color(0xFF1976D2)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 10,
+            offset: Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildVehilelist(),
-          _buildchangeseeting(),
-        //  _buildchangeseeting2(),
+          Row(
+            children: [
+              Icon(Icons.directions_car, color: Colors.white, size: 24),
+              SizedBox(width: 12),
+              Text(
+                'Selecionar Veículo',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 16),
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: DropdownSearch(
+              items: _devicesListstr,
+              popupProps: PopupProps.menu(
+                showSearchBox: true,
+                fit: FlexFit.loose,
+                constraints: BoxConstraints(maxHeight: 300),
+                searchFieldProps: TextFieldProps(
+                  cursorColor: Color(0xFF1976D2),
+                  decoration: InputDecoration(
+                    hintText: 'Buscar veículo...',
+                    prefixIcon: Icon(Icons.search, color: Color(0xFF1976D2)),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
+              ),
+              dropdownDecoratorProps: DropDownDecoratorProps(
+                dropdownSearchDecoration: InputDecoration(
+                  hintText: getTranslated(context, 'selectVehicle')!,
+                  border: InputBorder.none,
+                  hintStyle: TextStyle(color: Colors.white70),
+                ),
+              ),
+              onChanged: (dynamic value) {
+                for (int i = 0; i < StaticVarMethod.devicelist.length; i++) {
+                  if (value != null) {
+                    if (StaticVarMethod.devicelist
+                        .elementAt(i)
+                        .name!
+                        .contains(value)) {
+                      imei = StaticVarMethod.devicelist
+                          .elementAt(i)
+                          .deviceData!
+                          .imei
+                          .toString();
+                      devicename = StaticVarMethod.devicelist
+                          .elementAt(i)
+                          .name
+                          .toString();
+                      device_id =
+                          StaticVarMethod.devicelist.elementAt(i).id.toString();
+                      print("value: " + value);
+                      break;
+                    }
+                  }
+                }
+                setState(() {
+                  getfnsettign();
+                });
+              },
+            ),
+          ),
         ],
       ),
-
     );
   }
 
-
-
-  Widget _buildVehilelist(){
-    return Container(
-        margin: EdgeInsets.all(10),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
+  Widget _buildBasicSettingsSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Configurações Básicas',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+            color: Colors.black87,
+          ),
+        ),
+        SizedBox(height: 12),
+        Row(
           children: [
-
-
-
             Expanded(
-              child: Column(
-                children: <Widget>[
-                  GestureDetector(
-                    onTap: () {
-
-                    },
-                    child: Container(
-                        padding: EdgeInsets.all(18),
-
-                        decoration: new BoxDecoration(
-                          color: Colors.white,
-                          shape: BoxShape.rectangle,
-                          borderRadius:BorderRadius.all(Radius.circular(15)),
-                          // borderRadius: BorderRadius.circular(8),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black26,
-                              blurRadius: 10.0,
-                              //offset: const Offset(0.0, 10.0),
-                            ),
-                          ],
-                        ),
-                        // color: Colors.white,
-                        //color: Color(0x99FFFFFF),
-                        child:   DropdownSearch(
-                          items: _devicesListstr,
-                          popupProps: const PopupProps.menu(
-                            showSearchBox: true,
-                            fit: FlexFit.loose,
-                            searchFieldProps: const TextFieldProps(
-                              cursorColor: Colors.red,
-                            ),
-                          ),
-                          dropdownDecoratorProps: DropDownDecoratorProps(
-                              dropdownSearchDecoration: InputDecoration(
-                                //labelText: "Location",
-                                  hintText: getTranslated(context, 'selectVehicle')!,
-                                  border: InputBorder.none
-                              )),
-                          onChanged: (dynamic value) {
-                            for (int i = 0; i < StaticVarMethod.devicelist.length; i++) {
-                              if (value != null) {
-                                if (StaticVarMethod.devicelist.elementAt(i).name!.contains(value)) {
-                                  imei=StaticVarMethod.devicelist.elementAt(i).deviceData!.imei.toString();
-                                  devicename=StaticVarMethod.devicelist.elementAt(i).name.toString();
-                                  device_id=StaticVarMethod.devicelist.elementAt(i).id.toString();
-                                  print("value: " + value);
-                                  break;
-                                }
-                              }
-                            }
-                            setState(() {
-                              getfnsettign();
-                              //_selectedReport = value;
-                            });
-
-                          },
-
-                        )
-                    ),
-                  ),
-                ],
+              child: _buildSettingCard(
+                title: 'Alterar Ícone',
+                subtitle: 'Personalizar aparência',
+                icon: Icons.palette,
+                onTap: () {
+                  (imei != "") ? _showPopup(context) : showtoast();
+                },
+              ),
+            ),
+            SizedBox(width: 12),
+            Expanded(
+              child: _buildSettingCard(
+                title: 'Alterar Nome',
+                subtitle: 'Renomear veículo',
+                icon: Icons.edit,
+                onTap: () {
+                  (imei != "")
+                      ? _showEdit(context, "Change Name")
+                      : showtoast();
+                },
               ),
             ),
           ],
-        )
+        ),
+      ],
     );
   }
 
-  Widget _buildchangeseeting(){
-    return Container(
-        margin: EdgeInsets.all(10),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
+  Widget _buildAdvancedSettingsSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Configurações Avançadas',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+            color: Colors.black87,
+          ),
+        ),
+        SizedBox(height: 12),
+        Row(
           children: [
             Expanded(
-              child: Column(
-                children: <Widget>[
-                  GestureDetector(
-                    onTap: () {
-
-                      (imei!="")?_showPopup(context):showtoast();
-                    },
-                    child: Container(
-                        padding: EdgeInsets.only(top:10,bottom: 10,left: 10, right: 5),
-
-                        decoration: new BoxDecoration(
-                          color: Colors.white,
-                          shape: BoxShape.rectangle,
-                          borderRadius:BorderRadius.all(Radius.circular(15)),
-                          // borderRadius: BorderRadius.circular(8),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black26,
-                              blurRadius: 10.0,
-                              //offset: const Offset(0.0, 10.0),
-                            ),
-                          ],
-                        ),
-                        // color: Colors.white,
-                        //color: Color(0x99FFFFFF),
-                        child:   Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: <Widget>[
-                              Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: <Widget>[
-                                    Text('Change icon',  style: TextStyle(
-                                        fontSize: 14, color: SOFT_GREY)),
-                                  /*  Text('9AM - 6PM',  style: TextStyle(
-                                        fontSize: 10, color: SOFT_GREY)),*/
-                                  ]
-                              ),
-                              Image.asset("assets/speedoicon/assets_images_shuffleicon.png", height: 30,width: 30),
-
-                            ]
-                        )
-                    ),
-                  ),
-                ],
+              child: _buildSettingCard(
+                title: 'Odômetro',
+                subtitle: 'Configurar odômetro',
+                icon: Icons.speed,
+                onTap: () {
+                  (imei != "")
+                      ? _showEdit(context, "Change odometer")
+                      : showtoast();
+                },
               ),
             ),
-            SizedBox(width: 25),
+            SizedBox(width: 12),
             Expanded(
-              child: Column(
-                children: <Widget>[
-                  GestureDetector(
-                    onTap: () {
-                      (imei!="")?_showEdit(context,"Change Name"):showtoast();
-                    },
-                    child: Container(
-                       // padding: EdgeInsets.all(18),
-                        padding: EdgeInsets.only(top:10,bottom: 10,left: 10, right: 5),
-                        decoration: new BoxDecoration(
-                          color: Colors.white,
-                          shape: BoxShape.rectangle,
-                          borderRadius:BorderRadius.all(Radius.circular(15)),
-                          // borderRadius: BorderRadius.circular(8),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black26,
-                              blurRadius: 10.0,
-                              //offset: const Offset(0.0, 10.0),
-                            ),
-                          ],
-                        ),
-                        // color: Colors.white,
-                        //color: Color(0x99FFFFFF),
-                        child:   Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: <Widget>[
-                              Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: <Widget>[
-                                    Text('Change Name',  style: TextStyle(
-                                        fontSize: 14, color: SOFT_GREY)),
-                                 /*   Text('9AM - 6PM',  style: TextStyle(
-                                        fontSize: 10, color: SOFT_GREY)),*/
-                                  ]
-                              ),
-                              Image.asset("assets/speedoicon/assets_images_idname.png", height: 30,width: 30),
-
-                            ]
-                        )
-                    ),
-                  ),
-                ],
+              child: _buildSettingCard(
+                title: 'Quilometragem',
+                subtitle: 'Ajustar quilometragem',
+                icon: Icons.straighten,
+                onTap: () {
+                  (imei != "")
+                      ? _showEdit(context, "Change mileage")
+                      : showtoast();
+                },
               ),
             ),
           ],
-        )
+        ),
+      ],
     );
   }
-  Widget _buildchangeseeting2(){
-    return Container(
-        margin: EdgeInsets.all(10),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
+
+  Widget _buildVehicleInfoSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Informações do Veículo',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+            color: Colors.black87,
+          ),
+        ),
+        SizedBox(height: 12),
+        Container(
+          width: double.infinity,
+          padding: EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 10,
+                offset: Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Column(
+            children: [
+              _buildInfoRow(
+                  'IMEI', imei ?? 'Não selecionado', Icons.fingerprint),
+              SizedBox(height: 12),
+              _buildInfoRow(
+                  'Nome', devicename ?? 'Não selecionado', Icons.label),
+              SizedBox(height: 12),
+              _buildInfoRow('ID do Dispositivo', device_id ?? 'Não selecionado',
+                  Icons.device_hub),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSettingCard({
+    required String title,
+    required String subtitle,
+    required IconData icon,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 10,
+              offset: Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Expanded(
-              child: Column(
-                children: <Widget>[
-                  GestureDetector(
-                    onTap: () {
-
-                      (imei!="")?_showEdit(context,"Change odometer"):showtoast();
-                    },
-                    child: Container(
-                        padding: EdgeInsets.only(top:10,bottom: 10,left: 10, right: 5),
-
-                        decoration: new BoxDecoration(
-                          color: Colors.white,
-                          shape: BoxShape.rectangle,
-                          borderRadius:BorderRadius.all(Radius.circular(15)),
-                          // borderRadius: BorderRadius.circular(8),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black26,
-                              blurRadius: 10.0,
-                              //offset: const Offset(0.0, 10.0),
-                            ),
-                          ],
-                        ),
-                        // color: Colors.white,
-                        //color: Color(0x99FFFFFF),
-                        child:   Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: <Widget>[
-                              Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: <Widget>[
-                                    Text('Change odometer',  style: TextStyle(
-                                        fontSize: 14, color: SOFT_GREY)),
-                                    /*  Text('9AM - 6PM',  style: TextStyle(
-                                        fontSize: 10, color: SOFT_GREY)),*/
-                                  ]
-                              ),
-                              Image.asset("assets/speedoicon/assets_images_odometericon.png", height: 30,width: 30),
-
-                            ]
-                        )
+            Row(
+              children: [
+                Container(
+                  padding: EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [Color(0xFF001F5C), Color(0xFF1976D2)],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
                     ),
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                ],
+                  child: Icon(icon, color: Colors.white, size: 20),
+                ),
+                Spacer(),
+                Icon(Icons.arrow_forward_ios, color: Colors.grey, size: 16),
+              ],
+            ),
+            SizedBox(height: 12),
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: Colors.black87,
               ),
             ),
-            SizedBox(width: 25),
-            Expanded(
-              child: Column(
-                children: <Widget>[
-                  GestureDetector(
-                    onTap: () {
-                      (imei!="")?_showEdit(context,"Change mileage"):showtoast();
-                    },
-                    child: Container(
-                      // padding: EdgeInsets.all(18),
-                        padding: EdgeInsets.only(top:10,bottom: 10,left: 10, right: 5),
-                        decoration: new BoxDecoration(
-                          color: Colors.white,
-                          shape: BoxShape.rectangle,
-                          borderRadius:BorderRadius.all(Radius.circular(15)),
-                          // borderRadius: BorderRadius.circular(8),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black26,
-                              blurRadius: 10.0,
-                              //offset: const Offset(0.0, 10.0),
-                            ),
-                          ],
-                        ),
-                        // color: Colors.white,
-                        //color: Color(0x99FFFFFF),
-                        child:   Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: <Widget>[
-                              Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: <Widget>[
-                                    Text('Change mileage',  style: TextStyle(
-                                        fontSize: 14, color: SOFT_GREY)),
-                                    /*   Text('9AM - 6PM',  style: TextStyle(
-                                        fontSize: 10, color: SOFT_GREY)),*/
-                                  ]
-                              ),
-                              Image.asset("assets/speedoicon/assets_images_mileageicon.png", height: 30,width: 30),
-
-                            ]
-                        )
-                    ),
-                  ),
-                ],
+            SizedBox(height: 4),
+            Text(
+              subtitle,
+              style: TextStyle(
+                fontSize: 12,
+                color: Colors.grey[600],
               ),
             ),
           ],
-        )
+        ),
+      ),
     );
   }
 
-  void showtoast(){
-    Fluttertoast.showToast(msg: 'Please select vehicle First!', toastLength: Toast.LENGTH_LONG);
+  Widget _buildInfoRow(String label, String value, IconData icon) {
+    return Row(
+      children: [
+        Icon(icon, color: Color(0xFF1976D2), size: 20),
+        SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.grey[600],
+                ),
+              ),
+              Text(
+                value,
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.black87,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
   }
-  void _showPopup(BuildContext context){
-    double imageSize = MediaQuery.of(context).size.width/10;
+
+  void showtoast() {
+    Fluttertoast.showToast(
+        msg: 'Please select vehicle First!', toastLength: Toast.LENGTH_LONG);
+  }
+
+  void _showPopup(BuildContext context) {
+    double imageSize = MediaQuery.of(context).size.width / 10;
     showDialog(
         context: context,
         barrierDismissible: true,
         builder: (BuildContext context) {
           return SimpleDialog(
-            title: Text(''+devicename),
+            title: Text('' + devicename),
             children: [
-            Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-
-            children: [
-              Container(
-                  margin: EdgeInsets.only(top: 12, bottom: 20),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      Expanded(
-                        child: Column(
-                          children: <Widget>[
-                            GestureDetector(
-                              onTap: () {
-                               prefs.setString(imei, "bike_");
-                               Fluttertoast.showToast(msg: 'Update Successfully!', toastLength: Toast.LENGTH_LONG);
-                               Navigator.of(context).pop();
-                              /* Navigator.push(
+              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Container(
+                    margin: EdgeInsets.only(top: 12, bottom: 20),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        Expanded(
+                          child: Column(
+                            children: <Widget>[
+                              GestureDetector(
+                                onTap: () {
+                                  prefs.setString(imei, "bike_");
+                                  Fluttertoast.showToast(
+                                      msg: 'Update Successfully!',
+                                      toastLength: Toast.LENGTH_LONG);
+                                  Navigator.of(context).pop();
+                                  /* Navigator.push(
                                  context,
                                  MaterialPageRoute(
                                      builder: (context) => SplashScreen()),
                                );*/
-                              },
-                              child: Container(
-                                  padding: EdgeInsets.all(8),
-
-                                  decoration: new BoxDecoration(
-                                    color: Colors.white,
-                                    shape: BoxShape.rectangle,
-                                    borderRadius:BorderRadius.all(Radius.circular(15)),
-                                    // borderRadius: BorderRadius.circular(8),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black26,
-                                        blurRadius: 1.0,
-                                        //offset: const Offset(0.0, 10.0),
-                                      ),
-                                    ],
-                                  ),
-                                  // color: Colors.white,
-                                  //color: Color(0x99FFFFFF),
-                                  child:   Column(
-                                      children: <Widget>[
-                                        Image.asset("assets/tbtrack/bike_sidestop.png", height: imageSize,width: imageSize),
-                                        Text('Bike',  style: TextStyle(
-                                            fontSize: 12,height: 2))
-                                      ]
-                                  )
+                                },
+                                child: Container(
+                                    padding: EdgeInsets.all(8),
+                                    decoration: new BoxDecoration(
+                                      color: Colors.white,
+                                      shape: BoxShape.rectangle,
+                                      borderRadius:
+                                          BorderRadius.all(Radius.circular(15)),
+                                      // borderRadius: BorderRadius.circular(8),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black26,
+                                          blurRadius: 1.0,
+                                          //offset: const Offset(0.0, 10.0),
+                                        ),
+                                      ],
+                                    ),
+                                    // color: Colors.white,
+                                    //color: Color(0x99FFFFFF),
+                                    child: Column(children: <Widget>[
+                                      Image.asset(
+                                          "assets/tbtrack/bike_sidestop.png",
+                                          height: imageSize,
+                                          width: imageSize),
+                                      Text('Bike',
+                                          style: TextStyle(
+                                              fontSize: 12, height: 2))
+                                    ])),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
-                      Expanded(
-                        child: Column(
-                          children: <Widget>[
-                            GestureDetector(
-                              onTap: () {
-                                prefs.setString(imei, "car_");
-                                Fluttertoast.showToast(msg: 'Update Successfully!', toastLength: Toast.LENGTH_LONG);
-                                Navigator.of(context).pop();
-                              },
-                              child: Container(
-                                  padding: EdgeInsets.all(8),
-
-                                  decoration: new BoxDecoration(
-                                    color: Colors.white,
-                                    shape: BoxShape.rectangle,
-                                    borderRadius:BorderRadius.all(Radius.circular(15)),
-                                    // borderRadius: BorderRadius.circular(8),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black26,
-                                        blurRadius: 1.0,
-                                        //offset: const Offset(0.0, 10.0),
-                                      ),
-                                    ],
-                                  ),
-                                  // color: Colors.white,
-                                  //color: Color(0x99FFFFFF),
-                                  child:   Column(
-                                      children: <Widget>[
-                                        Image.asset("assets/tbtrack/car_sidestop.png", height: imageSize,width: imageSize),
-                                        Text('Car',  style: TextStyle(
-                                            fontSize: 12,height: 2.0))
-                                      ]
-                                  )
+                        Expanded(
+                          child: Column(
+                            children: <Widget>[
+                              GestureDetector(
+                                onTap: () {
+                                  prefs.setString(imei, "car_");
+                                  Fluttertoast.showToast(
+                                      msg: 'Update Successfully!',
+                                      toastLength: Toast.LENGTH_LONG);
+                                  Navigator.of(context).pop();
+                                },
+                                child: Container(
+                                    padding: EdgeInsets.all(8),
+                                    decoration: new BoxDecoration(
+                                      color: Colors.white,
+                                      shape: BoxShape.rectangle,
+                                      borderRadius:
+                                          BorderRadius.all(Radius.circular(15)),
+                                      // borderRadius: BorderRadius.circular(8),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black26,
+                                          blurRadius: 1.0,
+                                          //offset: const Offset(0.0, 10.0),
+                                        ),
+                                      ],
+                                    ),
+                                    // color: Colors.white,
+                                    //color: Color(0x99FFFFFF),
+                                    child: Column(children: <Widget>[
+                                      Image.asset(
+                                          "assets/tbtrack/car_sidestop.png",
+                                          height: imageSize,
+                                          width: imageSize),
+                                      Text('Car',
+                                          style: TextStyle(
+                                              fontSize: 12, height: 2.0))
+                                    ])),
                               ),
-                            ),
-                          ],
-
+                            ],
+                          ),
                         ),
-                      ),
-                      Expanded(
-                        child: Column(
-                          children: <Widget>[
-                            GestureDetector(
-                              onTap: () {
-                                prefs.setString(imei, "truck_");
-                                Fluttertoast.showToast(msg: 'Update Successfully!', toastLength: Toast.LENGTH_LONG);
-                                Navigator.of(context).pop();
-                              },
-                              child: Container(
-                                  padding: EdgeInsets.all(8),
-
-                                  decoration: new BoxDecoration(
-                                    color: Colors.white,
-                                    shape: BoxShape.rectangle,
-                                    borderRadius:BorderRadius.all(Radius.circular(15)),
-                                    // borderRadius: BorderRadius.circular(8),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black26,
-                                        blurRadius: 1.0,
-                                        //offset: const Offset(0.0, 10.0),
-                                      ),
-                                    ],
-                                  ),
-                                  // color: Colors.white,
-                                  //color: Color(0x99FFFFFF),
-                                  child:   Column(
-                                      children: <Widget>[
-                                        Image.asset("assets/tbtrack/truck_sidestop.png", height: imageSize,width: imageSize),
-                                        Text('Truck',  style: TextStyle(
-                                            fontSize: 12,height: 2.0))
-                                      ]
-                                  )
+                        Expanded(
+                          child: Column(
+                            children: <Widget>[
+                              GestureDetector(
+                                onTap: () {
+                                  prefs.setString(imei, "truck_");
+                                  Fluttertoast.showToast(
+                                      msg: 'Update Successfully!',
+                                      toastLength: Toast.LENGTH_LONG);
+                                  Navigator.of(context).pop();
+                                },
+                                child: Container(
+                                    padding: EdgeInsets.all(8),
+                                    decoration: new BoxDecoration(
+                                      color: Colors.white,
+                                      shape: BoxShape.rectangle,
+                                      borderRadius:
+                                          BorderRadius.all(Radius.circular(15)),
+                                      // borderRadius: BorderRadius.circular(8),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black26,
+                                          blurRadius: 1.0,
+                                          //offset: const Offset(0.0, 10.0),
+                                        ),
+                                      ],
+                                    ),
+                                    // color: Colors.white,
+                                    //color: Color(0x99FFFFFF),
+                                    child: Column(children: <Widget>[
+                                      Image.asset(
+                                          "assets/tbtrack/truck_sidestop.png",
+                                          height: imageSize,
+                                          width: imageSize),
+                                      Text('Truck',
+                                          style: TextStyle(
+                                              fontSize: 12, height: 2.0))
+                                    ])),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
-
-                    ],
-                  )
-              ),
-              Container(
-                  margin: EdgeInsets.only(/*top: 12,*/ bottom: 20),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      Expanded(
-                        child: Column(
-                          children: <Widget>[
-                            GestureDetector(
-                              onTap: () {
-                                prefs.setString(imei, "ambulance_");
-                                Fluttertoast.showToast(msg: 'Update Successfully!', toastLength: Toast.LENGTH_LONG);
-                                Navigator.of(context).pop();
-                              },
-                              child: Container(
-                                  padding: EdgeInsets.all(8),
-
-                                  decoration: new BoxDecoration(
-                                    color: Colors.white,
-                                    shape: BoxShape.rectangle,
-                                    borderRadius:BorderRadius.all(Radius.circular(15)),
-                                    // borderRadius: BorderRadius.circular(8),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black26,
-                                        blurRadius: 1.0,
-                                        //offset: const Offset(0.0, 10.0),
-                                      ),
-                                    ],
-                                  ),
-                                  // color: Colors.white,
-                                  //color: Color(0x99FFFFFF),
-                                  child:   Column(
-                                      children: <Widget>[
-                                        Image.asset("assets/tbtrack/ambulance_sidestop.png", height: imageSize,width: imageSize),
-                                        Text('Ambulance',  style: TextStyle(
-                                            fontSize: 12,height: 2))
-                                      ]
-                                  )
+                      ],
+                    )),
+                Container(
+                    margin: EdgeInsets.only(/*top: 12,*/ bottom: 20),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        Expanded(
+                          child: Column(
+                            children: <Widget>[
+                              GestureDetector(
+                                onTap: () {
+                                  prefs.setString(imei, "ambulance_");
+                                  Fluttertoast.showToast(
+                                      msg: 'Update Successfully!',
+                                      toastLength: Toast.LENGTH_LONG);
+                                  Navigator.of(context).pop();
+                                },
+                                child: Container(
+                                    padding: EdgeInsets.all(8),
+                                    decoration: new BoxDecoration(
+                                      color: Colors.white,
+                                      shape: BoxShape.rectangle,
+                                      borderRadius:
+                                          BorderRadius.all(Radius.circular(15)),
+                                      // borderRadius: BorderRadius.circular(8),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black26,
+                                          blurRadius: 1.0,
+                                          //offset: const Offset(0.0, 10.0),
+                                        ),
+                                      ],
+                                    ),
+                                    // color: Colors.white,
+                                    //color: Color(0x99FFFFFF),
+                                    child: Column(children: <Widget>[
+                                      Image.asset(
+                                          "assets/tbtrack/ambulance_sidestop.png",
+                                          height: imageSize,
+                                          width: imageSize),
+                                      Text('Ambulance',
+                                          style: TextStyle(
+                                              fontSize: 12, height: 2))
+                                    ])),
                               ),
-                            ),
-
-
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
-                      Expanded(
-                        child: Column(
-                          children: <Widget>[
-                            GestureDetector(
-                              onTap: () {
-                                prefs.setString(imei, "bus_");
-                                Fluttertoast.showToast(msg: 'Update Successfully!', toastLength: Toast.LENGTH_LONG);
-                                Navigator.of(context).pop();
-                              },
-                              child: Container(
-                                  padding: EdgeInsets.all(8),
-
-                                  decoration: new BoxDecoration(
-                                    color: Colors.white,
-                                    shape: BoxShape.rectangle,
-                                    borderRadius:BorderRadius.all(Radius.circular(15)),
-                                    // borderRadius: BorderRadius.circular(8),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black26,
-                                        blurRadius: 1.0,
-                                        //offset: const Offset(0.0, 10.0),
-                                      ),
-                                    ],
-                                  ),
-                                  // color: Colors.white,
-                                  //color: Color(0x99FFFFFF),
-                                  child:   Column(
-                                      children: <Widget>[
-                                        Image.asset("assets/tbtrack/bus_sidestop.png", height: imageSize,width: imageSize),
-                                        Text('BUS',  style: TextStyle(
-                                            fontSize: 12,height: 2.0))
-                                      ]
-                                  )
+                        Expanded(
+                          child: Column(
+                            children: <Widget>[
+                              GestureDetector(
+                                onTap: () {
+                                  prefs.setString(imei, "bus_");
+                                  Fluttertoast.showToast(
+                                      msg: 'Update Successfully!',
+                                      toastLength: Toast.LENGTH_LONG);
+                                  Navigator.of(context).pop();
+                                },
+                                child: Container(
+                                    padding: EdgeInsets.all(8),
+                                    decoration: new BoxDecoration(
+                                      color: Colors.white,
+                                      shape: BoxShape.rectangle,
+                                      borderRadius:
+                                          BorderRadius.all(Radius.circular(15)),
+                                      // borderRadius: BorderRadius.circular(8),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black26,
+                                          blurRadius: 1.0,
+                                          //offset: const Offset(0.0, 10.0),
+                                        ),
+                                      ],
+                                    ),
+                                    // color: Colors.white,
+                                    //color: Color(0x99FFFFFF),
+                                    child: Column(children: <Widget>[
+                                      Image.asset(
+                                          "assets/tbtrack/bus_sidestop.png",
+                                          height: imageSize,
+                                          width: imageSize),
+                                      Text('BUS',
+                                          style: TextStyle(
+                                              fontSize: 12, height: 2.0))
+                                    ])),
                               ),
-                            ),
-                          ],
-
+                            ],
+                          ),
                         ),
-                      ),
-                      Expanded(
-                        child: Column(
-                          children: <Widget>[
-                            GestureDetector(
-                              onTap: () {
-                                prefs.setString(imei, "erickshaw_");
-                                Fluttertoast.showToast(msg: 'Update Successfully!', toastLength: Toast.LENGTH_LONG);
-                                Navigator.of(context).pop();
-                              },
-                              child: Container(
-                                  padding: EdgeInsets.all(8),
-
-                                  decoration: new BoxDecoration(
-                                    color: Colors.white,
-                                    shape: BoxShape.rectangle,
-                                    borderRadius:BorderRadius.all(Radius.circular(15)),
-                                    // borderRadius: BorderRadius.circular(8),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black26,
-                                        blurRadius: 1.0,
-                                        //offset: const Offset(0.0, 10.0),
-                                      ),
-                                    ],
-                                  ),
-                                  // color: Colors.white,
-                                  //color: Color(0x99FFFFFF),
-                                  child:   Column(
-                                      children: <Widget>[
-                                        Image.asset("assets/tbtrack/erickshaw_sidestop.png", height: imageSize,width: imageSize),
-                                        Text('Auto',  style: TextStyle(
-                                            fontSize: 12,height: 2.0))
-                                      ]
-                                  )
+                        Expanded(
+                          child: Column(
+                            children: <Widget>[
+                              GestureDetector(
+                                onTap: () {
+                                  prefs.setString(imei, "erickshaw_");
+                                  Fluttertoast.showToast(
+                                      msg: 'Update Successfully!',
+                                      toastLength: Toast.LENGTH_LONG);
+                                  Navigator.of(context).pop();
+                                },
+                                child: Container(
+                                    padding: EdgeInsets.all(8),
+                                    decoration: new BoxDecoration(
+                                      color: Colors.white,
+                                      shape: BoxShape.rectangle,
+                                      borderRadius:
+                                          BorderRadius.all(Radius.circular(15)),
+                                      // borderRadius: BorderRadius.circular(8),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black26,
+                                          blurRadius: 1.0,
+                                          //offset: const Offset(0.0, 10.0),
+                                        ),
+                                      ],
+                                    ),
+                                    // color: Colors.white,
+                                    //color: Color(0x99FFFFFF),
+                                    child: Column(children: <Widget>[
+                                      Image.asset(
+                                          "assets/tbtrack/erickshaw_sidestop.png",
+                                          height: imageSize,
+                                          width: imageSize),
+                                      Text('Auto',
+                                          style: TextStyle(
+                                              fontSize: 12, height: 2.0))
+                                    ])),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
-                  )
-              ),
-              Container(
-                  margin: EdgeInsets.only(/*top: 12,*/ bottom: 20),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      Expanded(
-                        child: Column(
-                          children: <Widget>[
-                            GestureDetector(
-                              onTap: () {
-                                prefs.setString(imei, "cycle_");
-                                Fluttertoast.showToast(msg: 'Update Successfully!', toastLength: Toast.LENGTH_LONG);
-                                Navigator.of(context).pop();
-                              },
-                              child: Container(
-                                  padding: EdgeInsets.all(8),
-
-                                  decoration: new BoxDecoration(
-                                    color: Colors.white,
-                                    shape: BoxShape.rectangle,
-                                    borderRadius:BorderRadius.all(Radius.circular(15)),
-                                    // borderRadius: BorderRadius.circular(8),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black26,
-                                        blurRadius: 1.0,
-                                        //offset: const Offset(0.0, 10.0),
-                                      ),
-                                    ],
-                                  ),
-                                  // color: Colors.white,
-                                  //color: Color(0x99FFFFFF),
-                                  child:   Column(
-                                      children: <Widget>[
-                                        Image.asset("assets/tbtrack/cycle_sidestop.png", height: imageSize,width: imageSize),
-                                        Text('Cycle',  style: TextStyle(
-                                            fontSize: 12,height: 2))
-                                      ]
-                                  )
+                      ],
+                    )),
+                Container(
+                    margin: EdgeInsets.only(/*top: 12,*/ bottom: 20),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        Expanded(
+                          child: Column(
+                            children: <Widget>[
+                              GestureDetector(
+                                onTap: () {
+                                  prefs.setString(imei, "cycle_");
+                                  Fluttertoast.showToast(
+                                      msg: 'Update Successfully!',
+                                      toastLength: Toast.LENGTH_LONG);
+                                  Navigator.of(context).pop();
+                                },
+                                child: Container(
+                                    padding: EdgeInsets.all(8),
+                                    decoration: new BoxDecoration(
+                                      color: Colors.white,
+                                      shape: BoxShape.rectangle,
+                                      borderRadius:
+                                          BorderRadius.all(Radius.circular(15)),
+                                      // borderRadius: BorderRadius.circular(8),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black26,
+                                          blurRadius: 1.0,
+                                          //offset: const Offset(0.0, 10.0),
+                                        ),
+                                      ],
+                                    ),
+                                    // color: Colors.white,
+                                    //color: Color(0x99FFFFFF),
+                                    child: Column(children: <Widget>[
+                                      Image.asset(
+                                          "assets/tbtrack/cycle_sidestop.png",
+                                          height: imageSize,
+                                          width: imageSize),
+                                      Text('Cycle',
+                                          style: TextStyle(
+                                              fontSize: 12, height: 2))
+                                    ])),
                               ),
-                            ),
-
-
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
-                      Expanded(
-                        child: Column(
-                          children: <Widget>[
-                            GestureDetector(
-                              onTap: () {
-                                prefs.setString(imei, "scotty_");
-                                Fluttertoast.showToast(msg: 'Update Successfully!', toastLength: Toast.LENGTH_LONG);
-                                Navigator.of(context).pop();
-                              },
-                              child: Container(
-                                  padding: EdgeInsets.all(8),
-
-                                  decoration: new BoxDecoration(
-                                    color: Colors.white,
-                                    shape: BoxShape.rectangle,
-                                    borderRadius:BorderRadius.all(Radius.circular(15)),
-                                    // borderRadius: BorderRadius.circular(8),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black26,
-                                        blurRadius: 1.0,
-                                        //offset: const Offset(0.0, 10.0),
-                                      ),
-                                    ],
-                                  ),
-                                  // color: Colors.white,
-                                  //color: Color(0x99FFFFFF),
-                                  child:   Column(
-                                      children: <Widget>[
-                                        Image.asset("assets/tbtrack/scotty_sidestop.png", height: imageSize,width: imageSize),
-                                        Text('Scotty',  style: TextStyle(
-                                            fontSize: 12,height: 2.0))
-                                      ]
-                                  )
+                        Expanded(
+                          child: Column(
+                            children: <Widget>[
+                              GestureDetector(
+                                onTap: () {
+                                  prefs.setString(imei, "scotty_");
+                                  Fluttertoast.showToast(
+                                      msg: 'Update Successfully!',
+                                      toastLength: Toast.LENGTH_LONG);
+                                  Navigator.of(context).pop();
+                                },
+                                child: Container(
+                                    padding: EdgeInsets.all(8),
+                                    decoration: new BoxDecoration(
+                                      color: Colors.white,
+                                      shape: BoxShape.rectangle,
+                                      borderRadius:
+                                          BorderRadius.all(Radius.circular(15)),
+                                      // borderRadius: BorderRadius.circular(8),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black26,
+                                          blurRadius: 1.0,
+                                          //offset: const Offset(0.0, 10.0),
+                                        ),
+                                      ],
+                                    ),
+                                    // color: Colors.white,
+                                    //color: Color(0x99FFFFFF),
+                                    child: Column(children: <Widget>[
+                                      Image.asset(
+                                          "assets/tbtrack/scotty_sidestop.png",
+                                          height: imageSize,
+                                          width: imageSize),
+                                      Text('Scotty',
+                                          style: TextStyle(
+                                              fontSize: 12, height: 2.0))
+                                    ])),
                               ),
-                            ),
-                          ],
-
+                            ],
+                          ),
                         ),
-                      ),
-                      Expanded(
-                        child: Column(
-                          children: <Widget>[
-                            GestureDetector(
-                              onTap: () {
-                                prefs.setString(imei, "tractor_");
-                                Fluttertoast.showToast(msg: 'Update Successfully!', toastLength: Toast.LENGTH_LONG);
-                                Navigator.of(context).pop();
-                              },
-                              child: Container(
-                                  padding: EdgeInsets.all(8),
-
-                                  decoration: new BoxDecoration(
-                                    color: Colors.white,
-                                    shape: BoxShape.rectangle,
-                                    borderRadius:BorderRadius.all(Radius.circular(15)),
-                                    // borderRadius: BorderRadius.circular(8),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black26,
-                                        blurRadius: 1.0,
-                                        //offset: const Offset(0.0, 10.0),
-                                      ),
-                                    ],
-                                  ),
-                                  // color: Colors.white,
-                                  //color: Color(0x99FFFFFF),
-                                  child:   Column(
-                                      children: <Widget>[
-                                        Image.asset("assets/tbtrack/tractor_sidestop.png", height: imageSize,width: imageSize),
-                                        Text('Tractor',  style: TextStyle(
-                                            fontSize: 12,height: 2.0))
-                                      ]
-                                  )
+                        Expanded(
+                          child: Column(
+                            children: <Widget>[
+                              GestureDetector(
+                                onTap: () {
+                                  prefs.setString(imei, "tractor_");
+                                  Fluttertoast.showToast(
+                                      msg: 'Update Successfully!',
+                                      toastLength: Toast.LENGTH_LONG);
+                                  Navigator.of(context).pop();
+                                },
+                                child: Container(
+                                    padding: EdgeInsets.all(8),
+                                    decoration: new BoxDecoration(
+                                      color: Colors.white,
+                                      shape: BoxShape.rectangle,
+                                      borderRadius:
+                                          BorderRadius.all(Radius.circular(15)),
+                                      // borderRadius: BorderRadius.circular(8),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black26,
+                                          blurRadius: 1.0,
+                                          //offset: const Offset(0.0, 10.0),
+                                        ),
+                                      ],
+                                    ),
+                                    // color: Colors.white,
+                                    //color: Color(0x99FFFFFF),
+                                    child: Column(children: <Widget>[
+                                      Image.asset(
+                                          "assets/tbtrack/tractor_sidestop.png",
+                                          height: imageSize,
+                                          width: imageSize),
+                                      Text('Tractor',
+                                          style: TextStyle(
+                                              fontSize: 12, height: 2.0))
+                                    ])),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
-                  )
-              ),
-            ]
-            ),
-             /* SimpleDialogOption(
+                      ],
+                    )),
+              ]),
+              /* SimpleDialogOption(
                 onPressed: (){
                   Navigator.pop(context, 'user01@gmail.com');
                   Fluttertoast.showToast(msg: 'user01@gmail.com', toastLength: Toast.LENGTH_SHORT);
@@ -846,183 +903,169 @@ class _changedevicesettingsState extends State<changedevicesettings> {
         });
   }
 
-  void _showEdit(BuildContext context, String changetype){
-    double imageSize = MediaQuery.of(context).size.width/10;
+  void _showEdit(BuildContext context, String changetype) {
+    double imageSize = MediaQuery.of(context).size.width / 10;
     showDialog(
         context: context,
         barrierDismissible: true,
         builder: (BuildContext context) {
           return SimpleDialog(
-            title: Text(''+devicename),
+            title: Text('' + devicename),
             children: [
-              Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-
+              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Container(
+                    margin: EdgeInsets.only(top: 12, bottom: 20),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        Expanded(
+                          child: Card(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(30),
+                              ),
+                              elevation: 2,
+                              child: Container(
+                                  padding: EdgeInsets.only(left: 20, right: 10),
+                                  child: TextField(
+                                    keyboardType: TextInputType.text,
+                                    //controller: _usernameFieldController,
+                                    onChanged: (String value) {
+                                      changetext = value;
+                                    },
+                                    decoration: InputDecoration(
+                                        focusedBorder: UnderlineInputBorder(
+                                            borderSide: BorderSide(
+                                                color: Colors.transparent)),
+                                        enabledBorder: UnderlineInputBorder(
+                                          borderSide: BorderSide(
+                                              color: Colors.transparent),
+                                        ),
+                                        //labelText: 'Email / IMEI',
+                                        labelText: changetype,
+                                        labelStyle:
+                                            TextStyle(color: Colors.grey[500])),
+                                  ))),
+                        ),
+                      ],
+                    )),
+                Container(
+                    //margin: EdgeInsets.only(/*top: 12,*/ bottom: 20),
+                    child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Container(
-                        margin: EdgeInsets.only(top: 12, bottom: 20),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            Expanded(
-                              child: Card(
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(30),
-                                  ),
-                                  elevation: 2,
-                                  child:
-                                  Container(
-
-                                      padding: EdgeInsets.only(left: 20, right: 10),
-                                      child:
-                                      TextField(
-                                        keyboardType: TextInputType.text,
-                                        //controller: _usernameFieldController,
-                                        onChanged: (String value) {
-                                          changetext = value;
-                                        },
-                                        decoration: InputDecoration(
-                                            focusedBorder: UnderlineInputBorder(
-                                                borderSide: BorderSide(color: Colors.transparent)),
-                                            enabledBorder: UnderlineInputBorder(
-                                              borderSide: BorderSide(color: Colors.transparent),
-                                            ),
-                                            //labelText: 'Email / IMEI',
-                                            labelText: changetype,
-                                            labelStyle: TextStyle(color: Colors.grey[500])),
-                                      )
-                                  )
-                              ),
-                            ),
-
-
-                          ],
-                        )
-                    ),
-                    Container(
-                        //margin: EdgeInsets.only(/*top: 12,*/ bottom: 20),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Expanded(
-                              child: Column(
-                                children: <Widget>[
-                                  GestureDetector(
-                                    onTap: () {
-                                      //prefs.setString(imei, "assets_images_markers_m_4_");
-                                      Fluttertoast.showToast(msg: 'Canceled!', toastLength: Toast.LENGTH_LONG);
-                                      Navigator.of(context).pop();
-                                    },
-                                    child: Container(
-                                        padding: EdgeInsets.all(8),
-
-                                        decoration: new BoxDecoration(
-                                          color: Colors.white,
-                                          shape: BoxShape.rectangle,
-                                          borderRadius:BorderRadius.all(Radius.circular(15)),
-                                          // borderRadius: BorderRadius.circular(8),
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color: Colors.black26,
-                                              blurRadius: 1.0,
-                                              //offset: const Offset(0.0, 10.0),
-                                            ),
-                                          ],
-                                        ),
-                                        // color: Colors.white,
-                                        //color: Color(0x99FFFFFF),
-                                        child:   Column(
-                                            children: <Widget>[
-                                              //Image.asset("assets/speedoicon/assets_images_markers_m_4_red.png", height: imageSize,width: imageSize),
-                                              Text('Cancel',  style: TextStyle(
-                                                  fontSize: 12,height: 2))
-                                            ]
-                                        )
+                    Expanded(
+                      child: Column(
+                        children: <Widget>[
+                          GestureDetector(
+                            onTap: () {
+                              //prefs.setString(imei, "assets_images_markers_m_4_");
+                              Fluttertoast.showToast(
+                                  msg: 'Canceled!',
+                                  toastLength: Toast.LENGTH_LONG);
+                              Navigator.of(context).pop();
+                            },
+                            child: Container(
+                                padding: EdgeInsets.all(8),
+                                decoration: new BoxDecoration(
+                                  color: Colors.white,
+                                  shape: BoxShape.rectangle,
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(15)),
+                                  // borderRadius: BorderRadius.circular(8),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black26,
+                                      blurRadius: 1.0,
+                                      //offset: const Offset(0.0, 10.0),
                                     ),
-                                  ),
-
-
-                                ],
-                              ),
-                            ),
-                            Expanded(
-                              child: Column(
-                                children: <Widget>[
-                                  GestureDetector(
-                                    onTap: () {
-                                      
-                                      if(changetype.contains("Change Name")){
-                                        editfnsettign(device_id,changetext,imei);
-                                      }else if(changetype.contains("Change odometer")){
-                                        editfnsettign(name!,changetext, odometer17!);
-                                      }else if(changetype.contains("Change mileage")){
-                                        editfnsettign(name!,enginehour18!,changetext);
-                                      }
-
-
-                                     // prefs.setString(imei, "assets_images_markers_m_5_");
-                                      Fluttertoast.showToast(msg: 'Update Successfully!', toastLength: Toast.LENGTH_LONG);
-                                      Navigator.of(context).pop();
-                                    },
-                                    child: Container(
-                                        padding: EdgeInsets.all(8),
-                                        decoration: new BoxDecoration(
-                                          color: Colors.white,
-                                          shape: BoxShape.rectangle,
-                                          borderRadius:BorderRadius.all(Radius.circular(15)),
-                                          // borderRadius: BorderRadius.circular(8),
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color: Colors.black26,
-                                              blurRadius: 1.0,
-                                              //offset: const Offset(0.0, 10.0),
-                                            ),
-                                          ],
-                                        ),
-                                        child:   Column(
-                                            children: <Widget>[
-                                              Text('Save',  style: TextStyle(
-                                                  fontSize: 12,height: 2.0))
-                                            ]
-                                        )
-                                    ),
-                                  ),
-                                ],
-
-                              ),
-                            ),
-                          ],
-                        )
+                                  ],
+                                ),
+                                // color: Colors.white,
+                                //color: Color(0x99FFFFFF),
+                                child: Column(children: <Widget>[
+                                  //Image.asset("assets/speedoicon/assets_images_markers_m_4_red.png", height: imageSize,width: imageSize),
+                                  Text('Cancel',
+                                      style: TextStyle(fontSize: 12, height: 2))
+                                ])),
+                          ),
+                        ],
+                      ),
                     ),
+                    Expanded(
+                      child: Column(
+                        children: <Widget>[
+                          GestureDetector(
+                            onTap: () {
+                              if (changetype.contains("Change Name")) {
+                                editfnsettign(device_id, changetext, imei);
+                              } else if (changetype
+                                  .contains("Change odometer")) {
+                                editfnsettign(name!, changetext, odometer17!);
+                              } else if (changetype
+                                  .contains("Change mileage")) {
+                                editfnsettign(name!, enginehour18!, changetext);
+                              }
 
-                  ]
-              ),
+                              // prefs.setString(imei, "assets_images_markers_m_5_");
+                              Fluttertoast.showToast(
+                                  msg: 'Update Successfully!',
+                                  toastLength: Toast.LENGTH_LONG);
+                              Navigator.of(context).pop();
+                            },
+                            child: Container(
+                                padding: EdgeInsets.all(8),
+                                decoration: new BoxDecoration(
+                                  color: Colors.white,
+                                  shape: BoxShape.rectangle,
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(15)),
+                                  // borderRadius: BorderRadius.circular(8),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black26,
+                                      blurRadius: 1.0,
+                                      //offset: const Offset(0.0, 10.0),
+                                    ),
+                                  ],
+                                ),
+                                child: Column(children: <Widget>[
+                                  Text('Save',
+                                      style:
+                                          TextStyle(fontSize: 12, height: 2.0))
+                                ])),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                )),
+              ]),
             ],
           );
         });
   }
 
-  Future<void> editfnsettign(String device_id,String name,String imei) async {
+  Future<void> editfnsettign(String device_id, String name, String imei) async {
     print("getfnsettign");
 
     try {
+      var response = await gpsapis.editdevice(device_id, name, imei);
 
-      var response= await gpsapis. editdevice(device_id,name,imei );
-
-      Fluttertoast.showToast(msg: 'Device Updated Succeessfully!!!',backgroundColor: Colors.green, toastLength: Toast.LENGTH_LONG);
+      Fluttertoast.showToast(
+          msg: 'Device Updated Succeessfully!!!',
+          backgroundColor: Colors.green,
+          toastLength: Toast.LENGTH_LONG);
       Navigator.pop(context);
-    }
-    catch (e) {
+    } catch (e) {
       print("getfnsettignerror");
       // _showSnackBar("Not exist",0);
     }
-
   }
+
   Future<void> getfnsettign() async {
     print("getfnsettign");
 
     try {
-
       // gpsserverapis.getfn_settings()
       //     .then((response) {
       //   if (response != null) {
@@ -1097,22 +1140,9 @@ class _changedevicesettingsState extends State<changedevicesettings> {
       //
       //   }
       // });
-    }
-    catch (e) {
+    } catch (e) {
       print("getfnsettignerror");
       // _showSnackBar("Not exist",0);
     }
-
   }
-
-
 }
-
-
-
-
-
-
-
-
-

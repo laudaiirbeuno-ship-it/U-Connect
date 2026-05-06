@@ -1,8 +1,8 @@
 
 
 import 'package:flutter/material.dart';
-import 'package:maktrogps/config/apps/food_delivery/global_style.dart';
-import 'package:maktrogps/config/static.dart';
+import 'package:uconnect/config/apps/food_delivery/global_style.dart';
+import 'package:uconnect/config/static.dart';
 
 
 class privacypolicy extends StatefulWidget {

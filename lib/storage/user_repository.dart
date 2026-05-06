@@ -1,6 +1,6 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:intl/intl.dart';
-import 'package:maktrogps/config/static.dart';
+import 'package:uconnect/config/static.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class UserRepository {

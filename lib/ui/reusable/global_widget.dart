@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'package:maktrogps/config/constant.dart';
+import 'package:uconnect/config/constant.dart';
 
 class GlobalWidget{
   Random _random = Random();
