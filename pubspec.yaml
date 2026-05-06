@@ -1,9 +1,9 @@
-name: maktrogps
-description: A new Flutter project.
+name: uconnect
+description: U-Connect - Sistema de Rastreamento GPS.
 
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+publish_to: "none" # Remove this line if you wish to publish to pub.dev
 
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
@@ -17,10 +17,10 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 1.0.2+3
+version: 3.0.2+29
 
 environment:
-  sdk: '>=3.0.0 <4.0.0'
+  sdk: ">=3.0.0 <4.0.0"
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -32,6 +32,7 @@ dependencies:
   flutter:
     sdk: flutter
 
+  google_fonts: ^6.1.0
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -48,14 +49,16 @@ dependencies:
   #flutter_local_notifications: ^16.1.0
   fluttertoast: ^8.0.9
   universal_io: ^2.0.4
-  intl: 0.19.0
-  shared_preferences:
+  intl: ^0.20.2
+  shared_preferences: ^2.2.2
   shimmer: 2.0.0
   cookie_jar: ^3.0.1
   flutter_easyloading: ^3.0.5
-#  google_maps_flutter: ^2.10.0
+  #  google_maps_flutter: ^2.10.0
   google_maps_flutter: ^2.5.3
-  #image: 3.1.0
+  google_maps: ^6.3.0
+  # flutter_google_street_view: ^3.1.4  # Temporarily disabled due to Dart 3.0 compatibility issues with street_view_platform_interface
+  image: ^4.0.17
   geolocator: ^13.0.2
   url_launcher: ^6.0.6
   scrollable_positioned_list: ^0.3.5
@@ -81,10 +84,11 @@ dependencies:
   latlong2: ^0.9.1
   flutter_map: ^7.0.2
   font_awesome_flutter: ^10.3.0
-#  flutter_launcher_icons: ^0.11.0
+  #  flutter_launcher_icons: ^0.11.0
   flutter_launcher_icons: ^0.14.3
   audioplayers: ^6.1.0
   curved_navigation_bar: ^1.0.3
+  fluid_bottom_nav_bar: ^1.4.0
   #flutter_inappwebview: ^5.7.2+3
   whatsapp_unilink: ^2.1.0
   bloc: ^8.1.1
@@ -100,6 +104,14 @@ dependencies:
   provider: ^6.0.5
   share_plus: ^10.1.2
   path_provider: ^2.1.5
+  connectivity_plus: ^6.1.0
+  qr_flutter: ^4.1.0
+  mobile_scanner: ^5.2.3
+  image_picker: ^1.0.7
+  file_picker: ^8.1.2
+  speech_to_text: ^7.0.0
+  permission_handler: ^11.3.1
+  record: ^5.1.2
   #horizontal_calendar: ^1.0.0
   calendar_timeline: ^1.1.2
   flutter_localization: ^0.2.0
@@ -107,17 +119,49 @@ dependencies:
   #sliding_up_panel2: ^3.3.0+1
   change_app_package_name: ^1.4.0
   marquee: ^2.3.0
-  flutter_google_street_view: ^3.1.4
+  flutter_date_pickers: ^0.4.3
+  flutter_time_picker_spinner: ^2.0.0
+  flutter_rating_bar: ^4.0.1
+  in_app_review: ^2.0.9
+  flutter_markdown: ^0.6.18
+  flutter_screenutil: ^5.9.0
+  
+  # === OTIMIZAÇÃO PARA DISPOSITIVOS FRACOS ===
+  visibility_detector: ^0.4.0+2  # Detecta visibilidade para otimizar renderização
+  # flutter_list_view removido - usando otimizações nativas do Flutter
+  
+  # === TOP 5 PACOTES RECOMENDADOS ===
+  # 1. Cache Manager - Melhora performance
+  flutter_cache_manager: ^3.3.1
+  # 2. Pull to Refresh - UX moderna
+  pull_to_refresh: ^2.0.0
+  # 3. Cluster Manager - Agrupa marcadores no mapa (alternativa)
+  # Nota: Para clustering com google_maps_flutter, use implementação customizada
+  # ou considere usar flutter_map com marker_cluster
+  # 4. Secure Storage - Armazenamento seguro
+  flutter_secure_storage: ^9.0.0
+  # 5. Work Manager - Tarefas em background
+  # workmanager: ^0.5.2  # Temporariamente desabilitado devido a problemas de compatibilidade com Flutter/Android
+  # workmanager temporariamente desabilitado devido a problemas de compatibilidade
+  
+  # === PROTEÇÃO CONTRA CÓPIA/PLÁGIO ===
+  # Verificação de integridade do app
+  package_info_plus: ^8.0.0
+  device_info_plus: ^10.1.0
+  # logging_to_logcat: ^1.0.3
+  # flutter_google_street_view: ^3.1.4
+  # flutter_google_street_view: ^3.1.4
+  #  webview_flutter: ^4.10.0
 
 dependency_overrides:
   http: ^1.0.0
-
+  intl: ^0.20.2
+  record_linux: ^1.3.0
 
 #  flutter_datetime_picker: ^1.5.1
 dev_dependencies:
   flutter_test:
     sdk: flutter
-
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
@@ -131,22 +175,23 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 flutter_launcher_icons:
-  image_path: "assets/appsicon/logo512x512.png"
+  image_path: "assets/appsicon/Logo app U-connect.png"
   android: true
   ios: true
   remove_alpha_ios: true
+  adaptive_icon_background: "#000000"
+  adaptive_icon_foreground: "assets/appsicon/Logo app U-connect.png"
 
 flutter:
-
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
 
-  # To add assets to your application, add an assets section, like this:
   assets:
-
     - assets/
+    - assets/icon/
+    - assets/icon/anim/
     - assets/images/
     - assets/nepalicon/
     - assets/sensorsicon/
@@ -154,14 +199,9 @@ flutter:
     - assets/settingicon/
     - assets/speedoicon/
     - assets/rotatingicon/
-    - assets/saftyappicon/
-    - assets/tbtrack/
-    - assets/icon/
     - assets/images/app_icon.png
     - assets/images/direction.png
-    - assets/audio/
     - lib/Language/
-
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
@@ -174,10 +214,10 @@ flutter:
   # "family" key with the font family name, and a "fonts" key with a
   # list giving the asset and other descriptors for the font. For
   # example:
-  fonts:
-    - family: digital_font
-      fonts:
-        - asset: assets/fonts/assets_fonts_digital7.ttf
+  # fonts:
+  #   - family: digital_font
+  #     fonts:
+  #       - asset: assets/fonts/assets_fonts_digital7.ttf
   #      - asset: fonts/Schyler-Italic.ttf
   #         style: italic
   #   - family: Trajan Pro
