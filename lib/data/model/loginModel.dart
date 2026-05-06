@@ -9,7 +9,6 @@ class LoginModel {
     _userApiHash = userApiHash;
 }
 
-
   LoginModel.fromJson(dynamic json) {
     _status = json['status'];
     _userApiHash = json['user_api_hash'];

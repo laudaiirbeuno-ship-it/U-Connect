@@ -66,7 +66,9 @@ class Devices {
 /// total_distance : 25108.03
 
 class deviceItems {
-  Items({
+  String? _image;
+
+  deviceItems({
     dynamic id,
     dynamic alarm,
     String? name,
@@ -89,6 +91,10 @@ class deviceItems {
     String? stopDuration,
     dynamic totalDistance,
     DeviceData? deviceData,
+    String? image, // ✅ aqui o novo campo
+    String? plateNumber, // ✅ novo campo para placa
+    int? alert_id,
+    int? geofence_id,
   }) {
     _id = id;
     _alarm = alarm;
@@ -105,33 +111,49 @@ class deviceItems {
     _address = address;
     _protocol = protocol;
     _driver = driver;
-    _driverData = driverData;
     _icon = icon;
     _sensors = sensors;
-
     _ignitionDuration = ignitionDuration;
     _idleDuration = idleDuration;
     _stopDuration = stopDuration;
     _totalDistance = totalDistance;
     _deviceData = deviceData;
+    _image = image; // ✅ atribuição correta
+    _plateNumber = plateNumber; // ✅ atribuição da placa
+    _alert_id = alert_id;
+    _geofence_id = geofence_id;
   }
 
+  String? get image => _image;
+  String? get plateNumber => _plateNumber; // ✅ getter para placa
+
   deviceItems.fromJson(dynamic json) {
+    print(json);
+
     _id = json['id'];
     _alarm = json['alarm'];
     _name = json['name'];
     _online = json['online'];
+    _image = json['image'];
     _time = json['time'];
     _timestamp = json['timestamp'];
-    _lat = json['lat'];
-    _lng = json['lng'];
-    _course = json['course'];
-    _speed = json['speed'];
-    _altitude = json['altitude'];
+    // Converter coordenadas e valores numéricos para double de forma segura
+    _lat = json['lat'] != null ? (json['lat'] as num).toDouble() : null;
+    _lng = json['lng'] != null ? (json['lng'] as num).toDouble() : null;
+    _course = json['course'] != null ? (json['course'] as num).toDouble() : null;
+    _speed = json['speed'] != null ? (json['speed'] as num).toDouble() : null;
+    _altitude = json['altitude'] != null ? (json['altitude'] as num).toDouble() : null;
     _power = json['power'];
     _address = json['address'];
     _protocol = json['protocol'];
     _driver = json['driver'];
+    _plateNumber = json['plate_number']; // ✅ capturar placa do JSON
+    _brand = json['brand']; // ✅ Corrigido
+    _year = json['year'];   // ✅ Corrigido
+    _model = json['model'];
+    _color = json['color'];
+    _alert_id = json['alert_id'];
+    _geofence_id = json['geofence_id'];
     _driverData = json['driver_data'] != null
         ? DriverData.fromJson(json['driver_data'])
         : null;
@@ -165,6 +187,13 @@ class deviceItems {
   String? _address;
   String? _protocol;
   String? _driver;
+  String? _plateNumber; // ✅ campo para placa
+  String? _brand; // ✅ Novo
+  String? _year;  // ✅ Novo
+  String? _model;
+  String? _color;
+  int? _alert_id;
+  int? _geofence_id;
   DriverData? _driverData;
   DeviceIcon? _icon;
   List<Sensors>? _sensors;
@@ -189,6 +218,12 @@ class deviceItems {
   String? get address => _address;
   String? get protocol => _protocol;
   String? get driver => _driver;
+  String? get brand => _brand; // ✅ Novo
+  String? get year => _year;   // ✅ Novo
+  String? get model => model;
+  String? get color => color;
+  int? get alert_id => _alert_id;
+  int? get geofence_id => _geofence_id;
   DriverData? get driverData => _driverData;
   DeviceIcon? get icon => _icon;
   List<Sensors>? get sensors => _sensors;
@@ -200,6 +235,9 @@ class deviceItems {
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
+    if (_image != null) {
+      map['image'] = _image;
+    }
     map['id'] = _id;
     map['alarm'] = _alarm;
     map['name'] = _name;
@@ -215,6 +253,15 @@ class deviceItems {
     map['address'] = _address;
     map['protocol'] = _protocol;
     map['driver'] = _driver;
+    map['brand'] = _brand; // ✅ Novo
+    map['year'] = _year;   // ✅ Novo
+    map['model'] = _model;
+    map['color'] = _color;
+    map['alert_id'] = _alert_id;
+    map['geofence_id'] = _geofence_id;
+    if (_plateNumber != null) {
+      map['plate_number'] = _plateNumber; // ✅ incluir placa no JSON
+    }
     if (_driverData != null) {
       map['driver_data'] = _driverData?.toJson();
     }
@@ -250,6 +297,14 @@ class DeviceData {
     String? deviceModel,
     dynamic expirationDate,
     Traccar? traccar,
+    String? plateNumber,
+    String? registrationNumber,
+    String? brand, // ✅
+    String? year, // ✅
+    String? model,
+    String? color,
+    int? alert_id,
+    int? geofence_id,
   }) {
     _id = id;
     _userId = userId;
@@ -264,6 +319,14 @@ class DeviceData {
     _deviceModel = deviceModel;
     _expirationDate = expirationDate;
     _traccar = traccar;
+    _plateNumber = plateNumber;
+    _registrationNumber = registrationNumber;
+    _brand = brand;
+    _year = year;
+    _model = model;
+    _color = color;
+    _alert_id = alert_id;
+    _geofence_id = geofence_id;
   }
 
   DeviceData.fromJson(dynamic json) {
@@ -281,7 +344,16 @@ class DeviceData {
     _expirationDate = json['expiration_date'];
     _traccar =
         json['traccar'] != null ? Traccar.fromJson(json['traccar']) : null;
+    _plateNumber = json['plate_number'];
+    _registrationNumber = json['registration_number'];
+    _brand = json['brand']; // ✅
+    _year = json['year']; // ✅
+    _model = json['model']; // ✅
+    _color = json['color']; // ✅
+    _alert_id = json['alert_id'];
+    _geofence_id = json['geofence_id'];
   }
+
   dynamic _id;
   dynamic _userId;
   dynamic _active;
@@ -295,6 +367,14 @@ class DeviceData {
   String? _deviceModel;
   dynamic _expirationDate;
   Traccar? _traccar;
+  String? _plateNumber;
+  String? _registrationNumber;
+  String? _brand; // ✅
+  String? _year; // ✅
+  String? _model; // ✅
+  String? _color; // ✅
+  int? _alert_id;
+  int? _geofence_id;
 
   dynamic get id => _id;
   dynamic get userId => _userId;
@@ -309,6 +389,14 @@ class DeviceData {
   String? get deviceModel => _deviceModel;
   dynamic get expirationDate => _expirationDate;
   Traccar? get traccar => _traccar;
+  String? get plateNumber => _plateNumber;
+  String? get registrationNumber => _registrationNumber;
+  String? get brand => _brand; // ✅
+  String? get year => _year; // ✅
+  String? get model => _model; // ✅
+  String? get color => _color; // ✅
+  int? get alert_id => _alert_id;
+  int? get geofence_id => _geofence_id;
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -324,10 +412,22 @@ class DeviceData {
     map['sim_number'] = _simNumber;
     map['device_model'] = _deviceModel;
     map['expiration_date'] = _expirationDate;
+    map['plate_number'] = _plateNumber;
+    map['registration_number'] = _registrationNumber;
+    map['brand'] = _brand; // ✅
+    map['year'] = _year; // ✅
+    map['model'] = _model; // ✅
+    map['color'] = _color; // ✅
+    map['alert_id'] = _alert_id;
+    map['geofence_id'] = _geofence_id;
     if (_traccar != null) {
       map['traccar'] = _traccar?.toJson();
     }
     return map;
+  }
+
+  String? completeName() {
+    return '$brand $model - $year - $color';
   }
 }
 
@@ -342,56 +442,247 @@ class DeviceData {
 class Sensors {
   Sensors({
     dynamic id,
-    String? type,
+    dynamic userId,
+    dynamic deviceId,
     String? name,
-    dynamic showInPopup,
+    String? type,
+    String? tagName,
+    dynamic addToHistory,
+    dynamic onValue,
+    dynamic offValue,
+    dynamic shownValueBy,
+    String? fuelTankName,
+    dynamic fullTank,
+    dynamic fullTankValue,
+    dynamic minValue,
+    dynamic maxValue,
+    String? formula,
+    dynamic odometerValueBy,
+    dynamic odometerValue,
+    String? odometerValueUnit,
+    dynamic temperatureMax,
+    dynamic temperatureMaxValue,
+    dynamic temperatureMin,
+    dynamic temperatureMinValue,
     String? value,
-    dynamic val,
-    dynamic scaleValue,
+    dynamic valueFormula,
+    dynamic showInPopup,
+    String? unitOfMeasurement,
+    String? onTagValue,
+    String? offTagValue,
+    dynamic onType,
+    dynamic offType,
+    dynamic data,
+    dynamic calibrations,
+    dynamic skipCalibration,
+    dynamic skipEmpty,
+    dynamic decbin,
+    dynamic hexbin,
+    String? typeTitle,
   }) {
     _id = id;
-    _type = type;
+    _userId = userId;
+    _deviceId = deviceId;
     _name = name;
-    _showInPopup = showInPopup;
+    _type = type;
+    _tagName = tagName;
+    _addToHistory = addToHistory;
+    _onValue = onValue;
+    _offValue = offValue;
+    _shownValueBy = shownValueBy;
+    _fuelTankName = fuelTankName;
+    _fullTank = fullTank;
+    _fullTankValue = fullTankValue;
+    _minValue = minValue;
+    _maxValue = maxValue;
+    _formula = formula;
+    _odometerValueBy = odometerValueBy;
+    _odometerValue = odometerValue;
+    _odometerValueUnit = odometerValueUnit;
+    _temperatureMax = temperatureMax;
+    _temperatureMaxValue = temperatureMaxValue;
+    _temperatureMin = temperatureMin;
+    _temperatureMinValue = temperatureMinValue;
     _value = value;
-    _val = val;
-    _scaleValue = scaleValue;
+    _valueFormula = valueFormula;
+    _showInPopup = showInPopup;
+    _unitOfMeasurement = unitOfMeasurement;
+    _onTagValue = onTagValue;
+    _offTagValue = offTagValue;
+    _onType = onType;
+    _offType = offType;
+    _data = data;
+    _calibrations = calibrations;
+    _skipCalibration = skipCalibration;
+    _skipEmpty = skipEmpty;
+    _decbin = decbin;
+    _hexbin = hexbin;
+    _typeTitle = typeTitle;
   }
 
   Sensors.fromJson(dynamic json) {
     _id = json['id'];
-    _type = json['type'];
+    _userId = json['user_id'];
+    _deviceId = json['device_id'];
     _name = json['name'];
+    _type = json['type'];
+    _tagName = json['tag_name'];
+    _addToHistory = json['add_to_history'];
+    _onValue = json['on_value'];
+    _offValue = json['off_value'];
+    _shownValueBy = json['shown_value_by'];
+    _fuelTankName = json['fuel_tank_name'];
+    _fullTank = json['full_tank'];
+    _fullTankValue = json['full_tank_value'];
+    _minValue = json['min_value'];
+    _maxValue = json['max_value'];
+    _formula = json['formula'];
+    _odometerValueBy = json['odometer_value_by'];
+    _odometerValue = json['odometer_value'];
+    _odometerValueUnit = json['odometer_value_unit'];
+    _temperatureMax = json['temperature_max'];
+    _temperatureMaxValue = json['temperature_max_value'];
+    _temperatureMin = json['temperature_min'];
+    _temperatureMinValue = json['temperature_min_value'];
+    _value = json['value']?.toString();
+    _valueFormula = json['value_formula'];
     _showInPopup = json['show_in_popup'];
-    _value = json['value'];
-    _val = json['val'];
-    _scaleValue = json['scale_value'];
+    _unitOfMeasurement = json['unit_of_measurement'];
+    _onTagValue = json['on_tag_value']?.toString();
+    _offTagValue = json['off_tag_value']?.toString();
+    _onType = json['on_type'];
+    _offType = json['off_type'];
+    _data = json['data'];
+    _calibrations = json['calibrations'];
+    _skipCalibration = json['skip_calibration'];
+    _skipEmpty = json['skip_empty'];
+    _decbin = json['decbin'];
+    _hexbin = json['hexbin'];
+    _typeTitle = json['type_title'];
   }
+  
   dynamic _id;
-  String? _type;
+  dynamic _userId;
+  dynamic _deviceId;
   String? _name;
-  dynamic _showInPopup;
+  String? _type;
+  String? _tagName;
+  dynamic _addToHistory;
+  dynamic _onValue;
+  dynamic _offValue;
+  dynamic _shownValueBy;
+  String? _fuelTankName;
+  dynamic _fullTank;
+  dynamic _fullTankValue;
+  dynamic _minValue;
+  dynamic _maxValue;
+  String? _formula;
+  dynamic _odometerValueBy;
+  dynamic _odometerValue;
+  String? _odometerValueUnit;
+  dynamic _temperatureMax;
+  dynamic _temperatureMaxValue;
+  dynamic _temperatureMin;
+  dynamic _temperatureMinValue;
   String? _value;
-  dynamic _val;
-  dynamic _scaleValue;
+  dynamic _valueFormula;
+  dynamic _showInPopup;
+  String? _unitOfMeasurement;
+  String? _onTagValue;
+  String? _offTagValue;
+  dynamic _onType;
+  dynamic _offType;
+  dynamic _data;
+  dynamic _calibrations;
+  dynamic _skipCalibration;
+  dynamic _skipEmpty;
+  dynamic _decbin;
+  dynamic _hexbin;
+  String? _typeTitle;
 
   dynamic get id => _id;
-  String? get type => _type;
+  dynamic get userId => _userId;
+  dynamic get deviceId => _deviceId;
   String? get name => _name;
-  dynamic get showInPopup => _showInPopup;
+  String? get type => _type;
+  String? get tagName => _tagName;
+  dynamic get addToHistory => _addToHistory;
+  dynamic get onValue => _onValue;
+  dynamic get offValue => _offValue;
+  dynamic get shownValueBy => _shownValueBy;
+  String? get fuelTankName => _fuelTankName;
+  dynamic get fullTank => _fullTank;
+  dynamic get fullTankValue => _fullTankValue;
+  dynamic get minValue => _minValue;
+  dynamic get maxValue => _maxValue;
+  String? get formula => _formula;
+  dynamic get odometerValueBy => _odometerValueBy;
+  dynamic get odometerValue => _odometerValue;
+  String? get odometerValueUnit => _odometerValueUnit;
+  dynamic get temperatureMax => _temperatureMax;
+  dynamic get temperatureMaxValue => _temperatureMaxValue;
+  dynamic get temperatureMin => _temperatureMin;
+  dynamic get temperatureMinValue => _temperatureMinValue;
   String? get value => _value;
-  dynamic get val => _val;
-  dynamic get scaleValue => _scaleValue;
+  dynamic get valueFormula => _valueFormula;
+  dynamic get showInPopup => _showInPopup;
+  String? get unitOfMeasurement => _unitOfMeasurement;
+  String? get onTagValue => _onTagValue;
+  String? get offTagValue => _offTagValue;
+  dynamic get onType => _onType;
+  dynamic get offType => _offType;
+  dynamic get data => _data;
+  dynamic get calibrations => _calibrations;
+  dynamic get skipCalibration => _skipCalibration;
+  dynamic get skipEmpty => _skipEmpty;
+  dynamic get decbin => _decbin;
+  dynamic get hexbin => _hexbin;
+  String? get typeTitle => _typeTitle;
+
+  // Getters de compatibilidade (para código existente)
+  dynamic get val => _value; // Para compatibilidade
+  dynamic get scaleValue => null; // Não existe mais na nova estrutura
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
     map['id'] = _id;
-    map['type'] = _type;
+    map['user_id'] = _userId;
+    map['device_id'] = _deviceId;
     map['name'] = _name;
-    map['show_in_popup'] = _showInPopup;
+    map['type'] = _type;
+    map['tag_name'] = _tagName;
+    map['add_to_history'] = _addToHistory;
+    map['on_value'] = _onValue;
+    map['off_value'] = _offValue;
+    map['shown_value_by'] = _shownValueBy;
+    map['fuel_tank_name'] = _fuelTankName;
+    map['full_tank'] = _fullTank;
+    map['full_tank_value'] = _fullTankValue;
+    map['min_value'] = _minValue;
+    map['max_value'] = _maxValue;
+    map['formula'] = _formula;
+    map['odometer_value_by'] = _odometerValueBy;
+    map['odometer_value'] = _odometerValue;
+    map['odometer_value_unit'] = _odometerValueUnit;
+    map['temperature_max'] = _temperatureMax;
+    map['temperature_max_value'] = _temperatureMaxValue;
+    map['temperature_min'] = _temperatureMin;
+    map['temperature_min_value'] = _temperatureMinValue;
     map['value'] = _value;
-    map['val'] = _val;
-    map['scale_value'] = _scaleValue;
+    map['value_formula'] = _valueFormula;
+    map['show_in_popup'] = _showInPopup;
+    map['unit_of_measurement'] = _unitOfMeasurement;
+    map['on_tag_value'] = _onTagValue;
+    map['off_tag_value'] = _offTagValue;
+    map['on_type'] = _onType;
+    map['off_type'] = _offType;
+    map['data'] = _data;
+    map['calibrations'] = _calibrations;
+    map['skip_calibration'] = _skipCalibration;
+    map['skip_empty'] = _skipEmpty;
+    map['decbin'] = _decbin;
+    map['hexbin'] = _hexbin;
+    map['type_title'] = _typeTitle;
     return map;
   }
 }
@@ -464,6 +755,7 @@ class DriverData {
     dynamic id,
     dynamic userId,
     dynamic deviceId,
+    dynamic devicePort,
     dynamic name,
     dynamic rfid,
     dynamic phone,
@@ -471,10 +763,13 @@ class DriverData {
     dynamic description,
     dynamic createdAt,
     dynamic updatedAt,
+    DeviceData? device,
+    String? photo, // Campo para foto do motorista
   }) {
     _id = id;
     _userId = userId;
     _deviceId = deviceId;
+    _devicePort = devicePort;
     _name = name;
     _rfid = rfid;
     _phone = phone;
@@ -482,12 +777,15 @@ class DriverData {
     _description = description;
     _createdAt = createdAt;
     _updatedAt = updatedAt;
+    _device = device;
+    _photo = photo;
   }
 
   DriverData.fromJson(dynamic json) {
     _id = json['id'];
     _userId = json['user_id'];
     _deviceId = json['device_id'];
+    _devicePort = json['device_port'];
     _name = json['name'];
     _rfid = json['rfid'];
     _phone = json['phone'];
@@ -495,10 +793,16 @@ class DriverData {
     _description = json['description'];
     _createdAt = json['created_at'];
     _updatedAt = json['updated_at'];
+    _photo = json['photo'] ?? json['photo_url'] ?? json['image'] ?? json['image_url'];
+    // Processar objeto 'device' aninhado se disponível
+    if (json['device'] != null) {
+      _device = DeviceData.fromJson(json['device']);
+    }
   }
   dynamic _id;
   dynamic _userId;
   dynamic _deviceId;
+  dynamic _devicePort;
   dynamic _name;
   dynamic _rfid;
   dynamic _phone;
@@ -506,10 +810,13 @@ class DriverData {
   dynamic _description;
   dynamic _createdAt;
   dynamic _updatedAt;
+  DeviceData? _device;
+  String? _photo;
 
   dynamic get id => _id;
   dynamic get userId => _userId;
   dynamic get deviceId => _deviceId;
+  dynamic get devicePort => _devicePort;
   dynamic get name => _name;
   dynamic get rfid => _rfid;
   dynamic get phone => _phone;
@@ -517,12 +824,15 @@ class DriverData {
   dynamic get description => _description;
   dynamic get createdAt => _createdAt;
   dynamic get updatedAt => _updatedAt;
+  DeviceData? get device => _device;
+  String? get photo => _photo;
 
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
     map['id'] = _id;
     map['user_id'] = _userId;
     map['device_id'] = _deviceId;
+    map['device_port'] = _devicePort;
     map['name'] = _name;
     map['rfid'] = _rfid;
     map['phone'] = _phone;
@@ -530,6 +840,10 @@ class DriverData {
     map['description'] = _description;
     map['created_at'] = _createdAt;
     map['updated_at'] = _updatedAt;
+    if (_photo != null) map['photo'] = _photo;
+    if (_device != null) {
+      map['device'] = _device!.toJson();
+    }
     return map;
   }
 }

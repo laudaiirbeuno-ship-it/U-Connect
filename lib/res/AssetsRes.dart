@@ -101,7 +101,7 @@ class AssetsRes {
   static const String TRUCK_ICON = 'assets/icon/truck-icon.png';
   static const String USER = 'assets/icon/user.png';
   static const String WARNING = 'assets/icon/warning.png';
-  static const String LOGO = 'assets/images/logo.png';
+  // static const String LOGO = 'assets/images/logo.png'; // Arquivo não existe
   static const String UNLOCKED = 'assets/images/unlocked.png';
   static const String EN_US = 'assets/lang/en-US.json';
   static const String HI_IN = 'assets/lang/hi-IN.json';

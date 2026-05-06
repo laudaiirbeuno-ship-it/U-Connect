@@ -2,8 +2,7 @@ import 'dart:io';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
-
-  class BadRequest {
+class BadRequest {
 //    HttpClient client = new HttpClient();
 //    client.badCertificateCallback = ((X509Certificate cert, String host, int port) => true);
 //
@@ -25,4 +24,4 @@ import 'package:http/http.dart' as http;
 //    String reply = await response.transform(utf8.decoder).join();
 //
 //    print(reply);
-  }
+}

@@ -4,7 +4,7 @@ this is constant pages
 
 import 'package:flutter/material.dart';
 
-const String APP_NAME = 'DevKit';
+const String APP_NAME = 'U-Connect';
 
 // color for apps
 const Color PRIMARY_COLOR = Color(0xFF0181cc);

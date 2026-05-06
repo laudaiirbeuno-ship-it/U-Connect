@@ -138,6 +138,7 @@ class EventsData {
     _detail = detail;
     _geofence = geofence;
     _deviceName = deviceName;
+    
 }
 
   EventsData.fromJson(dynamic json) {
@@ -152,9 +153,9 @@ class EventsData {
     _message = json['message'];
     _address = json['address'];
     _altitude = json['altitude'];
-    _course = json['course'];
-    _latitude = json['latitude'];
-    _longitude = json['longitude'];
+    _course = json['course'] != null ? (json['course'] as num).toDouble() : null;
+    _latitude = json['latitude'] != null ? (json['latitude'] as num).toDouble() : null;
+    _longitude = json['longitude'] != null ? (json['longitude'] as num).toDouble() : null;
     _power = json['power'];
     _speed = json['speed'];
     _time = json['time'];
@@ -166,6 +167,8 @@ class EventsData {
     _detail = json['detail'];
     _geofence = json['geofence'];
     _deviceName = json['device_name'];
+    _read = false; // ✅ SEMPRE COMEÇA COMO NÃO LIDA
+
   }
   dynamic _id;
   dynamic _userId;
@@ -192,7 +195,7 @@ class EventsData {
   String? _detail;
   dynamic _geofence;
   String? _deviceName;
-
+  bool _read = false; // ✅ NOVO CAMPO PARA SABER SE A NOTIFICAÇÃO FOI LIDA
   dynamic get id => _id;
   dynamic get userId => _userId;
   dynamic get deviceId => _deviceId;
@@ -217,6 +220,8 @@ class EventsData {
   String? get name => _name;
   String? get detail => _detail;
   dynamic get geofence => _geofence;
+  bool get read => _read;
+  set read(bool value) => _read = value;
   String? get deviceName => _deviceName;
 
   Map<String, dynamic> toJson() {
@@ -241,6 +246,7 @@ class EventsData {
     map['deleted'] = _deleted;
     map['created_at'] = _createdAt;
     map['updated_at'] = _updatedAt;
+    map['read'] = _read;
     if (_additional != null) {
       map['additional'] = _additional?.toJson();
     }

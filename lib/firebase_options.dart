@@ -17,10 +17,7 @@ import 'package:flutter/foundation.dart'
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
-      throw UnsupportedError(
-        'DefaultFirebaseOptions have not been configured for web - '
-        'you can reconfigure this by running the FlutterFire CLI again.',
-      );
+      return web;
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
@@ -49,21 +46,32 @@ class DefaultFirebaseOptions {
     }
   }
 
+  // Configurações do Firebase para o projeto "u-connect-321e7"
+  // Service Account: gpswox@u-connect-app.iam.gserviceaccount.com
+  static const FirebaseOptions web = FirebaseOptions(
+    apiKey: "AIzaSyBu_gh30RGJEcZaYc3sli5JyzYW28hFXJ8",
+    appId: "1:434891985510:web:111301663926374755888",
+    messagingSenderId: "434891985510",
+    projectId: "u-connect-321e7",
+    authDomain: "u-connect-321e7.firebaseapp.com",
+    storageBucket: "u-connect-321e7.firebasestorage.app",
+    measurementId: "G-XXXXXXXXXX", // Atualizar com o Measurement ID do Firebase Console se necessário
+  );
+
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyBEIXovu5vxgZKCSzkmdzcqB14XVm1cxrs',
-    appId: '1:627469085868:android:7952698dfe560aba490309',
-    messagingSenderId: '627469085868',
-    projectId: 'u-connect-app',
-    storageBucket: 'u-connect-app.firebasestorage.app',
+    apiKey: "AIzaSyBu_gh30RGJEcZaYc3sli5JyzYW28hFXJ8",
+    appId: "1:434891985510:android:5638d91b3faf20ba84d3a7",
+    messagingSenderId: "434891985510",
+    projectId: "u-connect-321e7",
+    storageBucket: "u-connect-321e7.firebasestorage.app",
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyCUwMBEkNfVEzmqOKCI9jGUzw7ipImy1M8',
-    appId: '1:627469085868:ios:8ddf7e21c20fe4a8490309',
-    messagingSenderId: '627469085868',
-    projectId: 'u-connect-app',
-    storageBucket: 'u-connect-app.firebasestorage.app',
-    iosBundleId: 'com.uconnect.app',
+    apiKey: "AIzaSyCUzr3FldnBECIpEDpk3xmjXS8Rh4AAbI8",
+    appId: "1:434891985510:ios:9a2d8c20c239480884d3a7",
+    messagingSenderId: "434891985510",
+    projectId: "u-connect-321e7",
+    storageBucket: "u-connect-321e7.firebasestorage.app",
+    iosBundleId: "com.uconnect.app",
   );
-
 }

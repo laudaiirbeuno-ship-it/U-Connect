@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:uconnect/ui/reusable/custom_app_bar.dart'; // Importe o CustomAppBar
 //import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-
 
 class Browser extends StatefulWidget {
   static final String path = "/browser_module_old/browser.dart";
@@ -21,7 +21,7 @@ class _BrowserState extends State<Browser> with SingleTickerProviderStateMixin {
   String dashboardURL = "";
   String returnUrlVal = "";
   static const primary = Color(0xff0540ac);
- // static const primary = Color(0xffD73034);
+  // static const primary = Color(0xffD73034);
   final key = new GlobalKey<ScaffoldState>();
   _BrowserState({required this.dashboardName, required this.dashboardURL});
 
@@ -41,13 +41,11 @@ class _BrowserState extends State<Browser> with SingleTickerProviderStateMixin {
     super.dispose();
   }
 
-
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (!_isRestored) {
       _isRestored = true;
-
     }
     precacheImage(AssetImage("assets/images/app_icon.png"), context);
   }
@@ -57,51 +55,38 @@ class _BrowserState extends State<Browser> with SingleTickerProviderStateMixin {
     return Scaffold(
         key: key,
         // resizeToAvoidBottomPadding: false,
-        appBar: AppBar(
-          centerTitle: true,
-          title:  Text(''+dashboardName,
-            style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
-          ),
-          elevation: 0,
-          backgroundColor: primary,
-          actions: <Widget>[
-//            IconButton(
-//              icon: Icon(Icons.refresh),
-//              tooltip: 'Refresh',
-//              onPressed: () {},
-//            ),
-          ],
-        ),
+        appBar: CustomAppBar(title: dashboardName), // Usando o CustomAppBar
         backgroundColor: Colors.white,
-      //   body: InAppWebView(
-      //     initialUrlRequest: URLRequest(
-      //         url: Uri.parse(dashboardURL)) // updated
-      //
-      // /*    initialHeaders: {},
-      //     initialOptions: InAppWebViewGroupOptions(
-      //       crossPlatform: InAppWebViewOptions(
-      //           supportZoom: false, // zoom support
-      //           debuggingEnabled: true,
-      //           preferredContentMode: UserPreferredContentMode.MOBILE), // here you change the mode
-      //     ),
-      //     onWebViewCreated: (InAppWebViewController controller) {
-      //       webView = controller;
-      //     },
-      //     onLoadStart: (InAppWebViewController controller, String url) {
-      //
-      //     },
-      //     onLoadStop: (InAppWebViewController controller, String url) async {
-      //
-      //     },*/
-      //   )
-        body:Text("No Browser") /* WebView(
+        //   body: InAppWebView(
+        //     initialUrlRequest: URLRequest(
+        //         url: Uri.parse(dashboardURL)) // updated
+        //
+        // /*    initialHeaders: {},
+        //     initialOptions: InAppWebViewGroupOptions(
+        //       crossPlatform: InAppWebViewOptions(
+        //           supportZoom: false, // zoom support
+        //           debuggingEnabled: true,
+        //           preferredContentMode: UserPreferredContentMode.MOBILE), // here you change the mode
+        //     ),
+        //     onWebViewCreated: (InAppWebViewController controller) {
+        //       webView = controller;
+        //     },
+        //     onLoadStart: (InAppWebViewController controller, String url) {
+        //
+        //     },
+        //     onLoadStop: (InAppWebViewController controller, String url) async {
+        //
+        //     },*/
+        //   )
+        body: Text(
+            "No Browser") /* WebView(
           initialUrl: Uri.parse(dashboardURL).toString(),
           javascriptMode: JavascriptMode.unrestricted,
         )*/
-    );
+        );
   }
 
- /* Widget _buildBrowser() {
+  /* Widget _buildBrowser() {
 
 
 
@@ -111,10 +96,4 @@ class _BrowserState extends State<Browser> with SingleTickerProviderStateMixin {
       javascriptMode: JavascriptMode.unrestricted,
     );
   }*/
-
-
-
-
-
-
 }
