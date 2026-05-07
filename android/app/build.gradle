@@ -94,7 +94,7 @@ flutter {
 }
 
 dependencies {
-    implementation 'com.android.support:multidex:1.0.3'
+    implementation 'androidx.multidex:multidex:2.0.1'
     // Import the Firebase BoM
     implementation platform('com.google.firebase:firebase-bom:34.7.0')
     
