@@ -1,0 +1,2 @@
+/Volumes/Backup/Clientes/Unnica/gpsmobileapp/android/app/.cxx/Debug/1t12z556/x86/CMakeFiles/edit_cache.dir
+/Volumes/Backup/Clientes/Unnica/gpsmobileapp/android/app/.cxx/Debug/1t12z556/x86/CMakeFiles/rebuild_cache.dir

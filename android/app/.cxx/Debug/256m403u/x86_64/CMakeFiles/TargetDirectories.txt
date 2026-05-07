@@ -1,0 +1,2 @@
+/Users/dan_messas/Documents/gpsmobileapp/android/app/.cxx/Debug/256m403u/x86_64/CMakeFiles/edit_cache.dir
+/Users/dan_messas/Documents/gpsmobileapp/android/app/.cxx/Debug/256m403u/x86_64/CMakeFiles/rebuild_cache.dir

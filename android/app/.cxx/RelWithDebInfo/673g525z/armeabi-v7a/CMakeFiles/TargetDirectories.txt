@@ -1,0 +1,2 @@
+C:/Projects/GPS Wox/u-connect/gpsmobileapp/android/app/.cxx/RelWithDebInfo/673g525z/armeabi-v7a/CMakeFiles/edit_cache.dir
+C:/Projects/GPS Wox/u-connect/gpsmobileapp/android/app/.cxx/RelWithDebInfo/673g525z/armeabi-v7a/CMakeFiles/rebuild_cache.dir

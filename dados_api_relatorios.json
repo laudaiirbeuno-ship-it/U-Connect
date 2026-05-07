@@ -1,0 +1,162 @@
+{
+  "estrutura_resposta": {
+    "primeira_chamada": {
+      "endpoint": "POST /api/generate_report",
+      "resposta": {
+        "status": 1,
+        "url": "https://web.unnicatelemetria.com.br/api/generate_report?type=1&devices[0]=128&date_from=2026-02-01&date_to=2026-02-02&format=json&lang=pt&user_api_hash=***&generate=1"
+      }
+    },
+    "segunda_chamada": {
+      "endpoint": "GET [URL retornada]",
+      "resposta": {
+        "meta": {
+          "device": {
+            "device.name": {
+              "title": "Dispositivo",
+              "attribute": "name"
+            }
+          }
+        },
+        "items": [
+          {
+            "meta": {
+              "device.name": {
+                "title": "Dispositivo",
+                "attribute": "name",
+                "key": "device.name",
+                "value": "ACP-175-MP"
+              }
+            },
+            "totals": {
+              "position_count": {
+                "title": "position_count",
+                "value": 32
+              },
+              "duration": {
+                "title": "Duração",
+                "value": "14h 16min 27s"
+              },
+              "drive_distance": {
+                "title": "Comprimento Route",
+                "value": "0 Km"
+              },
+              "drive_duration": {
+                "title": "Duração movimento",
+                "value": "0s"
+              },
+              "drive_count": {
+                "title": "front.drive_count",
+                "value": 0
+              },
+              "stop_duration": {
+                "title": "Parar duração",
+                "value": "14h 16min 27s"
+              },
+              "stop_count": {
+                "title": "Contagem de parada",
+                "value": 1
+              },
+              "distance": {
+                "title": "Comprimento Route",
+                "value": "0.04 Km"
+              },
+              "speed_max": {
+                "title": "Velocidade máxima",
+                "value": "5 kph"
+              },
+              "speed_min": {
+                "title": "Min. speed",
+                "value": "0 kph"
+              },
+              "speed_avg": {
+                "title": "Velocidade média",
+                "value": "5 kph"
+              },
+              "engine_hours": {
+                "title": "Horas do motor",
+                "value": "0s"
+              },
+              "engine_idle": {
+                "title": "Marcha lenta",
+                "value": "0s"
+              },
+              "engine_work": {
+                "title": "Trabalho do motor",
+                "value": "0s"
+              },
+              "drivers": {
+                "title": "Motoristas",
+                "value": ""
+              },
+              "overspeed_duration": {
+                "title": "Duração de excesso de velocidade",
+                "value": "0s"
+              },
+              "overspeed_distance": {
+                "title": "overspeed_distance",
+                "value": "0 Km"
+              },
+              "overspeed_count": {
+                "title": "Contagem de excesso de velocidade",
+                "value": 0
+              },
+              "overspeed_positions": {
+                "title": "overspeed_positions",
+                "value": 0
+              },
+              "overspeed_limit": {
+                "title": "overspeed_limit",
+                "value": "0 kph"
+              },
+              "start": {
+                "title": "Início Route",
+                "value": "02-02-2026 00:31:30"
+              },
+              "end": {
+                "title": "Route final",
+                "value": "02-02-2026 14:47:57"
+              }
+            }
+          }
+        ],
+        "totals": []
+      }
+    }
+  },
+  "campos_disponiveis": {
+    "meta": "Informações sobre o dispositivo e metadados do relatório",
+    "items": "Lista de registros do relatório, cada item contém:",
+    "items[].meta": "Metadados do item (ex: nome do dispositivo)",
+    "items[].totals": "Estatísticas e totais do item, incluindo:",
+    "items[].totals.position_count": "Número de posições registradas",
+    "items[].totals.duration": "Duração total do período",
+    "items[].totals.drive_distance": "Distância percorrida em movimento",
+    "items[].totals.drive_duration": "Duração em movimento",
+    "items[].totals.drive_count": "Número de movimentos",
+    "items[].totals.stop_duration": "Duração parado",
+    "items[].totals.stop_count": "Número de paradas",
+    "items[].totals.distance": "Distância total",
+    "items[].totals.speed_max": "Velocidade máxima",
+    "items[].totals.speed_min": "Velocidade mínima",
+    "items[].totals.speed_avg": "Velocidade média",
+    "items[].totals.engine_hours": "Horas do motor",
+    "items[].totals.engine_idle": "Tempo em marcha lenta",
+    "items[].totals.engine_work": "Tempo de trabalho do motor",
+    "items[].totals.drivers": "Motoristas associados",
+    "items[].totals.overspeed_duration": "Duração em excesso de velocidade",
+    "items[].totals.overspeed_distance": "Distância em excesso de velocidade",
+    "items[].totals.overspeed_count": "Contagem de excessos de velocidade",
+    "items[].totals.overspeed_positions": "Posições com excesso de velocidade",
+    "items[].totals.overspeed_limit": "Limite de velocidade",
+    "items[].totals.start": "Data/hora de início",
+    "items[].totals.end": "Data/hora de fim",
+    "totals": "Lista de totais gerais (pode estar vazia)"
+  },
+  "observacoes": {
+    "fluxo": "A API retorna primeiro apenas status e URL. É necessário fazer uma segunda chamada GET na URL retornada para obter os dados completos.",
+    "estrutura_dados": "Os dados estão organizados em items[], onde cada item contém meta e totals com todas as estatísticas.",
+    "formato_valores": "Alguns valores são strings formatadas (ex: '14h 16min 27s', '5 kph'), outros são números (ex: 32, 0).",
+    "periodo_teste": "Últimas 24 horas retornou 1 item com 32 posições registradas."
+  }
+}

@@ -79,22 +79,10 @@ public final class FirebaseMessagingService extends com.google.firebase.messagin
 
         int notificationId = new Random().nextInt(1000);
 
+        // The project currently ships without custom files in res/raw,
+        // so always use the default Android notification sound to avoid
+        // resource resolution failures in CI builds.
         Uri notifySound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-        if (message.toLowerCase(Locale.ROOT).contains("Desligada")) {
-            notifySound = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.offline);
-        } else if (message.toLowerCase(Locale.ROOT).contains("IGNIÇÃO LIGADA")) {
-            notifySound = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.ignition_on);
-        } else if (message.toLowerCase(Locale.ROOT).contains("IGNIÇÃO DESLIGADA")) {
-            notifySound = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.ignition_off);
-        } else if (message.toLowerCase(Locale.ROOT).contains("cerca em")) {
-            notifySound = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.fence_in);
-        } else if (message.toLowerCase(Locale.ROOT).contains("cerca para fora")) {
-            notifySound = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.fence_out);
-        } else if (message.toLowerCase(Locale.ROOT).contains("corte de energia")) {
-            notifySound = Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.power_cut);
-        }else {
-            notifySound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-        }
 
         Ringtone r = RingtoneManager.getRingtone(getApplicationContext(), notifySound);
         if (r != null) r.play();

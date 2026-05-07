@@ -1,0 +1,1 @@
+C:\Projects\GPS Wox\u-connect\gpsmobileapp\build\app\intermediates\cxx\RelWithDebInfo\673g525z\obj\x86_64

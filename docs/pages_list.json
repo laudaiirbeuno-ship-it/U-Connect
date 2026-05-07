@@ -1,0 +1,454 @@
+{
+  "pages": [
+    {
+      "pageId": "bottom_nav_vehicles",
+      "pageName": "Veículos",
+      "category": "Bottom Navigation",
+      "icon": "directions_car",
+      "description": "Lista de veículos da frota",
+      "defaultEnabled": true,
+      "order": 0,
+      "requiredRole": null
+    },
+    {
+      "pageId": "bottom_nav_map",
+      "pageName": "Monitoramento",
+      "category": "Bottom Navigation",
+      "icon": "map",
+      "description": "Mapa principal de monitoramento",
+      "defaultEnabled": true,
+      "order": 1,
+      "requiredRole": null
+    },
+    {
+      "pageId": "bottom_nav_dashboard",
+      "pageName": "Dashboard",
+      "category": "Bottom Navigation",
+      "icon": "dashboard_outlined",
+      "description": "Dashboard da frota",
+      "defaultEnabled": true,
+      "order": 2,
+      "requiredRole": null
+    },
+    {
+      "pageId": "bottom_nav_camera",
+      "pageName": "Câmera",
+      "category": "Bottom Navigation",
+      "icon": "videocam",
+      "description": "Video Telemetria",
+      "defaultEnabled": true,
+      "order": 3,
+      "requiredRole": null
+    },
+    {
+      "pageId": "bottom_nav_menu",
+      "pageName": "Menu",
+      "category": "Bottom Navigation",
+      "icon": "menu",
+      "description": "Menu hambúrguer",
+      "defaultEnabled": true,
+      "order": 4,
+      "requiredRole": null
+    },
+    {
+      "pageId": "nav_monitoring",
+      "pageName": "Monitoramento",
+      "category": "Navegação",
+      "icon": "map",
+      "description": "Mapa principal de monitoramento",
+      "defaultEnabled": true,
+      "order": 0,
+      "requiredRole": null
+    },
+    {
+      "pageId": "nav_vehicle_list",
+      "pageName": "Lista de Veículos",
+      "category": "Navegação",
+      "icon": "list_alt",
+      "description": "Lista de veículos da frota",
+      "defaultEnabled": true,
+      "order": 1,
+      "requiredRole": null
+    },
+    {
+      "pageId": "nav_fleet_dashboard",
+      "pageName": "Dashboard da Frota",
+      "category": "Navegação",
+      "icon": "dashboard",
+      "description": "Dashboard principal da frota",
+      "defaultEnabled": true,
+      "order": 2,
+      "requiredRole": null
+    },
+    {
+      "pageId": "admin_my_users",
+      "pageName": "Meus Usuários",
+      "category": "Administração",
+      "icon": "people",
+      "description": "Gerenciar usuários do sistema",
+      "defaultEnabled": false,
+      "order": 0,
+      "requiredRole": "admin"
+    },
+    {
+      "pageId": "admin_charges_to_pay",
+      "pageName": "Cobranças para Pagar",
+      "category": "Administração",
+      "icon": "payment",
+      "description": "Gerenciar cobranças pendentes",
+      "defaultEnabled": false,
+      "order": 1,
+      "requiredRole": "admin"
+    },
+    {
+      "pageId": "service_tow",
+      "pageName": "Chamar Reboque",
+      "category": "Serviços",
+      "icon": "local_taxi",
+      "description": "Solicitar serviço de reboque",
+      "defaultEnabled": false,
+      "order": 0,
+      "requiredRole": "admin"
+    },
+    {
+      "pageId": "fleet_drivers",
+      "pageName": "Meus Motoristas",
+      "category": "Gestão de Frotas",
+      "icon": "people_outline",
+      "description": "Gerenciar motoristas da frota",
+      "defaultEnabled": true,
+      "order": 0,
+      "requiredRole": null
+    },
+    {
+      "pageId": "fleet_maintenance",
+      "pageName": "Manutenção",
+      "category": "Gestão de Frotas",
+      "icon": "task",
+      "description": "Gerenciar manutenções dos veículos",
+      "defaultEnabled": true,
+      "order": 1,
+      "requiredRole": null
+    },
+    {
+      "pageId": "fleet_km_traveled",
+      "pageName": "Km Percorrida",
+      "category": "Gestão de Frotas",
+      "icon": "speed",
+      "description": "Visualizar quilometragem percorrida",
+      "defaultEnabled": true,
+      "order": 2,
+      "requiredRole": null
+    },
+    {
+      "pageId": "fleet_fuel_consumption",
+      "pageName": "Consumo de Combustível",
+      "category": "Gestão de Frotas",
+      "icon": "local_gas_station",
+      "description": "Monitorar consumo de combustível",
+      "defaultEnabled": true,
+      "order": 3,
+      "requiredRole": null
+    },
+    {
+      "pageId": "fleet_video_telemetry",
+      "pageName": "Video Telemetria",
+      "category": "Gestão de Frotas",
+      "icon": "videocam",
+      "description": "Acessar câmeras dos veículos",
+      "defaultEnabled": true,
+      "order": 4,
+      "requiredRole": null
+    },
+    {
+      "pageId": "fleet_route_history",
+      "pageName": "Histórico de Rotas",
+      "category": "Gestão de Frotas",
+      "icon": "route",
+      "description": "Visualizar histórico de rotas",
+      "defaultEnabled": true,
+      "order": 5,
+      "requiredRole": null
+    },
+    {
+      "pageId": "fleet_fuel_control",
+      "pageName": "Controle de Abastecimento",
+      "category": "Gestão de Frotas",
+      "icon": "local_gas_station",
+      "description": "Gerenciar abastecimentos",
+      "defaultEnabled": true,
+      "order": 6,
+      "requiredRole": null
+    },
+    {
+      "pageId": "fleet_checklist",
+      "pageName": "Checklist da Frota",
+      "category": "Gestão de Frotas",
+      "icon": "checklist",
+      "description": "Gerenciar checklists dos veículos",
+      "defaultEnabled": true,
+      "order": 7,
+      "requiredRole": null
+    },
+    {
+      "pageId": "fleet_reports",
+      "pageName": "Relatórios",
+      "category": "Gestão de Frotas",
+      "icon": "insert_chart",
+      "description": "Visualizar relatórios da frota",
+      "defaultEnabled": true,
+      "order": 8,
+      "requiredRole": null
+    },
+    {
+      "pageId": "fleet_sensors",
+      "pageName": "Sensores da Frota",
+      "category": "Gestão de Frotas",
+      "icon": "sensors",
+      "description": "Monitorar sensores dos veículos",
+      "defaultEnabled": true,
+      "order": 9,
+      "requiredRole": null
+    },
+    {
+      "pageId": "fleet_fuel_pump",
+      "pageName": "Controle de Bomba de Combustível",
+      "category": "Gestão de Frotas",
+      "icon": "local_gas_station",
+      "description": "Gerenciar bombas de combustível",
+      "defaultEnabled": false,
+      "order": 10,
+      "requiredRole": null
+    },
+    {
+      "pageId": "fleet_documentation",
+      "pageName": "Documentação da Frota",
+      "category": "Gestão de Frotas",
+      "icon": "description",
+      "description": "Gerenciar documentação dos veículos",
+      "defaultEnabled": true,
+      "order": 11,
+      "requiredRole": null
+    },
+    {
+      "pageId": "fleet_advanced_telemetry",
+      "pageName": "Telemetria Avançada",
+      "category": "Gestão de Frotas",
+      "icon": "sensors",
+      "description": "Acessar telemetria avançada",
+      "defaultEnabled": false,
+      "order": 12,
+      "requiredRole": null
+    },
+    {
+      "pageId": "events_notifications",
+      "pageName": "Central de Notificações",
+      "category": "Eventos",
+      "icon": "notifications",
+      "description": "Visualizar notificações",
+      "defaultEnabled": true,
+      "order": 0,
+      "requiredRole": null
+    },
+    {
+      "pageId": "events_alerts",
+      "pageName": "Alertas",
+      "category": "Eventos",
+      "icon": "warning_amber_outlined",
+      "description": "Visualizar alertas do sistema",
+      "defaultEnabled": true,
+      "order": 1,
+      "requiredRole": null
+    },
+    {
+      "pageId": "financial_my_charges",
+      "pageName": "Minhas Cobranças",
+      "category": "Financeiro",
+      "icon": "payment",
+      "description": "Visualizar minhas cobranças",
+      "defaultEnabled": true,
+      "order": 0,
+      "requiredRole": null
+    },
+    {
+      "pageId": "financial_dashboard",
+      "pageName": "Dashboard Financeiro",
+      "category": "Financeiro",
+      "icon": "dashboard",
+      "description": "Dashboard financeiro",
+      "defaultEnabled": true,
+      "order": 1,
+      "requiredRole": null
+    },
+    {
+      "pageId": "financial_transactions",
+      "pageName": "Transações",
+      "category": "Financeiro",
+      "icon": "swap_horiz",
+      "description": "Visualizar transações",
+      "defaultEnabled": true,
+      "order": 2,
+      "requiredRole": null
+    },
+    {
+      "pageId": "financial_contracts",
+      "pageName": "Meus Contratos",
+      "category": "Financeiro",
+      "icon": "description",
+      "description": "Gerenciar contratos",
+      "defaultEnabled": true,
+      "order": 3,
+      "requiredRole": null
+    },
+    {
+      "pageId": "financial_receipts",
+      "pageName": "Comprovantes",
+      "category": "Financeiro",
+      "icon": "receipt",
+      "description": "Visualizar comprovantes",
+      "defaultEnabled": true,
+      "order": 4,
+      "requiredRole": null
+    },
+    {
+      "pageId": "contacts_emergency",
+      "pageName": "Contatos de Emergência",
+      "category": "Contatos",
+      "icon": "emergency",
+      "description": "Gerenciar contatos de emergência",
+      "defaultEnabled": true,
+      "order": 0,
+      "requiredRole": null
+    },
+    {
+      "pageId": "support_main",
+      "pageName": "Suporte",
+      "category": "Suporte",
+      "icon": "support_agent",
+      "description": "Acessar suporte",
+      "defaultEnabled": true,
+      "order": 0,
+      "requiredRole": null
+    },
+    {
+      "pageId": "settings_main",
+      "pageName": "Configuração",
+      "category": "Configurações",
+      "icon": "settings",
+      "description": "Configurações do app",
+      "defaultEnabled": true,
+      "order": 0,
+      "requiredRole": null
+    },
+    {
+      "pageId": "settings_personalization",
+      "pageName": "Configuração da Personalização",
+      "category": "Configurações",
+      "icon": "palette",
+      "description": "Personalizar aparência do app",
+      "defaultEnabled": true,
+      "order": 1,
+      "requiredRole": null
+    },
+    {
+      "pageId": "legal_privacy",
+      "pageName": "Políticas e Privacidade",
+      "category": "Legais",
+      "icon": "privacy_tip_outlined",
+      "description": "Política de privacidade",
+      "defaultEnabled": true,
+      "order": 0,
+      "requiredRole": null
+    },
+    {
+      "pageId": "legal_terms",
+      "pageName": "Termos de Uso",
+      "category": "Legais",
+      "icon": "description_outlined",
+      "description": "Termos de uso do app",
+      "defaultEnabled": true,
+      "order": 1,
+      "requiredRole": null
+    },
+    {
+      "pageId": "logout",
+      "pageName": "Sair",
+      "category": "Logout",
+      "icon": "logout_outlined",
+      "description": "Fazer logout do app",
+      "defaultEnabled": true,
+      "order": 0,
+      "requiredRole": null
+    }
+  ],
+  "templates": {
+    "basic": {
+      "name": "Basic",
+      "description": "Apenas páginas essenciais",
+      "enabledPages": [
+        "bottom_nav_vehicles",
+        "bottom_nav_map",
+        "bottom_nav_dashboard",
+        "bottom_nav_menu",
+        "nav_monitoring",
+        "nav_vehicle_list",
+        "nav_fleet_dashboard",
+        "events_notifications",
+        "events_alerts",
+        "settings_main",
+        "legal_privacy",
+        "legal_terms",
+        "logout"
+      ]
+    },
+    "premium": {
+      "name": "Premium",
+      "description": "Páginas básicas + Gestão de Frotas",
+      "enabledPages": [
+        "bottom_nav_vehicles",
+        "bottom_nav_map",
+        "bottom_nav_dashboard",
+        "bottom_nav_camera",
+        "bottom_nav_menu",
+        "nav_monitoring",
+        "nav_vehicle_list",
+        "nav_fleet_dashboard",
+        "fleet_drivers",
+        "fleet_maintenance",
+        "fleet_km_traveled",
+        "fleet_fuel_consumption",
+        "fleet_video_telemetry",
+        "fleet_route_history",
+        "fleet_fuel_control",
+        "fleet_checklist",
+        "fleet_reports",
+        "fleet_sensors",
+        "fleet_documentation",
+        "events_notifications",
+        "events_alerts",
+        "financial_my_charges",
+        "financial_dashboard",
+        "financial_transactions",
+        "financial_contracts",
+        "financial_receipts",
+        "contacts_emergency",
+        "support_main",
+        "settings_main",
+        "settings_personalization",
+        "legal_privacy",
+        "legal_terms",
+        "logout"
+      ]
+    },
+    "enterprise": {
+      "name": "Enterprise",
+      "description": "Todas as páginas exceto Administração",
+      "enabledPages": "all_except_admin"
+    },
+    "full": {
+      "name": "Full",
+      "description": "Todas as páginas disponíveis",
+      "enabledPages": "all"
+    }
+  }
+}
