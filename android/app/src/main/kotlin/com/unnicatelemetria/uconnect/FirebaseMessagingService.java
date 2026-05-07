@@ -1,4 +1,4 @@
-package com.uconnect.app;
+package com.unnicatelemetria.uconnect;
 
 import android.app.ActivityManager;
 import android.app.Notification;
@@ -17,9 +17,9 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
 
-import com.uconnect.app.MainActivity;
+import com.unnicatelemetria.uconnect.MainActivity;
 import com.google.firebase.messaging.RemoteMessage;
-import com.track.gpsmtrack.R;
+import com.unnicatelemetria.uconnect.R;
 
 import java.util.List;
 import java.util.Locale;
@@ -124,7 +124,7 @@ public final class FirebaseMessagingService extends com.google.firebase.messagin
             Log.i("@@@@", "BUILDER 1");
 
             NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
-                    .setSmallIcon(R.mipmap.ic_launcher_round)
+                    .setSmallIcon(R.mipmap.ic_launcher)
                     .setContentTitle(title)
                     .setContentText(message)
                     .setPriority(NotificationCompat.PRIORITY_HIGH)
@@ -165,3 +165,9 @@ public final class FirebaseMessagingService extends com.google.firebase.messagin
         }
     }
 }
+
+
+
+
+
+
