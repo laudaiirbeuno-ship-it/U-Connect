@@ -24,6 +24,7 @@ import 'model/driver_form_data.dart';
 import 'model/device_latest_response.dart';
 import 'model/Review.dart';
 import 'model/ReportModel.dart';
+import 'model/user_api.dart';
 import 'package:http/http.dart' as http;
 
 class gpsapis {
@@ -3736,6 +3737,150 @@ class gpsapis {
       print('❌ Erro ao baixar log de relatório: $e');
       print(stackTrace);
       return null;
+    }
+  }
+
+  static Map<String, String> _jsonHeaders(String? token) {
+    return {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+      if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',
+    };
+  }
+
+  /// API de usuários administrativos
+  static Future<UserListResponse?> getUsers({
+    String? search,
+    bool? active,
+    int? groupId,
+    int? page,
+    int? perPage,
+  }) async {
+    final token = StaticVarMethod.user_api_hash;
+    if (token == null || token.isEmpty) return null;
+
+    final queryParameters = <String, String>{
+      'lang': 'en',
+      'user_api_hash': token,
+      if (search != null && search.isNotEmpty) 'search_phrase': search,
+      if (active != null) 'active': active ? '1' : '0',
+      if (groupId != null) 'group_id': groupId.toString(),
+      if (page != null) 'page': page.toString(),
+      if (perPage != null) 'per_page': perPage.toString(),
+    };
+
+    try {
+      final uri = Uri.parse("${UserRepository.getServerURL()}/api/get_users")
+          .replace(queryParameters: queryParameters);
+      final response = await http
+          .get(uri, headers: _jsonHeaders(token))
+          .timeout(Duration(seconds: 30));
+
+      if (response.statusCode != 200) return null;
+
+      final data = json.decode(response.body);
+      if (data is Map<String, dynamic>) {
+        return UserListResponse.fromJson(data);
+      }
+      return null;
+    } catch (e) {
+      print('❌ getUsers error: $e');
+      return null;
+    }
+  }
+
+  static Future<UserResponse?> createUser(CreateUserRequest request) async {
+    final token = StaticVarMethod.user_api_hash;
+    if (token == null || token.isEmpty) return null;
+
+    try {
+      final uri = Uri.parse(
+        "${UserRepository.getServerURL()}/api/create_user?lang=en&user_api_hash=$token",
+      );
+      final response = await http
+          .post(
+            uri,
+            headers: _jsonHeaders(token),
+            body: json.encode(request.toJson()),
+          )
+          .timeout(Duration(seconds: 30));
+
+      if (response.statusCode != 200 && response.statusCode != 201) return null;
+
+      final data = json.decode(response.body);
+      if (data is Map<String, dynamic>) {
+        return UserResponse.fromJson(data);
+      }
+      return null;
+    } catch (e) {
+      print('❌ createUser error: $e');
+      return null;
+    }
+  }
+
+  static Future<UserResponse?> updateUser(
+    int userId,
+    CreateUserRequest request,
+  ) async {
+    final token = StaticVarMethod.user_api_hash;
+    if (token == null || token.isEmpty) return null;
+
+    try {
+      final uri = Uri.parse(
+        "${UserRepository.getServerURL()}/api/update_user?lang=en&user_api_hash=$token",
+      );
+      final payload = request.toJson(isUpdate: true);
+      payload['id'] = userId;
+
+      final response = await http
+          .post(
+            uri,
+            headers: _jsonHeaders(token),
+            body: json.encode(payload),
+          )
+          .timeout(Duration(seconds: 30));
+
+      if (response.statusCode != 200 && response.statusCode != 201) return null;
+
+      final data = json.decode(response.body);
+      if (data is Map<String, dynamic>) {
+        return UserResponse.fromJson(data);
+      }
+      return null;
+    } catch (e) {
+      print('❌ updateUser error: $e');
+      return null;
+    }
+  }
+
+  static Future<bool> deleteUser(int userId) async {
+    final token = StaticVarMethod.user_api_hash;
+    if (token == null || token.isEmpty) return false;
+
+    try {
+      final uri = Uri.parse(
+        "${UserRepository.getServerURL()}/api/delete_user?lang=en&user_api_hash=$token",
+      );
+      final response = await http
+          .post(
+            uri,
+            headers: _jsonHeaders(token),
+            body: json.encode({'id': userId}),
+          )
+          .timeout(Duration(seconds: 30));
+
+      if (response.statusCode != 200 && response.statusCode != 201) return false;
+
+      final data = json.decode(response.body);
+      if (data is Map<String, dynamic>) {
+        final status = data['status'];
+        if (status is int) return status == 1;
+        if (status is bool) return status;
+      }
+      return false;
+    } catch (e) {
+      print('❌ deleteUser error: $e');
+      return false;
     }
   }
 }
