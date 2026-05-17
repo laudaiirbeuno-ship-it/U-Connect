@@ -8,15 +8,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:provider/provider.dart';
 import 'package:uconnect/provider/color_provider.dart';
 import 'package:uconnect/provider/logo_provider.dart';
 import 'package:uconnect/provider/app_settings_provider.dart';
-import 'package:uconnect/data/screens/register_screen.dart';
 import 'package:uconnect/data/screens/login_welcome_screen.dart';
 import 'package:uconnect/utils/translation_helper.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class signinwithbackground2 extends StatefulWidget {
   @override
@@ -220,66 +217,40 @@ class _signinState extends State<signinwithbackground2> {
                           ),
                         ),
                         const SizedBox(height: 20),
-                        // Checkbox "Lembrar senha" e "Esqueci minha senha" na mesma linha
                         Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Row(
-                            children: [
-                              Theme(
-                                data: ThemeData(
-                                  unselectedWidgetColor: Colors.white,
-                                  checkboxTheme: CheckboxThemeData(
-                                    fillColor: MaterialStateProperty.resolveWith<Color>(
-                                      (Set<MaterialState> states) {
-                                        if (states.contains(MaterialState.selected)) {
-                                          return Colors.white;
-                                        }
-                                        return Colors.transparent;
-                                      },
-                                    ),
-                                    checkColor: MaterialStateProperty.all(colorProvider.primaryColor),
+                          children: [
+                            Theme(
+                              data: ThemeData(
+                                unselectedWidgetColor: Colors.white,
+                                checkboxTheme: CheckboxThemeData(
+                                  fillColor: MaterialStateProperty.resolveWith<Color>(
+                                    (Set<MaterialState> states) {
+                                      if (states.contains(MaterialState.selected)) {
+                                        return Colors.white;
+                                      }
+                                      return Colors.transparent;
+                                    },
                                   ),
-                                ),
-                                child: Checkbox(
-                                  value: _rememberPassword,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      _rememberPassword = value ?? true;
-                                    });
-                                  },
+                                  checkColor: MaterialStateProperty.all(colorProvider.primaryColor),
                                 ),
                               ),
-                              Text(
-                                TranslationHelper.translateSync(context, 'Lembrar senha', 'Remember password'),
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: Colors.white,
-                                ),
+                              child: Checkbox(
+                                value: _rememberPassword,
+                                onChanged: (value) {
+                                  setState(() {
+                                    _rememberPassword = value ?? true;
+                                  });
+                                },
                               ),
-                            ],
-                          ),
-                          TextButton(
-                            onPressed: () async {
-                              const url =
-                                  'https://web.unnicatelemetria.com.br/password_reminder';
-                              final Uri _url = Uri.parse(url);
-                              if (await canLaunchUrl(_url)) {
-                                await launchUrl(_url);
-                              } else {
-                                Fluttertoast.showToast(
-                                    msg: TranslationHelper.translateSync(context, 'Sem permissão para abrir navegador', 'No permission to open browser'));
-                              }
-                            },
-                            child: Text(
-                              TranslationHelper.translateSync(context, 'Esqueci minha senha', 'Forgot password'),
+                            ),
+                            Text(
+                              TranslationHelper.translateSync(context, 'Lembrar senha', 'Remember password'),
                               style: TextStyle(
                                 fontSize: 14,
                                 color: Colors.white,
                               ),
                             ),
-                          ),
-                        ],
+                          ],
                         ),
                         const SizedBox(height: 20),
                         // Botão ENTRAR branco e redondo
@@ -320,54 +291,6 @@ class _signinState extends State<signinwithbackground2> {
                                 ),
                               ),
                             ],
-                          ),
-                        ),
-                        ),
-                        const SizedBox(height: 24),
-                        // Ícones Facebook e Google
-                        Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          _buildSocialButton(
-                            icon: Icons.facebook,
-                            color: Color(0xFF1877F2),
-                            backgroundColor: Colors.white,
-                            iconColor: Color(0xFF1877F2),
-                            onTap: () {
-                              // TODO: Implementar login com Facebook
-                              Fluttertoast.showToast(msg: TranslationHelper.translateSync(context, 'Login com Facebook em breve', 'Facebook login coming soon'));
-                            },
-                          ),
-                          SizedBox(width: 20),
-                          _buildSocialButton(
-                            icon: FontAwesomeIcons.google,
-                            color: Color(0xFF4285F4),
-                            backgroundColor: Colors.white,
-                            iconColor: Color(0xFF4285F4),
-                            onTap: () {
-                              // TODO: Implementar login com Google
-                              Fluttertoast.showToast(msg: TranslationHelper.translateSync(context, 'Login com Google em breve', 'Google login coming soon'));
-                            },
-                          ),
-                        ],
-                        ),
-                        const SizedBox(height: 20),
-                        // Link para registro
-                        TextButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => RegisterScreen(),
-                            ),
-                          );
-                        },
-                        child: Text(
-                          TranslationHelper.translateSync(context, 'Não tem uma conta? Registre-se', 'Don\'t have an account? Sign up'),
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.white,
-                            decoration: TextDecoration.underline,
                           ),
                         ),
                         ),
@@ -437,42 +360,6 @@ class _signinState extends State<signinwithbackground2> {
           border: InputBorder.none,
           contentPadding:
               const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSocialButton({
-    required IconData icon,
-    required Color color,
-    Color? backgroundColor,
-    Color? iconColor,
-    required VoidCallback onTap,
-  }) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(50),
-      child: Container(
-        width: 56,
-        height: 56,
-        decoration: BoxDecoration(
-          color: backgroundColor ?? color,
-          shape: BoxShape.circle,
-          border: backgroundColor != null
-              ? Border.all(color: Colors.grey.shade300, width: 1)
-              : null,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              blurRadius: 8,
-              offset: Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Icon(
-          icon,
-          color: iconColor ?? (backgroundColor != null ? Colors.grey.shade700 : Colors.white),
-          size: 28,
         ),
       ),
     );
