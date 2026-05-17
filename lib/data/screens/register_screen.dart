@@ -5,7 +5,6 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import 'package:uconnect/provider/color_provider.dart';
 import 'package:uconnect/utils/translation_helper.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class RegisterScreen extends StatefulWidget {
   @override
@@ -255,34 +254,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           ),
                         ),
                       ),
-                      const SizedBox(height: 24),
-                      // Ícones Facebook e Google
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          _buildSocialButton(
-                            icon: Icons.facebook,
-                            color: Color(0xFF1877F2),
-                            backgroundColor: Colors.white,
-                            iconColor: Color(0xFF1877F2),
-                            onTap: () {
-                              // TODO: Implementar registro com Facebook
-                              Fluttertoast.showToast(msg: TranslationHelper.translateSync(context, 'Registro com Facebook em breve', 'Facebook registration coming soon'));
-                            },
-                          ),
-                          SizedBox(width: 20),
-                          _buildSocialButton(
-                            icon: FontAwesomeIcons.google,
-                            color: Color(0xFF4285F4),
-                            backgroundColor: Colors.white,
-                            iconColor: Color(0xFF4285F4),
-                            onTap: () {
-                              // TODO: Implementar registro com Google
-                              Fluttertoast.showToast(msg: TranslationHelper.translateSync(context, 'Registro com Google em breve', 'Google registration coming soon'));
-                            },
-                          ),
-                        ],
-                      ),
                       const SizedBox(height: 20),
                       // Link para login
                       TextButton(
@@ -362,42 +333,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
           border: InputBorder.none,
           contentPadding:
               const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSocialButton({
-    required IconData icon,
-    required Color color,
-    Color? backgroundColor,
-    Color? iconColor,
-    required VoidCallback onTap,
-  }) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(50),
-      child: Container(
-        width: 56,
-        height: 56,
-        decoration: BoxDecoration(
-          color: backgroundColor ?? color,
-          shape: BoxShape.circle,
-          border: backgroundColor != null
-              ? Border.all(color: Colors.grey.shade300, width: 1)
-              : null,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              blurRadius: 8,
-              offset: Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Icon(
-          icon,
-          color: iconColor ?? (backgroundColor != null ? Colors.grey.shade700 : Colors.white),
-          size: 28,
         ),
       ),
     );

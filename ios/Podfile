@@ -27,6 +27,15 @@ require File.expand_path(File.join('packages', 'flutter_tools', 'bin', 'podhelpe
 
 flutter_ios_podfile_setup
 
+def ensure_pod_shell_scripts_executable(pods_root)
+  support = File.join(pods_root, 'Target Support Files')
+  return unless File.directory?(support)
+
+  Dir.glob(File.join(support, '**', '*.sh')).each do |path|
+    File.chmod(0o755, path) if File.file?(path)
+  end
+end
+
 target 'Runner' do
   use_frameworks!
   use_modular_headers!
@@ -41,4 +50,10 @@ post_install do |installer|
        config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '14.0'
       end
   end
+  # CocoaPods .sh must be +x; external volumes / zip copies cause GoogleMaps-xcframeworks.sh "Permission denied".
+  ensure_pod_shell_scripts_executable(installer.sandbox.root.to_s)
+end
+
+post_integrate do |installer|
+  ensure_pod_shell_scripts_executable(installer.sandbox.root.to_s)
 end
